@@ -207,11 +207,11 @@ jirl       $ra, $ra, 0
 tail36的语法是： ``tail36  $rd, symbol_name``，意思是跳转到symbol_name地址去执行, 同时将返回地址保存到$rd, ，它也使用$rd寄存器作为中间保存临时地址。它的实际反汇编是
 ```
 pcaddu18i  $rd, %call36(symbol_name)
-jirl       $rd, $rd, 0
+jirl       $zero, $rd, 0
 ```
 
 :::{caution}
-tail36需要一个寄存器，而call36默认使用$ra寄存器。``tail36 $ra, sym_name``和``call36  sym_name``是等价的。
+tail36需要一个寄存器，而call36默认使用$ra寄存器。
 
 需要注意下，这两个伪汇编指令的跳转地址范围
 ```
@@ -220,7 +220,7 @@ tail36需要一个寄存器，而call36默认使用$ra寄存器。``tail36 $ra, 
 
 :::
 
-5.分支指令伪汇编
+5. 分支指令伪汇编
 
 ```
 bgt    $rj, $rd, si18 or symbol
@@ -264,19 +264,351 @@ bgez 	$rd, si18 or symbol
 这个小节主要处理将一个地址加载到寄存器，这里面包含很多的知识点，因此单独作为一个小节来说明。
 
 
+1. ``la.local  $rd, sym_name``
+
+```
+la.local  $rd, sym_name
+```
+la.local加载当前模块中的符号。
 
 
 
+```
+la.local  $t0, sym_name
+``` 
+实际会扩展成下面指令序列(采用默认的编译参数)
+
+
+```
+原始伪代码：
+la.local  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name) 
+addi.d     $t0, $t0, %pc_lo12(sym_name)
+```
+
+如果使用as汇编器参数 **\-mla-local-with-abs**，则会扩展成下面的指令序列
+
+```bash
+$ loongarch64-linux-musl-as test_asm_main.S -mla-local-with-abs -o test_asm_main.S.o -c
+$ loongarch64-linux-musl-objdump -alDr -M no-aliases test_asm_main.S.o > test_asm_main.S.o.s
+```
+
+```
+原始伪代码：
+la.local  $t0, sym_name
+
+实际扩展序列：
+lu12i.w   $t0, %abs_hi20(sym_name)
+ori       $t0, $t0, %abs_lo12(sym_name)
+lu32i.d   $t0, %abs64_lo20(sym_name)
+lu52i.d   $t0, $t0, %abs64_hi12(sym_name)
+```
+
+2. ``la.local  $rd, $rj, sym_name``
+
+```
+la.local  $t0, $t1, sym_name
+``` 
+上述语义是将sym_name符号的地址，加载到``$t0``寄存器中，此时``$t1``作为一个临时的寄存器存放中间的结果。
+
+实际会扩展成下面指令序列(采用默认的编译参数)
+
+```
+原始伪代码：
+la.local  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t1, $zero, %pc_lo12(sym_name)
+lu32i.d    $t1, %pc64_lo20(sym_name)
+lu52i.d    $t1, $t1, %pc64_hi12(sym_name)
+add.d      $t0, $t0, $t1
+```
+
+其实就是将一条宏指令扩展成五条指令。
+
+- 如果使用as汇编器参数 **\-mla-local-with-abs**，则会扩展成下面的指令序列
+
+```
+原始伪代码：
+la.local  $t0, $t1, sym_name
+
+实际扩展序列：
+lu12i.w   $t0, %abs_hi20(sym_local)
+ori       $t0, $t0, %abs_lo12(sym_local)
+lu32i.d   $t0, %abs64_lo20(sym_local)
+lu52i.d   $t0, $t0, %abs64_hi12(sym_local)
+```
+
+注意此时 ``$t1``临时寄存器其实没有使用。宏指令替换成五条指令。
+
+
+:::{caution}
+```
+注意 ``la.local  $t0, sym_name`` 是加载本模块的符号地址，此时的符号地址是小范围的， 大概在[-2G, 2G]。
+而``la.local  $t0, $t1, sym_name`` 是加载较大符号的范围地址。超出2G的符号使用此宏指令。
+```
+:::
+
+
+3. ``la.global  $rd, sym_name``
+
+```
+la.global  $t0, sym_name
+``` 
+加载一个全局符号sym_name地址，到寄存器``$t0``中。
+
+```
+原始伪代码：
+la.global  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %got_pc_hi20(sym_name)
+ld.d       $t0, $t0, %got_pc_lo12(sym_name)
+```
+``la.global``是先获得符号位于GOT表的地址，然后将GOT表中符号的地址从内存中读取出来。此时涉及到一条访存指令。
+
+
+- 如果使用as汇编器参数 **\-mla-global-with-pcrel**，则会扩展成下面的指令序列
+
+```
+原始伪代码：
+la.global  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t0, $t0, %pc_lo12(sym_name)
+```
+
+
+- 如果使用as汇编器参数 **\-mla-global-with-abs**，则会扩展成下面的指令序列
+
+```
+原始伪代码：
+la.global  $t0, sym_name
+
+实际扩展序列：
+lu12i.w    $t0, %abs_hi20(sym_name)
+ori        $t0, $t0, %abs_lo12(sym_name)
+lu32i.d    $t0, %abs64_lo20(sym_name)
+lu52i.d    $t0, $t0, %abs64_hi12(sym_name)
+```
+
+4. ``la.global  $rd, $rj, sym_name``
+
+上述语义是将sym_name符号的地址，加载到``$t0``寄存器中，此时``$t1``作为一个临时的寄存器存放中间的结果。
+
+实际会扩展成下面指令序列(采用默认的编译参数)
+
+```
+原始伪代码：
+la.global  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %got_pc_hi20(sym_name)
+addi.d     $t1, $zero, %got_pc_lo12(sym_name)
+lu32i.d    $t1, %got64_pc_lo20(sym_name)
+lu52i.d    $t1, $t1, %got64_pc_hi12(sym_name)
+ldx.d      $t0, $t0, $t1
+```
+其实就是将一条宏指令扩展成五条指令。
+
+
+- 如果使用as汇编器参数 **\-mla-global-with-pcrel**，则会扩展成下面的指令序列
+
+```
+原始伪代码：
+la.global  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t1, $zero, %pc_lo12(sym_name)
+lu32i.d    $t1, %pc64_lo20(sym_name)
+lu52i.d    $t1, $t1, %pc64_hi12(sym_name)
+add.d      $t0, $t0, $t1
+```
+
+- 如果使用as汇编器参数 **\-mla-global-with-abs**，则会扩展成下面的指令序列
+
+```
+原始伪代码：
+la.global  $t0, $t1, sym_name
+
+实际扩展序列：
+lu12i.w    $t0, %abs_hi20(sym_name)
+ori        $t0, $t0, %abs_lo12(sym_name)
+lu32i.d    $t0, %abs64_lo20(sym_name)
+lu52i.d    $t0, $t0, %abs64_hi12(sym_name)
+```
+
+:::{caution}
+```
+注意 ``la.global  $t0, sym_name`` 是加载本模块的符号地址，此时的符号地址是小范围的， 大概在[-2G, 2G]。
+而``la.global  $t0, $t1, sym_name`` 是加载较大符号的范围地址。超出2G的符号使用此宏指令。
+
+可以使用参数 **\-mla-global-with-abs** 和 **\-mla-global-with-pcrel** 进行替换
+```
+:::
+
+
+5. ``la是la.global宏指令的别名``
+
+也就是说， ``la $t0, $t1, sym_name `` 和 ``la.global  $t0, $t1, sym_name``是相等的。
+
+
+6. ``la.abs  $t0, sym_name``
+
+实际会扩展成下面指令序列(采用默认的编译参数)
+
+```
+原始伪代码：
+la.abs  $t0, sym_name
+
+实际扩展序列：
+lu12i.w    $t0, %abs_hi20(sym_name)
+ori        $t0, $t0, %abs_lo12(sym_name)
+lu32i.d    $t0, %abs64_lo20(sym_name)
+lu52i.d    $t0, $t0, %abs64_hi12(sym_name)
+```
+
+
+7. ``la.pcrel  $t0, sym_name``
+
+实际会扩展成下面指令序列(采用默认的编译参数)
+
+```
+原始伪代码：
+la.abs  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t0, $t0, %pc_lo12(sym_name)
+```
+
+8. ``la.pcrel  $t0, $t1, sym_name``
+
+实际会扩展成下面指令序列(采用默认的编译参数)
+
+```
+原始伪代码：
+la.abs  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t1, $zero, %pc_lo12(sym_name)
+lu32i.d    $t1, %pc64_lo20(sym_name)
+lu52i.d    $t1, $t1, %pc64_hi12(sym_name)
+add.d      $t0, $t0, $t1
+```
+
+
+9. ``la.got  $t0, sym_name``
+实际会扩展成下面指令序列(采用默认的编译参数)
+
+```
+原始伪代码：
+la.got  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %got_pc_hi20(sym_name)
+ld.d       $t0, $t0, %got_pc_lo12(sym_name)
+```
+
+10. ``la.got  $t0, $t1, sym_name``
+
+实际会扩展成下面指令序列(采用默认的编译参数)
+
+```
+原始伪代码：
+la.got  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %got_pc_hi20(sym_got_large)
+addi.d     $t1, $zero, %got_pc_lo12(sym_got_large)
+lu32i.d    $t1, %got64_pc_lo20(sym_got_large)
+lu52i.d    $t1, $t1, %got64_pc_hi12(sym_got_large)
+ldx.d      $t0, $t0, $t1
+```
+
+11. ``nop``
+
+nop宏指令是一条空指令，不会对32个通用寄存器进行任何修改，只是将pc设置为pc+4指向下一条指令。
+
+指令编码为``0x03400000``， 等价于指令``andi  $zero, $zero, 0x0``
 
 
 
 ### 内嵌汇编
 
+内联汇编或者内嵌汇编(Inline Assembly)，允许在高级语言C/C++中嵌入汇编指令。
+
+比如下面的例子：
+```c
+int main()
+{
+	asm volatile("move $r23, $r24");
+	asm volatile("addi.w $r23, $r24, 1");
+}
+```
+
+有时候也写作下面的方式：
+
+```c
+int main()
+{
+	__asm__ __volatile__("move $r23, $r24");
+	__asm__ __volatile__("addi.w $r23, $r24, 1");
+}
+```
+
+内敛汇编的语法如下所示：
+
+asm volatile ( AssemblerTemplate
+				: OutputOperands
+				: InputOperands
+				: Clobbers )
+
+
+asm goto(AssemblerTemplate
+			: OutputOperands
+			: InputOperands
+			: Clobbers
+			: GotoLabels)
+
+
+1. OutputOperands
+
+```c
+int result;
+int d1, d2;
+... ...
+asm volatile("add.w %0 , %1 , %2 \n\t"
+				: "=r" (result)
+				: "r" (d1), "r" (d2):);
+```
+上述例子中，``"=r" (result)``就是输出操作数，其中，``=r``是约束，r表示定点的寄存器，=表示输出。
+
+
+2. InputOperands
+
+``"r" (d1), "r" (d2)``是输入操作数，r表示定点的寄存器，多个输入操作数使用``,``分割。
+
+
+3. Clobbers
+指明AssemblerTemplate中的指令会修改的寄存器的值。
+``memory``表明内存会被修改。
+
+
+更多具体的约束可以查看[GCC Constraints](https://github.com/gcc-mirror/gcc/blob/master/gcc/config/loongarch/constraints.md)
 
 
 ### 参考阅读
 
 1. [Assembly Language Programming Guide LoongArch, 英文版](https://github.com/loongson/la-asm-manual/releases/download/release-1.1/la-asm-manual-v1.1.pdf)
+
+2. [LoongArch ABI 2.50](https://github.com/loongson/la-abi-specs/releases/download/v2.50/la-abi-v2.50.pdf)
 
 ## 链接脚本
 
