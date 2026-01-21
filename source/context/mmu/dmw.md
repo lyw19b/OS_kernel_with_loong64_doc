@@ -67,7 +67,100 @@ CSR.DMW**2**和CSR.DWM**3**: 此两个配置寄存器窗只用于 **Load、Store
 
 ### 代码示例如何在内核中使用
 
+```c
+#define DMW_PABITS	48
 
+// DMW Register Context
+#define CSR_DMW0_PLV0		1 << 0
+#define CSR_DMW0_VSEG		0x8000
+#define CSR_DMW0_BASE		(CSR_DMW0_VSEG << DMW_PABITS)
+#define CSR_DMW0_INIT		(CSR_DMW0_BASE | CSR_DMW0_PLV0)
+
+#define CSR_DMW1_PLV0		1 << 0
+#define CSR_DMW1_MAT		1 << 4
+#define CSR_DMW1_VSEG		0x9000
+#define CSR_DMW1_BASE		(CSR_DMW1_VSEG << DMW_PABITS)
+#define CSR_DMW1_INIT		(CSR_DMW1_BASE | CSR_DMW1_MAT | CSR_DMW1_PLV0)
+
+// CSR DMW Defined
+#define LOONGARCH_CSR_DMWIN0		0x180	/* 64 direct map win0: MEM & IF */
+#define LOONGARCH_CSR_DMWIN1		0x181	/* 64 direct map win1: MEM & IF */
+#define LOONGARCH_CSR_DMWIN2		0x182	/* 64 direct map win2: MEM */
+#define LOONGARCH_CSR_DMWIN3		0x183	/* 64 direct map win3: MEM */
+
+// Code here.
+
+// 1. UC, PLV0, 0x8000 xxxx xxxx xxxx
+li.d		t0, CSR_DMW0_INIT	
+csrwr		t0, LOONGARCH_CSR_DMWIN0
+// 2. CA, PLV0, 0x9000 xxxx xxxx xxxx
+li.d		t0, CSR_DMW1_INIT	
+csrwr		t0, LOONGARCH_CSR_DMWIN1
+
+```
+
+CSR_DMW0_INIT: CSR_DMW0_PLV0为1表示只有特权级0才能使用。CSR_DMW0_BASE表示将虚拟地址0X8000 xxxx xxxx xxxx
+映射到0Xxxxx xxxx xxxx上， 此时访问0X8000 xxxx xxxx xxxx的内存类型MAT=0，表示是UnCached的。
+
+``csrwr		t0, LOONGARCH_CSR_DMWIN0`` 此时将内容写入DMW0寄存器中。
+
+
+CSR_DMW1_INIT: CSR_DMW0_PLV0为1表示只有特权级0才能使用。CSR_DMW1_BASE表示将虚拟地址0X9000 xxxx xxxx xxxx
+映射到0Xxxxx xxxx xxxx上，并且MAT=1，表示通过虚拟地址0X9000 xxxx xxxx xxxx访问时，内存类型是Cached，可缓存的。
+
+:::{tip}
+注意上述这样做的目的在于，如果我们访问正常的内存(即需要经过Cache的)，可以通过地址0x9000 xxxx xxxx xxxx访问，
+如果我们想要访问设备的内存（即不需要经过Cached, UnCached类型），可以通过0x8000 xxxx xxxx xxxx访问。
+
+假设我们访问物理地址``0x1ff0_1f00``这个地址的内容：
+
+如果是设备内存的话，我们使用虚拟地址``0x800000001ff01f00``来访问。
+
+如果是正常的内存，我们使用虚拟地址0x``900000001ff01f00``来访问。
+
+如果我们访问正常物理地址``0x20000000``这个地址的内容：
+
+我们可以使用``0x9000000020000000``来访问（推荐的方式），其实也可以使用``0x8000000020000000``来访问，读取的内存值是
+一致的，唯一的区别是他们访问的速度不一致，前者会放到Cache中，而后者直接读内存或者写回到内存，导致性能低下。
+
+:::
+
+
+:::{note}
+CSR.DMW直接映射模式有几点需要注意：     
+
+1. DMW0/1 可以用于取指（Fetch），也可以访存（Load/Store）；而DMW2/3 只能用于访存（Load/Store）。    
+	
+2. 虚拟地址多次命中DMW.x的行为是不确定的。比如下面的代码：
+   ```asm
+   # 向DMW0写入PLV0，Cache，VSEG=8
+   li.d  $t0, 0x8000 0000 0000 0011
+   csrwr $t0, 0x180 // DMW0
+
+   # 向DMW1写入PLV0/PLV3，UnCache，VSEG=8
+   li.d  $t0, 0x8000 0000 0000 0009
+   csrwr $t0, 0x181 // DMW1
+   ```
+   此时如果使用0x8000 xxxx xxxx xxxx访问时，结果行为会不预期，禁止这样使用。
+
+3. 可以使用多个DMW映射到同一个块地址空间。比如我们上面将``0x8000 xxxx xxxx xxxx``和
+   ``0x9000 xxxx xxxx xxxx`` 映射到了``xxxx xxxx xxxx``，可以通过不同的虚拟地址使用
+   不同的内存属性进行访问。
+
+4. 主要DMW的使用很方便，但是仅仅限定于特权态，在Linux中是PLV0。如果说你将PLV3用户态也设置成了1   
+   的话，这就导致，几乎全部的物理内存都可以被用户态的程序访问，这是不允许、禁止的。    
+   除非不故意设置成用户态可访问！！！。
+
+5. 在Linux内核中，通常使用``0x9000 xxxx xxxx xxxx``作为可缓存Cached内存访问的虚拟地址，
+   使用``0x8000 xxxx xxxx xxxx``作为设备的访问虚拟地址。
+
+   至于为什么用``0x9000``和``0x8000``是因为Loongson之前的很多固件使用这个地址，因此沿用了
+   这个地址空间段。
+
+   你可以不按照Linux的使用规约，自己定义别的，也是可以的，比如VSEG=4'b0110或者VSEG=4'b1110，
+   也是合法的。
+
+:::
 
 如何地址划分，划分了怎么处理等等
 
