@@ -288,6 +288,14 @@ TLB 表项的**比较部分**包括：
 TLB和地址转换是什么关系?
 
 
+:::{tip}
+龙芯架构没有规定必须实现 TLB 的硬件初始化，让启动阶段的软件通过执行
+```asm
+invtlb 0, $zero, $zero
+```
+来完成这一功能。
+:::
+
 ## TLB相关的指令
 
 TLB 相关的指令主要涉及对 TLB 的查找、读、写、无效等操作，用于进行 TLB 的填充、更新与一致性   
@@ -409,7 +417,7 @@ TLB 相关的 CSR 按照功能主要分为三类，
 
 --------
 
-
+(csr_pgd_ctx)=
 **第二类包括**：
    - ❖PGDL：低半地址空间全局目录基址，该寄存器用于配置低半地址空间的全局目录的基址。要求全局目录的基址一定是4KB      
       边界地址对齐的，所以该寄存器的最低 12 位软件不可配置，只读恒为 0。
@@ -570,6 +578,7 @@ TLB 相关的 CSR 按照功能主要分为三类，
 
 
 
+(tlb_excption_handle)=
 ## TLB相关的例外
 
 TLB 进行虚实地址转换过程由硬件自动完成，但是当 TLB 中没有匹配项，或者尽管匹配但页表项无效     
@@ -614,5 +623,150 @@ TLB 访问接口 CSR，意味着该例外允许在其它例外的处理过程中
 - ❖ 页不可执行例外：取指操作的虚地址在 TLB 中找到了匹配，且 V=1，且特权等级合规的项，但是    
 该页表项的 NX 位为 1，将触发该例外。
 
+
+(cpu_inner_tlb_lookup)=
+## CPU内部TLB查找流程示例
+
+```text
+//  va: 待查找虚地址
+//  mem_type: 访存操作类型，FETCH 是取指操作，LOAD 是 load 操作，STORE 是 store 操作
+//  plv：当前特权等级，即 CSR.CRMD.PLV 的值
+//  pa: 转换后的物理地址
+//  mat: 转换后得到的存储访问类型
+//  VALEN: 虚地址的有效位数
+//  PALEN: 物理地址的有效位数
+//  STLB[][]: STLB[N][M]表示 STLB 第 N 路第 M 项
+//  STLB_WAY: STLB 的路数
+//  STLB_INDEX: STLB 每一路组数的 2 的幂指数，即每一路有 2STLB_INDEX 组
+//  MTLB[]: MTLB[N]表示 MTLB 的第 N 项
+//  MTLB_ENTRIES: MTLB 的项数
+
+/**************************************************
+///  查找 STLB
+**************************************************/
+stlb_found = 0
+stlb_ps = CSR.STLBPS.PS
+stlb_idx = va[stlb_ps+STLB_INDEX:stlb_ps+1]
+for way in range(STLB_WAY)：
+   if (STLB[way][stlb_idx].E==1) and
+   ((STLB[way][stlb_idx].G==1) or (STLB[way][stlb_idx].ASID==CSR.ASID.ASID))
+   and
+   (STLB[way][stlb_idx].VPPN[VALEN-1:stlb_ps+1]==va[VALEN-1:stlb_ps+1]) :
+      if (stlb_found==0) :
+         stlb_found = 1
+         if (va[stlb_ps]==0) :
+            sfound_v = STLB[way][stlb_idx].V0
+            sfound_d = STLB[way][stlb_idx].D0
+            sfound_nr = STLB[way][stlb_idx].NR0
+            sfound_nx = STLB[way][stlb_idx].NX0
+            sfound_mat = STLB[way][stlb_idx].MAT0
+            sfound_plv = STLB[way][stlb_idx].PLV0
+            sfound_rplv = STLB[way][stlb_idx].RPLV0
+            sfound_ppn = STLB[way][stlb_idx].PPN0
+         else :
+            sfound_v = STLB[way][stlb_idx].V1
+            sfound_d = STLB[way][stlb_idx].D1
+            sfound_nr = STLB[way][stlb_idx].NR1
+            sfound_nx = STLB[way][stlb_idx].NX1
+            sfound_mat = STLB[way][stlb_idx].MAT1
+            sfound_plv = STLB[way][stlb_idx].PLV1
+            sfound_rplv = STLB[way][stlb_idx].RPLV1
+            sfound_ppn = STLB[way][stlb_idx].PPN1
+      else :
+         # 出现多项命中，处理器运行结果不确定
+
+// 此时STLB查找完成
+
+
+/**************************************************
+///  查找 MTLB
+**************************************************/
+
+mtlb_found = 0
+for i in range(MTLB_ENTRIES) :
+   if (MTLB[i].E==1) and
+      ((MTLB[i].G==1) or (MTLB[i].ASID==CSR.ASID.ASID)) and
+      (MTLB[i].VPPN[VALEN-1:MTLB[i].PS+1]==va[VALEN-1: MTLB[i].PS+1]) :
+         if (mtlb_found==0) :
+            mtlb_found = 1
+            mfound_ps = MTLB[i].PS
+            if (va[mfound_ps]==0) :
+               mfound_v = MTLB[i].V0
+               mfound_d = MTLB[i].D0
+               mfound_nr = MTLB[i].NR0
+               mfound_nx = MTLB[i].NX0
+               mfound_mat = MTLB[i].MAT0
+               mfound_plv = MTLB[i].PLV0
+               mfound_rplv = MTLB[i].RPLV0
+               mfound_ppn = MTLB[i].PPN0
+            else :
+               mfound_v = MTLB[i].V1
+               mfound_d = MTLB[i].D1
+               mfound_nr = MTLB[i].NR1
+               mfound_nx = MTLB[i].NX1
+               mfound_mat = MTLB[i].MAT1
+               mfound_plv = MTLB[i].PLV1
+               mfound_rplv = MTLB[i].RPLV1
+               mfound_ppn = MTLB[i].PPN1
+         else:
+         #出现多项命中，处理器运行结果不确定
+
+// 此时MTLB查找完成
+
+
+// 下面按照STLB和MTLB查找的结构处理：
+
+if (stlb_found==1) and (mtlb_found==1) :
+   #出现多项命中，处理器运行结果不确定
+else if (stlb_found==1) :
+   found_v = sfound_v
+   found_d = sfound_d
+   found_nr = sfound_nr
+   found_nx = sfound_nx
+   found_mat = sfound_mat
+   found_plv = sfound_plv
+   found_rplv = sfound_rplv
+   found_ppn = sfound_ppn
+   found_ps = stlb_ps
+else if (mtlb_found==1) :
+   found_v = mfound_v
+   found_d = mfound_d
+   found_nr = mfound_nr
+   found_nx = mfound_nx
+   found_mat = mfound_mat
+   found_plv = mfound_plv
+   found_rplv = mfound_rplv
+   found_ppn = mfound_ppn
+   found_ps = mfound_ps
+else :
+   // Raise SignalException(TLBR)
+   // 报 TLB 重填例外
+
+
+if (found_v==0) :
+   case mem_type :
+      FETCH : SignalException(PIF)#报取指操作页无效例外
+      LOAD: SignalException(PIL)#报 load 操作页无效例外
+      STORE : SignalException(PIS)#报 store 操作页无效例外
+else if (mem_type==FETCH) and (found_nx==1) :
+   SignalException(PNX)
+   #报页不可执行例外
+else if ((found_rplv==0) and (plv > found_plv)) or
+         ((found_rplv==1) and (plv!= found_plv)) :
+   SignalException(PPI)
+   #报页特权等级不合规例外
+else if (mem_type==LOAD) and (found_nr==1) :
+   SignalException(PNR)
+   #报页不可读例外
+else if (mem_type==STORE) and (found_d==0)
+         and ((plv==3) or (CSR.MISC[16+plv]==0)) :
+   SignalException(PME)
+   #禁止写允许检查功能未开启
+   #报页修改例外
+else :
+   pa = {found_ppn[PALEN-13:found_ps-12], va[found_ps-1:0]}
+   mat = found_mat
+
+```
 
 
