@@ -5,10 +5,6 @@
 假设我们现在使用4K页，或者2M页面，访问一个虚拟地址为0xfffff8007898的地址。
 下面我们按照Kernel的视角来看如何处理。
 
-全部以代码说明，切勿全是文字性的表述！！！
-
-以Linux为主，从头到尾梳理
-
 ## 地址翻译相关的初始化
 
 下面我们详细的分析Linux内核中LoongArch的TLB初始化相关内容。
@@ -137,7 +133,75 @@ static void setup_ptwalker(void)
 
 3. 设置TLB相关的例外配置
 
+异常号如下所示，具体的使用说明我们在下一章详细说明！
 ```c
+/* ExStatus.ExcCode */
+#define EXCCODE_RSV     0  /* Reserved */
+#define EXCCODE_TLBL    1  /* TLB miss on a load */
+#define EXCCODE_TLBS    2  /* TLB miss on a store */
+#define EXCCODE_TLBI    3  /* TLB miss on a ifetch */
+#define EXCCODE_TLBM    4  /* TLB modified fault */
+#define EXCCODE_TLBNR      5  /* TLB Read-Inhibit exception */
+#define EXCCODE_TLBNX      6  /* TLB Execution-Inhibit exception */
+#define EXCCODE_TLBPE      7  /* TLB Privilege Error */
+#define EXCCODE_ADE     8  /* Address Error */
+   #define EXSUBCODE_ADEF     0  /* Fetch Instruction */
+   #define EXSUBCODE_ADEM     1  /* Access Memory*/
+#define EXCCODE_ALE     9  /* Unalign Access */
+#define EXCCODE_BCE     10 /* Bounds Check Error */
+#define EXCCODE_SYS     11 /* System call */
+#define EXCCODE_BP      12 /* Breakpoint */
+#define EXCCODE_INE     13 /* Inst. Not Exist */
+#define EXCCODE_IPE     14 /* Inst. Privileged Error */
+#define EXCCODE_FPDIS      15 /* FPU Disabled */
+#define EXCCODE_LSXDIS     16 /* LSX Disabled */
+#define EXCCODE_LASXDIS    17 /* LASX Disabled */
+#define EXCCODE_FPE     18 /* Floating Point Exception */
+   #define EXCSUBCODE_FPE     0  /* Floating Point Exception */
+   #define EXCSUBCODE_VFPE    1  /* Vector Exception */
+#define EXCCODE_WATCH      19 /* WatchPoint Exception */
+   #define EXCSUBCODE_WPEF    0  /* ... on Instruction Fetch */
+   #define EXCSUBCODE_WPEM    1  /* ... on Memory Accesses */
+#define EXCCODE_BTDIS      20 /* Binary Trans. Disabled */
+#define EXCCODE_BTE     21 /* Binary Trans. Exception */
+#define EXCCODE_GSPR    22 /* Guest Privileged Error */
+#define EXCCODE_HVC     23 /* Hypercall */
+#define EXCCODE_GCM     24 /* Guest CSR modified */
+   #define EXCSUBCODE_GCSC    0  /* Software caused */
+   #define EXCSUBCODE_GCHC    1  /* Hardware caused */
+#define EXCCODE_SE      25 /* Security */
+```
+
+
+(exception_table_example)=
+```c
+// 所有异常表
+void *exception_table[EXCCODE_INT_START] = {
+   [0 ... EXCCODE_INT_START - 1] = handle_reserved,
+
+   [EXCCODE_TLBI]    = handle_tlb_load,
+   [EXCCODE_TLBL]    = handle_tlb_load,
+   [EXCCODE_TLBS]    = handle_tlb_store,
+   [EXCCODE_TLBM]    = handle_tlb_modify,
+   [EXCCODE_TLBNR]      = handle_tlb_protect,
+   [EXCCODE_TLBNX]      = handle_tlb_protect,
+   [EXCCODE_TLBPE]      = handle_tlb_protect,
+   [EXCCODE_ADE]     = handle_ade,
+   [EXCCODE_ALE]     = handle_ale,
+   [EXCCODE_BCE]     = handle_bce,
+   [EXCCODE_SYS]     = handle_sys,
+   [EXCCODE_BP]      = handle_bp,
+   [EXCCODE_INE]     = handle_ri,
+   [EXCCODE_IPE]     = handle_ri,
+   [EXCCODE_FPDIS]      = handle_fpu,
+   [EXCCODE_LSXDIS]  = handle_lsx,
+   [EXCCODE_LASXDIS] = handle_lasx,
+   [EXCCODE_FPE]     = handle_fpe,
+   [EXCCODE_WATCH]      = handle_watch,
+   [EXCCODE_BTDIS]      = handle_lbt,
+};
+
+
 // 将handle_tlb_refill的代码拷贝到tlbrentry中。
 memcpy((void *)tlbrentry, handle_tlb_refill, 0x80);
 
@@ -167,6 +231,47 @@ csr_write64(eentry, LOONGARCH_CSR_EENTRY);
 
 
 假设我们CPU上电后，操作权限交给了Kernel，此时我们还是运行在物理地址0x200000，此时虚拟地址等于物理地址。
+
+:::{tip}
+复位将重新处理器核中的所有逻辑，将电路置于确定的状态。这里将给出复位后处理器的状态的定义。
+
+复位后第一条指令的 PC 是 0x1C000000。由于复位撤销后 MMU 一定处于直接地址翻译模式，所以复
+
+位后所取的第一条指令的物理地址也是 0x1C000000。
+
+复位撤销后，处于确定状态的寄存器内容有：
+
+ - CSR.CRMD 的 PLV=0，IE=0，DA=1，PG=0，DATF=0，DATM=0，WE=0；
+
+ - CSR.EUEN 的 FPUen、VPUen、XVPUen、BTUen 均为 0；
+
+ - CSR.MISC 中的所有可配置位均为 0；
+
+ - CSR.ECFG 中的 VS 和 LIE 均为 0；
+
+ - CSR.ESTAT 中 IS[1:0]均为 0；
+
+ - CSR.RVACFG 中的 RDVA=0；
+
+ - CSR.TCFG 的 En=0；
+
+ - CSR.LLBCTL 的 KLO=0；
+
+ - CSR.TLBRERA 的 IsTLBR=0；
+
+ - CSR.ERRCTL 的 IsMERR=0；
+
+ - 所有实现的 CSR.DMW 中的 PLV0~PLV3 均为 0；
+
+ - 所有实现的 CSR.PMCFG 中除 EvCode 之外的所有可配置位均为 0；
+
+ - 所有实现的数据断点控制 CSR 中的所有可配置位均为 0；
+
+ - 所有实现的指令断点控制 CSR 中的所有可配置位均为 0；
+
+ - CSR.DBG 中的 DS=0。
+:::
+
 
 具体涉及到的相关配置寄存器，请查看上个章节我们的描述！
 
@@ -446,19 +551,574 @@ static inline pgd_t *pgd_offset_pgd(pgd_t *pgd, unsigned long address)
 
 ## 页表的遍历页表
 
+假设我们现在使用4K页，或者2M页面，使用软件重填机制（硬件重填机制相似），   
+访问一个虚拟地址为0xfffff8007898的地址。    
 
-## 如果TLB中没有映射
+下面我们按照Kernel的视角来看如何处理。
 
-## 如果页表项的V=0
-
-
-## 如果写操作页表项D=0
-
-## 如果权限不合法
+我们还是以Linux内核代码为例说明。
 
 
-## 虚拟地址到物理地址的映射
-一个具体的示例代码
+假设内核有下面的汇编代码需要执行：
+```asm
+li.d  $t0, 0xfffff8007898
+ld.d  $t1, $t0, 0
+```
+
+此时当执行指令``ld.d  $t1, $t0, 0``时，首先
+
+CPU按照[<u>内部TLB查找流程</u>](#cpu_inner_tlb_lookup)看是否有对应的STLB和MTLB命中，
+如果没有命中的话，直接抛出TLB重填例外。
+
+## 情况1. 如果TLB中没有映射
+
+如果CPU抛出TLB重填例外，此时CPU跳转到CSR.TLBRENTRY也就是``handle_tlb_refill``
+函数执行，具体的分析看[<u>三级页表重填的示例代码</u>](#three_level_page_table_refill)。
+
+:::{tip}
+当触发 TLB 重填例外时，处理器硬件会进行如下操作：
+
+❖将 CSR.CRMD 的 PLV、IE 分别存到 CSR.TLBRPRMD 的 PPLV、PIE 中，然后将 CSR.CRMD 的   
+PLV 置为 0，IE 置为 0，DA 置为 1，PG 置为 0；
+
+❖对于支持 Watch 功能的实现，还要将 CSR.CRMD 的 WE 存到 CSR.TLBRPRMD 的 PWE 中，然后    
+将 CSR.CRMD 的 WE 置为 0；
+
+❖将触发例外指令的 PC 的[GRLEN-1:2]位记录到 CSR.TLBRERA 的 ERA 域中，将 CSR.TLBRERA    
+的 IsTLBR 置为 1；
+
+❖将触发该例外的访存虚地址（如果是取指触发的则就是 PC）记录到 CSR.TLBRBADV 中，将虚地    
+址的[PALEN-1:13]位记录到 CSR.TLBREHI 的 VPPN 域中；
+
+❖跳转到 CSR.TLBRENTTRY 所配置的例外入口处取指。     
+ 
+
+当软件执行 ERTN 指令从 TLB 重填例外执行返回时，处理器硬件会完成如下操作：    
+
+❖将 CSR.TLBRPRMD 中的 PPLV、PIE 值恢复到 CSR.CRMD 的 PLV、IE 中；
+
+❖对于支持 Watch 功能的实现，还要将 CSR.TLBRPRMD 中的 PWE 值恢复到 CSR.CRMD 的 WE 中；
+
+❖将 CSR.CRMD 的 DA 置为 0，PG 置为 1；
+
+❖将 CSR.TLBRERA 的 IsTLBR 置为 0；
+
+❖跳转到 CSR.TLBRERA 所记录的地址处取指。
+
+:::
 
 
+:::{tip}
+TLB软件重填使用频率高，因此代码都比较精简，一般情况下，代码都是通用的！可参看我们上个章节给出的例子，需要结合CSR.PWCH和CSR.PWCL寄存器。
+:::
+
+TLB重填完成后，会继续执行访存指令``ld.d  $t1, $t0, 0``
+
+CPU按照[<u>内部TLB查找流程</u>](#cpu_inner_tlb_lookup)由于我们已经进行了TLB重填异常处理，因此我们
+肯定会命中TLB表项。
+
+然后我们继续分析下面的情况。
+
+## 情况2. 如果页表项的V=0
+
+如此CPU查找到TLB的表项中V=0，也就是说，此虚拟地址对应的物理页不存在，因此会抛出异常
+
+此时区分访存的类型，抛出不同的异常处理：
+  - FETCH : SignalException(PIF) #报取指操作页无效例外
+  - LOAD:   SignalException(PIL) #报 load 操作页无效例外
+  - STORE : SignalException(PIS) #报 store 操作页无效例外
+
+按照我们当前的例子，我们是load指令出了异常，因此执行PIL异常处理。
+
+按照上面的初始化流程[<u>异常初始化</u>](#exception_table_example)，此时CPU执行对应异常号为``EXCCODE_TLBL``的例外。
+
+也就是执行函数handle_tlb_load，下面分析Linux中LoongArch有关的历程代码。
+
+(example_handle_tlb_load)=
+```text
+SYM_CODE_START(handle_tlb_load)
+   UNWIND_HINT_UNDEFINED
+   csrwr    t0, EXCEPTION_KS0
+   csrwr    t1, EXCEPTION_KS1
+   csrwr    ra, EXCEPTION_KS2
+
+   /*
+    * The vmalloc handling is not in the hotpath.
+    */
+   csrrd    t0, LOONGARCH_CSR_BADV
+   bltz     t0, vmalloc_load
+   csrrd    t1, LOONGARCH_CSR_PGDL
+
+vmalloc_done_load:
+   /* Get PGD offset in bytes */
+   bstrpick.d  ra, t0, PTRS_PER_PGD_BITS + PGDIR_SHIFT - 1, PGDIR_SHIFT
+   alsl.d      t1, ra, t1, 3
+#if CONFIG_PGTABLE_LEVELS > 3
+   ld.d     t1, t1, 0
+   bstrpick.d  ra, t0, PTRS_PER_PUD_BITS + PUD_SHIFT - 1, PUD_SHIFT
+   alsl.d      t1, ra, t1, 3
+#endif
+#if CONFIG_PGTABLE_LEVELS > 2
+   ld.d     t1, t1, 0
+   bstrpick.d  ra, t0, PTRS_PER_PMD_BITS + PMD_SHIFT - 1, PMD_SHIFT
+   alsl.d      t1, ra, t1, 3
+#endif
+   ld.d     ra, t1, 0
+
+   /*
+    * For huge tlb entries, pmde doesn't contain an address but
+    * instead contains the tlb pte. Check the PAGE_HUGE bit and
+    * see if we need to jump to huge tlb processing.
+    */
+   rotri.d     ra, ra, _PAGE_HUGE_SHIFT + 1
+   bltz     ra, tlb_huge_update_load
+
+   rotri.d     ra, ra, 64 - (_PAGE_HUGE_SHIFT + 1)
+   bstrpick.d  t0, t0, PTRS_PER_PTE_BITS + PAGE_SHIFT - 1, PAGE_SHIFT
+   alsl.d      t1, t0, ra, _PTE_T_LOG2
+
+#ifdef CONFIG_SMP
+smp_pgtable_change_load:
+   ll.d     t0, t1, 0
+#else
+   ld.d     t0, t1, 0
+#endif
+   andi     ra, t0, _PAGE_PRESENT
+   beqz     ra, nopage_tlb_load
+
+   ori      t0, t0, _PAGE_VALID
+#ifdef CONFIG_SMP
+   sc.d     t0, t1, 0
+   beqz     t0, smp_pgtable_change_load
+#else
+   st.d     t0, t1, 0
+#endif
+   tlbsrch
+   bstrins.d   t1, zero, 3, 3
+   ld.d     t0, t1, 0
+   ld.d     t1, t1, 8
+   csrwr    t0, LOONGARCH_CSR_TLBELO0
+   csrwr    t1, LOONGARCH_CSR_TLBELO1
+   tlbwr
+
+   csrrd    t0, EXCEPTION_KS0
+   csrrd    t1, EXCEPTION_KS1
+   csrrd    ra, EXCEPTION_KS2
+   ertn
+
+#ifdef CONFIG_64BIT
+vmalloc_load:
+   la_abs      t1, swapper_pg_dir
+   b     vmalloc_done_load
+#endif
+
+   /* This is the entry point of a huge page. */
+tlb_huge_update_load:
+#ifdef CONFIG_SMP
+   ll.d     ra, t1, 0
+#else
+   rotri.d     ra, ra, 64 - (_PAGE_HUGE_SHIFT + 1)
+#endif
+   andi     t0, ra, _PAGE_PRESENT
+   beqz     t0, nopage_tlb_load
+
+#ifdef CONFIG_SMP
+   ori      t0, ra, _PAGE_VALID
+   sc.d     t0, t1, 0
+   beqz     t0, tlb_huge_update_load
+   ori      t0, ra, _PAGE_VALID
+#else
+   ori      t0, ra, _PAGE_VALID
+   st.d     t0, t1, 0
+#endif
+   csrrd    ra, LOONGARCH_CSR_ASID
+   csrrd    t1, LOONGARCH_CSR_BADV
+   andi     ra, ra, CSR_ASID_ASID
+   invtlb      INVTLB_ADDR_GFALSE_AND_ASID, ra, t1
+
+   /*
+    * A huge PTE describes an area the size of the
+    * configured huge page size. This is twice the
+    * of the large TLB entry size we intend to use.
+    * A TLB entry half the size of the configured
+    * huge page size is configured into entrylo0
+    * and entrylo1 to cover the contiguous huge PTE
+    * address space.
+    */
+   /* Huge page: Move Global bit */
+   xori     t0, t0, _PAGE_HUGE
+   lu12i.w     t1, _PAGE_HGLOBAL >> 12
+   and      t1, t0, t1
+   srli.d      t1, t1, (_PAGE_HGLOBAL_SHIFT - _PAGE_GLOBAL_SHIFT)
+   or    t0, t0, t1
+
+   move     ra, t0
+   csrwr    ra, LOONGARCH_CSR_TLBELO0
+
+   /* Convert to entrylo1 */
+   addi.d      t1, zero, 1
+   slli.d      t1, t1, (HPAGE_SHIFT - 1)
+   add.d    t0, t0, t1
+   csrwr    t0, LOONGARCH_CSR_TLBELO1
+
+   /* Set huge page tlb entry size */
+   addu16i.d   t0, zero, (CSR_TLBIDX_PS >> 16)
+   addu16i.d   t1, zero, (PS_HUGE_SIZE << (CSR_TLBIDX_PS_SHIFT - 16))
+   csrxchg     t1, t0, LOONGARCH_CSR_TLBIDX
+
+   tlbfill
+
+   addu16i.d   t0, zero, (CSR_TLBIDX_PS >> 16)
+   addu16i.d   t1, zero, (PS_DEFAULT_SIZE << (CSR_TLBIDX_PS_SHIFT - 16))
+   csrxchg     t1, t0, LOONGARCH_CSR_TLBIDX
+
+   csrrd    t0, EXCEPTION_KS0
+   csrrd    t1, EXCEPTION_KS1
+   csrrd    ra, EXCEPTION_KS2
+   ertn
+
+nopage_tlb_load:
+   dbar     0x700
+   csrrd    ra, EXCEPTION_KS2
+   la_abs      t0, tlb_do_page_fault_0
+   jr    t0
+SYM_CODE_END(handle_tlb_load)
+```
+
+过程如下：
+ - 先保存handle_tlb_load使用的临时寄存器到CSR.SAVE[x]中。
+ - 读出出错的地址从CSR.BADV寄存器。
+ - 分析出错地址是内核地址还是用户地址空间，针对不同的历程，走不同的处理方法。
+ - 从CSR.PGDL中得出全局页表基址，然后分析其PGD，PMD，PTE
+ - 判断PTE是否存在，``andi $ra, $t0, _PAGE_PRESENT``, 如果不存在，跳转到nopage_tlb_load中执行。
+ - nopage_tlb_load是对 tlb_do_page_fault的包装函数。
+ - 执行函数LoongArch下的do_page_fault函数：
+ ```c
+   asmlinkage void __kprobes do_page_fault(struct pt_regs *regs,
+            unsigned long write, unsigned long address)
+   {
+      irqentry_state_t state = irqentry_enter(regs);
+   
+      /* Enable interrupt if enabled in parent context */
+      if (likely(regs->csr_prmd & CSR_PRMD_PIE))
+         local_irq_enable();
+   
+      __do_page_fault(regs, write, address);
+   
+      local_irq_disable();
+   
+      irqentry_exit(regs, state);
+   }
+ ```
+ - 进入内核的公共处理函数``fault = handle_mm_fault(vma, address, flags, regs)``执行：
+ ```c
+   static inline vm_fault_t handle_mm_fault(struct vm_area_struct *vma,
+                unsigned long address, unsigned int flags,
+                struct pt_regs *regs)
+ ```
+
+``handle_mm_fault`` 函数会执行我们上章节页表的遍历过程，分配物理页，设置对应的页表表项，然后返回。
+
+## 情况3. 如果写操作页表项D=0
+如果访存的是一个Store指令，比如``st.d  $t1, $t0, 0``时，store指令操作的虚地址在 TLB 中找到了匹配，且    V=1，且特权等级合规的项，但是该页 表项的 D 位为 0，将触发页修改例外PME例外。
+
+PME按照我们上面的初始化，此时CPU执行对应异常号为``EXCCODE_TLBM``的例外。
+
+也就是执行函数handle_tlb_modify，下面分析Linux中LoongArch有关PME的处理历程代码。
+
+```
+SYM_CODE_START(handle_tlb_modify)
+   UNWIND_HINT_UNDEFINED
+   csrwr    t0, EXCEPTION_KS0
+   csrwr    t1, EXCEPTION_KS1
+   csrwr    ra, EXCEPTION_KS2
+
+   /*
+    * The vmalloc handling is not in the hotpath.
+    */
+   csrrd    t0, LOONGARCH_CSR_BADV
+   bltz     t0, vmalloc_modify
+   csrrd    t1, LOONGARCH_CSR_PGDL
+
+vmalloc_done_modify:
+   /* Get PGD offset in bytes */
+   bstrpick.d  ra, t0, PTRS_PER_PGD_BITS + PGDIR_SHIFT - 1, PGDIR_SHIFT
+   alsl.d      t1, ra, t1, 3
+#if CONFIG_PGTABLE_LEVELS > 3
+   ld.d     t1, t1, 0
+   bstrpick.d  ra, t0, PTRS_PER_PUD_BITS + PUD_SHIFT - 1, PUD_SHIFT
+   alsl.d      t1, ra, t1, 3
+#endif
+#if CONFIG_PGTABLE_LEVELS > 2
+   ld.d     t1, t1, 0
+   bstrpick.d  ra, t0, PTRS_PER_PMD_BITS + PMD_SHIFT - 1, PMD_SHIFT
+   alsl.d      t1, ra, t1, 3
+#endif
+   ld.d     ra, t1, 0
+
+   /*
+    * For huge tlb entries, pmde doesn't contain an address but
+    * instead contains the tlb pte. Check the PAGE_HUGE bit and
+    * see if we need to jump to huge tlb processing.
+    */
+   rotri.d     ra, ra, _PAGE_HUGE_SHIFT + 1
+   bltz     ra, tlb_huge_update_modify
+
+   rotri.d     ra, ra, 64 - (_PAGE_HUGE_SHIFT + 1)
+   bstrpick.d  t0, t0, PTRS_PER_PTE_BITS + PAGE_SHIFT - 1, PAGE_SHIFT
+   alsl.d      t1, t0, ra, _PTE_T_LOG2
+
+#ifdef CONFIG_SMP
+smp_pgtable_change_modify:
+   ll.d     t0, t1, 0
+#else
+   ld.d     t0, t1, 0
+#endif
+   andi     ra, t0, _PAGE_WRITE
+   beqz     ra, nopage_tlb_modify
+
+   ori      t0, t0, (_PAGE_VALID | _PAGE_DIRTY | _PAGE_MODIFIED)
+#ifdef CONFIG_SMP
+   sc.d     t0, t1, 0
+   beqz     t0, smp_pgtable_change_modify
+#else
+   st.d     t0, t1, 0
+#endif
+   tlbsrch
+   bstrins.d   t1, zero, 3, 3
+   ld.d     t0, t1, 0
+   ld.d     t1, t1, 8
+   csrwr    t0, LOONGARCH_CSR_TLBELO0
+   csrwr    t1, LOONGARCH_CSR_TLBELO1
+   tlbwr
+
+   csrrd    t0, EXCEPTION_KS0
+   csrrd    t1, EXCEPTION_KS1
+   csrrd    ra, EXCEPTION_KS2
+   ertn
+
+#ifdef CONFIG_64BIT
+vmalloc_modify:
+   la_abs      t1, swapper_pg_dir
+   b     vmalloc_done_modify
+#endif
+
+   /* This is the entry point of a huge page. */
+tlb_huge_update_modify:
+#ifdef CONFIG_SMP
+   ll.d     ra, t1, 0
+#else
+   rotri.d     ra, ra, 64 - (_PAGE_HUGE_SHIFT + 1)
+#endif
+   andi     t0, ra, _PAGE_WRITE
+   beqz     t0, nopage_tlb_modify
+
+#ifdef CONFIG_SMP
+   ori      t0, ra, (_PAGE_VALID | _PAGE_DIRTY | _PAGE_MODIFIED)
+   sc.d     t0, t1, 0
+   beqz     t0, tlb_huge_update_modify
+   ori      t0, ra, (_PAGE_VALID | _PAGE_DIRTY | _PAGE_MODIFIED)
+#else
+   ori      t0, ra, (_PAGE_VALID | _PAGE_DIRTY | _PAGE_MODIFIED)
+   st.d     t0, t1, 0
+#endif
+   csrrd    ra, LOONGARCH_CSR_ASID
+   csrrd    t1, LOONGARCH_CSR_BADV
+   andi     ra, ra, CSR_ASID_ASID
+   invtlb      INVTLB_ADDR_GFALSE_AND_ASID, ra, t1
+
+   /*
+    * A huge PTE describes an area the size of the
+    * configured huge page size. This is twice the
+    * of the large TLB entry size we intend to use.
+    * A TLB entry half the size of the configured
+    * huge page size is configured into entrylo0
+    * and entrylo1 to cover the contiguous huge PTE
+    * address space.
+    */
+   /* Huge page: Move Global bit */
+   xori     t0, t0, _PAGE_HUGE
+   lu12i.w     t1, _PAGE_HGLOBAL >> 12
+   and      t1, t0, t1
+   srli.d      t1, t1, (_PAGE_HGLOBAL_SHIFT - _PAGE_GLOBAL_SHIFT)
+   or    t0, t0, t1
+
+   move     ra, t0
+   csrwr    ra, LOONGARCH_CSR_TLBELO0
+
+   /* Convert to entrylo1 */
+   addi.d      t1, zero, 1
+   slli.d      t1, t1, (HPAGE_SHIFT - 1)
+   add.d    t0, t0, t1
+   csrwr    t0, LOONGARCH_CSR_TLBELO1
+
+   /* Set huge page tlb entry size */
+   addu16i.d   t0, zero, (CSR_TLBIDX_PS >> 16)
+   addu16i.d   t1, zero, (PS_HUGE_SIZE << (CSR_TLBIDX_PS_SHIFT - 16))
+   csrxchg     t1, t0, LOONGARCH_CSR_TLBIDX
+
+   tlbfill
+
+   /* Reset default page size */
+   addu16i.d   t0, zero, (CSR_TLBIDX_PS >> 16)
+   addu16i.d   t1, zero, (PS_DEFAULT_SIZE << (CSR_TLBIDX_PS_SHIFT - 16))
+   csrxchg     t1, t0, LOONGARCH_CSR_TLBIDX
+
+   csrrd    t0, EXCEPTION_KS0
+   csrrd    t1, EXCEPTION_KS1
+   csrrd    ra, EXCEPTION_KS2
+   ertn
+
+nopage_tlb_modify:
+   dbar     0x700
+   csrrd    ra, EXCEPTION_KS2
+   la_abs      t0, tlb_do_page_fault_1
+   jr    t0
+SYM_CODE_END(handle_tlb_modify)
+
+```
+
+其处理逻辑和上面的章节的[<u>handle_tlb_load</u>](#example_handle_tlb_load)主题逻辑差异不大，但是   
+有几个需要注意下的是：
+   - 将内存PTE读取后，首先要判断PTE属性是否可写``andi  $t0, $ra, _PAGE_WRITE``
+   - 如果PTE不可写，直接走nopage_tlb_modify分支，
+      ```asm
+      nopage_tlb_modify:
+         dbar     0x700
+         csrrd    ra, EXCEPTION_KS2
+         la_abs   t0, tlb_do_page_fault_1
+      ```
+      而nopage_tlb_modify实际上会调用LoongArch的__do_page_fault函数，这个函数会判断       
+      这个Store操作是否合法，如果不合法的话，会发送信号，结束进程。
+
+   - 假设这个PTE是可写的，而此时PTE没有置_PAGE_DIRTY，会将页表设置       
+     ``ori  $t0, $t0, (_PAGE_VALID | _PAGE_DIRTY | _PAGE_MODIFIED)``
+     写回到内存中。
+
+   - 同时为了优化TLB重填，将PTE对应的奇数偶数页加载到了TLB中，避免了再一次进入TLB refill历程。
+
+   - 最后ertn返回到出现异常的地方继续执行！
+
+## 情况4. 如果权限不合法
+
+假设上述的熟悉情况都正确，但是权限不能匹配，则此时执行如下的异常：
+
+  - 页特权等级不合规例外（PPI）：访存操作的虚地址在 TLB 中找到了匹配且 V=1 的项，但是访问的特权等       
+    级不合规，将触发该例外。特权等级不合规体现为，该页表项的 RPLV=0 且 CSR.CRMD.PLV 值大       
+    于页表项中的 PLV；或是该页表项的 RPLV=1 且 CSR.CRMD.PLV 不等于页表项中的 PLV。       
+
+  - 页不可读例外（PNR）：load 操作的虚地址在 TLB 中找到了匹配，且 V=1，且特权等级合规的项，但是该       
+    页表项的 NR 位为 1，将触发该例外。
+
+  - 页不可执行例外（PNX）：取指操作的虚地址在 TLB 中找到了匹配，且 V=1，且特权等级合规的项，但是       
+    该页表项的 NX 位为 1，将触发该例外。
+
+
+Linux对于这三种和内存管理相关的权限异常，使用了同一个例外处理函数：
+
+```c
+   [EXCCODE_TLBNR]      = handle_tlb_protect,
+   [EXCCODE_TLBNX]      = handle_tlb_protect,
+   [EXCCODE_TLBPE]      = handle_tlb_protect,
+```
+
+都是handle_tlb_protect处理函数，下面我们看handle_tlb_protect的具体内容。
+
+
+```
+SYM_CODE_START(handle_tlb_protect)
+   UNWIND_HINT_UNDEFINED
+   BACKUP_T0T1
+   SAVE_ALL
+   move     a0, sp
+   move     a1, zero
+   csrrd    a2, LOONGARCH_CSR_BADV
+   REG_S    a2, sp, PT_BVADDR
+   la_abs      t0, do_page_fault
+   jirl     ra, t0, 0
+   RESTORE_ALL_AND_RET
+SYM_CODE_END(handle_tlb_protect)
+```
+
+上述的处理逻辑如下：
+   - 保存所有出异常时的寄存器
+   - 进入do_page_fault函数执行。
+
+```c
+asmlinkage void __kprobes do_page_fault(struct pt_regs *regs,
+         unsigned long write, unsigned long address)
+{
+   irqentry_state_t state = irqentry_enter(regs);
+
+   /* Enable interrupt if enabled in parent context */
+   if (likely(regs->csr_prmd & CSR_PRMD_PIE))
+      local_irq_enable();
+
+   __do_page_fault(regs, write, address);
+
+   local_irq_disable();
+
+   irqentry_exit(regs, state);
+}
+```
+
+``__do_page_fault``会判断操作的合法性。如果不合法，就会发送信号，然后结束进程。
+
+
+## 如果使能硬件PTW
+
+上述我们是假设使用软件TLB重填时的处理流程，因为我们需要考虑一些加速优化的方法。
+
+但是如果使用硬件HPTW的话，我们处理的过程变得相对简单，如下初始化的时候的代码：
+
+```c
+   if (cpu_has_ptw) {
+      exception_table[EXCCODE_TLBI] = handle_tlb_load_ptw;
+      exception_table[EXCCODE_TLBL] = handle_tlb_load_ptw;
+      exception_table[EXCCODE_TLBS] = handle_tlb_store_ptw;
+      exception_table[EXCCODE_TLBM] = handle_tlb_modify_ptw;
+   }
+```
+
+而这几个处理函数如下所示：
+
+``handle_tlb_load_ptw``处理PIL异常
+
+```asm
+SYM_CODE_START(handle_tlb_load_ptw)
+   UNWIND_HINT_UNDEFINED
+   csrwr    t0, LOONGARCH_CSR_KS0
+   csrwr    t1, LOONGARCH_CSR_KS1
+   la_abs      t0, tlb_do_page_fault_0
+   jr    t0
+SYM_CODE_END(handle_tlb_load_ptw)
+```
+
+``handle_tlb_store_ptw``处理PIS异常
+
+```asm
+SYM_CODE_START(handle_tlb_store_ptw)
+   UNWIND_HINT_UNDEFINED
+   csrwr    t0, LOONGARCH_CSR_KS0
+   csrwr    t1, LOONGARCH_CSR_KS1
+   la_abs      t0, tlb_do_page_fault_1
+   jr    t0
+SYM_CODE_END(handle_tlb_store_ptw)
+```
+
+
+``handle_tlb_modify_ptw``处理PME异常
+```asm
+SYM_CODE_START(handle_tlb_modify_ptw)
+   UNWIND_HINT_UNDEFINED
+   csrwr    t0, LOONGARCH_CSR_KS0
+   csrwr    t1, LOONGARCH_CSR_KS1
+   la_abs      t0, tlb_do_page_fault_1
+   jr    t0
+SYM_CODE_END(handle_tlb_modify_ptw)
+```
+
+他们最后都调用了**do_page_fault**函数来进行页表的处理。
+
+另外的异常情况PPI，PNR和PNX，和上面的一致，都是使用``handle_tlb_protect``处理函数。
 
