@@ -234,7 +234,13 @@ la_emu_kernel -m n[G] -k kernel
 
 本章以多个开源操作系统为示例，展示LoongArch架构的操作系统编译详细步骤，并在 x86 平台 QEMU 上启动。
 
-首先准备开发环境。可使用以下命令安装交叉编译器:
+首先准备启动系统需要的 bios 固件，可通过以下指令下载编译好的版本:
+``` shell
+wget https://raw.githubusercontent.com/Open-ChipHub/LoongArch-SDK/refs/heads/main/bios/QEMU_EFI.fd
+```
+或者，可使用以下命令，手动编译。
+
+1. 安装交叉编译器
 ```shell
 wget https://github.com/loongson/build-tools/releases/download/2023.08.08/x86_64-cross-tools-loongarch64-gcc-libc.tar.xz
 tar xvf ./x86_64-cross-tools-loongarch64-gcc-libc.tar.xz
@@ -248,10 +254,78 @@ export PATH={/path/of/cross/compile}/bin:$PATH
 loongarch64-unknown-linux-gnu-gcc --version
 // print version on terminal.
 ```
+2. 下载仓库并初始化
+``` shell
+git clone https://github.com/tianocore/edk2.git
+#  初始化
+cd edk2
+git submodule update --init
+```
+3. 开始构建
+``` shell
+make -C BaseTools
+build -a LOONGARCH64 -t GCC5 -p OvmfPkg/LoongArchVirt/LoongArchVirtQemu.dsc
+```
+编译完成后，固件映像位于 Build/LoongArchPkg/DEBUG_GCC5/FV/ 目录下。
 
 ## LoongNix
 
+1. 使用以下命令，下载 Loongnix 社区预编译系统:
+``` shell
+wget https://pkg.loongnix.cn/loongnix/isos/Loongnix-20.3/Loongnix-20.3.mate.gui.loongarch64.en.qcow2
+```
+2. 使用以下命令，启动 Loongnix 系统:
+``` shell
+qemu-system-loongarch64 -m 8G -cpu la464 -machine virt -smp 4 \
+   -bios ../QEMU_EFI.fd -serial stdio \
+   -device virtio-gpu-pci -net nic \
+   -device nec-usb-xhci,id=xhci,addr=0x1b \
+   -device usb-tablet,id=tablet,bus=xhci.0,port=1 \
+   -device usb-kbd,id=keyboard,bus=xhci.0,port=2  \
+   -hda ./Loongnix-20.3.mate.gui.loongarch64.cn.qcow2
+```
+3. 可在 QEMU 界面看到如下选项。
+
+```{image} ../../img/loongnix_start.png
+:alt: Loongnix 启动界面
+:class: bg-primary
+:scale: 50 %
+:align: center
+```
+4. 点击回车键，可进入系统登录界面。
+```{image} ../../img/loongnix_login.png
+:alt: Loongnix 登录界面
+:class: bg-primary
+:scale: 50 %
+:align: center
+```
+5. 输入密码 Loongson20 ，即可进入主界面。
+```{image} ../../img/loongnix_home.png
+:alt: Loongnix 登录界面
+:class: bg-primary
+:scale: 50 %
+:align: center
+```
 ## UOS
+
+1. 使用以下命令，下载 UOS 系统镜像:
+``` shell
+wget https://cdimage-download.chinauos.com/desktop-professional/1074/uos-desktop-20-professional-1070-loongarch64-202511.iso
+```
+2. 创建虚拟机磁盘。
+``` shell
+qemu-img create -f qcow2 ./uso-20.qcow2 100G
+```
+3. 使用以下命令，启动系统:
+``` shell
+qemu-system-loongarch64 -m 4G -smp 4 -cpu la464 -machine virt -bios ./QEMU_EFI.fd \
+                -serial stdio -device virtio-gpu-pci -net nic -net user \
+                -device virtio-blk-pci,drive=drive-virtio-disk0 \
+                -drive id=drive-virtio-disk0,if=none,format=raw,file=uos-20.qcow2 \
+                -device virtio-scsi-pci,id=scsi0 \
+                -drive id=drive-scsi0-cdrom0,if=none,format=raw,readonly=on,file=uos-desktop-20-professional-1070-loongarch64-202511 \
+                -device scsi-cd,bus=scsi0.0,drive=drive-scsi0-cdrom0
+```
 
 ## Deepin
 
@@ -267,10 +341,13 @@ wget https://mirrors.hust.edu.cn/deepin-cd/25.0.10/loong64/deepin-desktop-commun
 ```
 运行一下命令，启动系统:
 ``` shell
-~/emulator/qemu/bin/qemu-system-loongarch64 -m 8G -cpu la464-loongarch-cpu -machine virt -smp 4 -bios ../QEMU_EFI.fd -serial stdio -device virtio-gpu-pci -net nic -device virtio-blk-pci,drive=drive-virtio-disk0 -drive id=drive-virtio-disk0,if=none,format=raw,file=deepin-v23.qcow2 -device virtio-scsi-pci,id=scsi0 -drive id=drive-scsi0-cdrom0,if=none,format=raw,readonly=on,file=deepin-desktop-community-25.0.10-loong64.iso -device scsi-cd,bus=scsi0.0,drive=drive-scsi0-cdrom0
-```
-``` shell
-
+~/emulator/qemu/bin/qemu-system-loongarch64 -m 8G -cpu la464-loongarch-cpu -machine virt -smp 4 -bios ../QEMU_EFI.fd \
+            -serial stdio -device virtio-gpu-pci -net nic \
+            -device virtio-blk-pci,drive=drive-virtio-disk0 \
+            -drive id=drive-virtio-disk0,if=none,format=raw,file=deepin-v23.qcow2 \
+            -device virtio-scsi-pci,id=scsi0 \
+            -drive id=drive-scsi0-cdrom0,if=none,format=raw,readonly=on,file=deepin-desktop-community-25.0.10-loong64.iso \
+            -device scsi-cd,bus=scsi0.0,drive=drive-scsi0-cdrom0
 ```
 
 ## AOSC(安同)
@@ -491,9 +568,7 @@ make ARCH=loongarch CROSS_COMPILE=loongarch64-linux-gnu- menuconfig
 ```
 在`[General setup]`选项中，选择`[Initial RAM filesystem and RAM disk (initramfs/initrd) support]`。在`[Initramfs source file(s)]`中输入`[rootfs.cpio.gz]`。
 
-
 返回上一页，在`[Kernel type and options]`选项中，选中`[Enable built-in dtb in kernel]`，在`[Source file for built-in dtb]`中输入`[labcore-sim]`。
-
 
 保存并退出。
 
@@ -503,7 +578,3 @@ make ARCH=loongarch CROSS_COMPILE=loongarch64-linux-gnu- menuconfig
 make ARCH=loongarch CROSS_COMPILE=loongarch64-linux-gnu- -j$(nproc)
 ```
 部分编译过程以及结果如下所示。
-
-## 如何自己上手编译一个发行版
-   以“勇豹”(Yongbao)为例：https://github.com/sunhaiyong1978/Yongbao.git
-
