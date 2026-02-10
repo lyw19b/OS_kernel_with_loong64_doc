@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4.7. Kernel与MMU &mdash; 龙芯实验室文档 V1.0 文档</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=b01b2dd9" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.jpg"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=3f0bcac8"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+        <script src="../../_static/translations.js?v=beaddf03"></script>
+        <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="5. 中断与异常系统" href="../trap/index.html" />
+    <link rel="prev" title="4.5. 多级页表结构" href="tlb_ptw.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          <a href="../../index.html" class="icon icon-home">
+            龙芯实验室文档
+          </a>
+              <div class="version">
+                V1.0
+              </div>
+<div role="search">
+  <form id="evas-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preparation/index.html">1. 准备工作</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/preface.html">1.1. 前言</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/preface.html#id2">1.1.1. 更新说明</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/preface.html#id3">1.1.2. 仓库地址</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/tools.html">1.2. 工具链说明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#gcc">1.2.1. GCC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#llvm">1.2.2. LLVM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#rust">1.2.3. Rust</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/tools.html#id2">1.3. 模拟器</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#qemu">1.3.1. QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#la-emu">1.3.2. LA_EMU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/tools.html#id3">1.4. 操作系统编译</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#loongnix">1.4.1. LoongNix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#uos">1.4.2. UOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#deepin">1.4.3. Deepin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#aosc">1.4.4. AOSC(安同)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#linux-kernel">1.4.5. Linux kernel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../toolchains/index.html">2. 工具链</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/gcc.html">2.1. GCC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id1">2.1.1. GCC的相关概念</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id2">2.1.1.1. GCC的基本定义与起源</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id4">2.1.1.2. GCC支持的语言与平台</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id5">2.1.1.3. GCC的核心功能与特点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id6">2.1.1.4. GCC的最新进展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id7">2.1.1.5. GCC的应用场景</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id8">2.1.2. 交叉编译器</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id9">2.1.3. 常见的类别组合</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id12">2.1.4. 如何编译交叉编译器</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#loongarch64-linux-gnu-sf">2.1.4.1. 如何编译loongarch64-linux-gnu[sf]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#loongarch64-linux-musl-sf">2.1.4.2. 如何编译loongarch64-linux-musl[sf]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#crtn-crti-crtbegin-crtend">2.1.4.3. crtn, crti, crtbegin, crtend有什么区别</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id22">2.1.5. 常用的参数与选项</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id23">2.1.5.1. GCC常见的参数</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#picpie">2.1.5.2. PIC与PIE的区别是什么</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#loongarch">2.1.5.3. 与LoongArch相关的选项说明</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#c-c">2.1.5.4. C/C++ 预处理器内嵌的宏定义</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/binutils.html">2.2. Binutils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#gnu-binutils">2.2.1. GNU Binutils的相关说明</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id1">2.2.1.1. <strong>核心定位与背景</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id2">2.2.1.2. <strong>重要组成部分与功能</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id5">2.2.1.3. <strong>应用场景</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#ld">2.2.2. ld链接器</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id6">2.2.2.1. LD的参数说明</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#readelf">2.2.3. 如何正确的使用readelf</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id7">2.2.3.1. 基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id11">2.2.3.2. 二、高级用法</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id14">2.2.3.3. 三、实战示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id18">2.2.3.4. 四、与其他工具对比</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#objdump">2.2.4. objdump</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id19">2.2.4.1. 一、基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id25">2.2.4.2. 二、高级用法</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id31">2.2.4.3. 三、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id36">2.2.4.4. 四、与其他工具对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id37">2.2.4.5. 五、注意事项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id38">2.2.4.6. 六、实战示例</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#objcopy">2.2.5. objcopy</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id42">2.2.5.1. 一、基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id46">2.2.5.2. 二、高级功能</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id51">2.2.5.3. 三、参数详解</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id52">2.2.5.4. 四、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id56">2.2.5.5. 五、常见问题与解决</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id60">2.2.5.6. 六、与其他工具对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id61">2.2.5.7. 七、总结</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/rust.html">2.3. Rust</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#id1">2.3.1. Rust的概念</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id2">2.3.1.1. Rust的起源与发展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id3">2.3.1.2. Rust的核心特性</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id4">2.3.1.3. Rust的应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id5">2.3.1.4. Rust的最新进展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id6">2.3.1.5. Rust的优缺点</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#loongarchtarget">2.3.2. LoongArch支持的target有哪些</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#loongarch">2.3.3. 与LoongArch相关的具体参数那些</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#laexe">2.3.4. 简单的例子说明如何编译成LA架构的EXE文件</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/builtin.html">2.4. 内嵌的函数与指令包装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/builtin.html#gcc">2.4.1. GCC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/builtin.html#llvm">2.4.2. LLVM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/builtin.html#rust">2.4.3. Rust</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/builtin.html#loongarch">2.4.3.1. LoongArch包的相关内容</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/assembly.html">2.5. 汇编代码与链接脚本</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/assembly.html#loongarch">2.5.1. 与LoongArch相关的汇编指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id2">2.5.1.1. 伪汇编指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id3">2.5.1.2. 地址加载指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id4">2.5.1.3. 内嵌汇编</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id5">2.5.1.4. 参考阅读</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/assembly.html#id6">2.5.2. 链接脚本</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id7">2.5.2.1. 一、基础语法结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id8">2.5.2.2. 二、核心命令与操作</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id13">2.5.2.3. 三、高级功能</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id17">2.5.2.4. 四、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id21">2.5.2.5. 五、实战示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id24">2.5.2.6. 六、调试与验证</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id25">2.5.2.7. 七、总结</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id26">2.5.2.8. 以LoongArch为例说明链接脚本</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/library.html">2.6. 一些常用的库函数</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#glibc">2.6.1. GLIBC</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id2">2.6.1.1. 一、核心功能与作用</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id3">2.6.1.2. 二、架构与实现细节</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id4">2.6.1.3. 三、版本演进与升级风险</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id5">2.6.1.4. 四、与其他运行库的对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id6">2.6.1.5. 五、开发与调试工具</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#musl">2.6.2. MUSL</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#musl-c">2.6.2.1. Musl C 库详解</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id15">2.6.2.2. 总结</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#memcpy">2.6.3. memcpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#memmove">2.6.4. memmove</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#memset">2.6.5. memset</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../privilege_isa/index.html">3. 特权态指令</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html">3.1. CSR寄存器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html#id1">3.2. CSR指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrrd">3.2.1. CSRRD指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrwr">3.2.2. CSRWR指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrxchg">3.2.3. CSRXCHG指令</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html#iocsr">3.3. IOCSR指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#iocsrrd">3.3.1. IOCSRRD指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#iocsrwr">3.3.2. IOCSRWR指令</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/cacop_insn.html">3.4. CPUCFG 指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/cacop_insn.html#cacop">3.5. CACOP 指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/tlb_insn.html">3.6. TLB 与页表指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id1">3.6.1. TLB 相关指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbsrch">3.6.1.1. TLBSRCH</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbrd">3.6.1.2. TLBRD</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbwr">3.6.1.3. TLBWR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbfill">3.6.1.4. TLBFILL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbclr">3.6.1.5. TLBCLR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbflush">3.6.1.6. TLBFLUSH</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#invtlb">3.6.1.7. INVTLB</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id2">3.6.2. 页表查找指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#lddir">3.6.2.1. LDDIR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#ldpte">3.6.2.2. LDPTE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id3">3.6.3. 应用示例</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html">3.7. ERTN指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html#idle">3.8. IDLE指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html#syscall">3.9. SysCALL指令</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">4. 内存管理</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tlb_struct.html">4.1. LoongArch的地址管理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#id2">4.1.1. 直接地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#id3">4.1.2. 映射地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#id4">4.1.3. 存储访问的类型</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tlb_struct.html#loongarchtlb">4.2. LoongArch的TLB结构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#id5">4.2.1. 逻辑组织结构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#tlb-cpu">4.2.2. TLB的表项（以CPU的视觉）</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tlb_struct.html#tlb">4.3. TLB的管理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#id6">4.3.1. TLB的一些概念区分</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#id7">4.3.2. TLB相关的指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#tlbcsr">4.3.3. TLB相关的CSR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#tlb-excption-handle">4.3.4. TLB相关的例外</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_struct.html#cputlb">4.3.5. CPU内部TLB查找流程示例</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dmw.html">4.4. 直接映射翻译模式</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dmw.html#csr-dmw-0-3">4.4.1. CSR.DMW[0-3]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dmw.html#id2">4.4.2. 操作系统中如何使用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dmw.html#dmw">4.4.2.1. DMW的优点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dmw.html#id3">4.4.2.2. DMW的缺点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dmw.html#id4">4.4.2.3. 代码示例如何在内核中使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tlb_ptw.html">4.5. 多级页表结构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tlb_ptw.html#id2">4.5.1. 设计背景与必要性</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id3">4.5.1.1. 多级页表的结构与层级</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id4">4.5.1.2. 地址转换流程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id5">4.5.1.3. 多级页表的优势</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id6">4.5.1.4. 优化机制</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id7">4.5.1.5. 对比不同架构的页表设计</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_ptw.html#loongarch">4.5.2. LoongArch的多级页表结构</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#kernel">4.5.2.1. Kernel如何初始化设置多级页表结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#kb">4.5.2.2. 二级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id8">4.5.2.3. 二级页表，16KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id9">4.5.2.4. 三级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id10">4.5.2.5. 三级页表，16KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id11">4.5.2.6. 四级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id12">4.5.2.7. 四级页表，16KB页大小</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_ptw.html#id13">4.5.3. 内存中的页表表项（Kernel视角）</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id14">4.5.3.1. 基本页表（叶子节点）</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id15">4.5.3.2. 大页页表（叶子节点）</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#no-leaf-pg-entry">4.5.3.3. 中间指向下一级目录的地址的页表(非叶子节点页表)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_ptw.html#id17">4.5.4. 页表的遍历</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#k">4.5.4.1. 以一个例子4K页为例说明：</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#m">4.5.4.2. 以一个例子2M页为例说明：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tlb_ptw.html#cputlb">4.6. 从内存中的页表表项到CPU中的TLB</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tlb_ptw.html#tlbrefill-softeware-ptw">4.6.1. TLBRefill (Softeware PTW)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#csr">4.6.1.1. 相关的CSR寄存器</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id18">4.6.1.2. 重填示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id19">4.6.1.3. 两级页表的示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#three-level-page-table-refill">4.6.1.4. 三级页表的示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id21">4.6.1.5. 四级页表的示例代码</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_ptw.html#hardware-ptw">4.6.2. Hardware PTW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tlb_ptw.html#id22">4.6.3. 页表的刷新</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id23">4.6.3.1. 页表为什么需要刷新</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id24">4.6.3.2. 页表刷新的指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tlb_ptw.html#id25">4.6.3.3. 页表刷新的例子</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.7. Kernel与MMU</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">4.7.1. 地址翻译相关的初始化</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">4.7.2. 如何从直接地址翻译模式到映射地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">4.7.3. 如何建立虚拟地址到物理地址的映射关系</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">4.7.4. 页表的遍历页表</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tlb">4.7.5. 情况1. 如果TLB中没有映射</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v-0">4.7.6. 情况2. 如果页表项的V=0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#d-0">4.7.7. 情况3. 如果写操作页表项D=0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">4.7.8. 情况4. 如果权限不合法</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ptw">4.7.9. 如果使能硬件PTW</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../trap/index.html">5. 中断与异常系统</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../trap/interrupt.html">5.1. 中断</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id2">5.1.1. 线中断</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#ipi">5.1.1.1. 核间中断IPI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id3">5.1.1.2. 定时器中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id4">5.1.1.3. 性能计数器中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id5">5.1.1.4. 外部硬中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id6">5.1.1.5. 内部软中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id7">5.1.1.6. 中断号</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id8">5.1.2. 消息中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id9">5.1.3. 中断的优先级</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id10">5.1.3.1. 线中断的优先级</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id11">5.1.3.2. 消息中断的优先级</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id12">5.1.4. 中断的打开与关闭</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id13">5.1.5. 中断的入口地址</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id14">5.1.6. 中断的处理流程</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/exception.html">5.2. 例外</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id2">5.2.1. 例外的优先级</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id3">5.2.2. 例外的入口地址</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id4">5.2.3. 例外的处理过程</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#id5">5.2.3.1. 普通例外的处理过程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#tlb">5.2.3.2. TLB 重填例外硬件处理过程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#id6">5.2.3.3. 机器错误例外硬件处理过程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/trap_in_kernel.html">5.3. Kernel与异常</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#expection-entry-selection">5.3.1. 异常的入口地址选择</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id2">5.3.1.1. “统一式”的入口地址</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id3">5.3.1.2. “分离式”的入口地址</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id4">5.3.2. 异常的初始化</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id5">5.3.2.1. 统一式的初始化</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id7">5.3.2.2. 分离式的初始化</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#cpu">5.3.3. 异常发生时，CPU做了什么</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/trap_in_kernel.html#id9">5.4. 特殊异常的处理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id10">5.4.1. 定时器中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id11">5.4.2. 系统调用</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id12">5.4.3. 非对齐访问</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../smp/index.html">6. SMP多核系统</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../smp/smp.html">6.1. SMP与LoongArch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#ipi">6.1.1. IPI中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#id1">6.1.2. 如何通信</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#id2">6.1.3. 如何初始化</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../smp/smp.html#linuxsmp">6.2. Linux中SMP的处理（与架构相关）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../abi/index.html">7. 程序二进制接口</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html">7.1. 新旧世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id2">7.2. 旧世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id3">7.3. 新世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id4">7.4. 新旧世界的区分</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/abi.html">7.5. ABI 2.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/index.html">8. 调试方法与技巧</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../debug/debug_env.html">8.1. LoongArch最小debug环境搭建</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#linux-ramdisk">8.1.1. 制作Linux RamDisk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#qemu">8.1.2. 如何在 QEMU 中调试</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#id1">8.1.3. 设置断点</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../debug/debug_gdb.html">8.2. GDB的使用</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id1">8.2.1. 交叉编译环境中的GDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id2">8.2.2. 常见的GDB命令示例</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id3">8.2.3. 调试指令常见失效状况</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/index.html">9. 平台相关</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../platform/qemu.html">9.1. QEMU</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/qemu.html#virt">9.1.1. Virt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/qemu.html#id1">9.1.2. 设备</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/3a5000.html">9.2. 3A5000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id1">9.2.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id2">9.2.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id3">9.2.3. 地址空间</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../platform/3a5000.html#id4">9.2.3.1. 结点间物理地址空间</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../platform/3a5000.html#id5">9.2.3.2. 结点内物理地址空间</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/3a6000.html">9.3. 3A6000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a6000.html#id1">9.3.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a6000.html#id2">9.3.2. 芯片架构</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k3000.html">9.4. 2k3000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k3000.html#id1">9.4.1. 芯片参数</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k1000la.html">9.5. 2k1000LA芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id1">9.5.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id2">9.5.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id3">9.5.3. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id4">9.5.4. 地址空间</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k0500.html">9.6. 2k0500芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id1">9.6.1. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id2">9.6.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id3">9.6.3. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id4">9.6.4. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id5">9.6.5. 地址空间</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id6">9.6.6. 中断配置</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k0300.html">9.7. 2k0300芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id1">9.7.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id2">9.7.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id3">9.7.3. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id4">9.7.4. 地址空间</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id5">9.7.5. 中断配置及路由</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../simd/index.html">10. 高级应用：SMID与向量指令</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../simd/todo.html">10.1. TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../virt/index.html">11. 高级应用：LVZ与虚拟化扩展</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../virt/todo.html">11.1. TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">12. FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../faq/faq-25.html">12.1. FAQ-25</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">龙芯实验室文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html"><span class="section-number">4. </span>内存管理</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">4.7. </span>Kernel与MMU</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="kernelmmu">
+<h1><span class="section-number">4.7. </span>Kernel与MMU<a class="headerlink" href="#kernelmmu" title="Link to this heading"></a></h1>
+<p>主要是从操作系统的角度，如果实现一个完整的地址翻译，来看我需要什么的功能？</p>
+<p>假设我们现在使用4K页，或者2M页面，访问一个虚拟地址为0xfffff8007898的地址。
+下面我们按照Kernel的视角来看如何处理。</p>
+<section id="id1">
+<h2><span class="section-number">4.7.1. </span>地址翻译相关的初始化<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>下面我们详细的分析Linux内核中LoongArch的TLB初始化相关内容。</p>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>我们在内核中一般使用固定的页大小和大页的配置，比如我们使用基础4KB页表的话，大页就是2MB和1GB的页，
+如果使用基础页16KB的话，那么大页就是32MB和64GB的配置。</p>
+<p><code class="docutils literal notranslate"><span class="pre">不建议将基础页4KB的页大小和基础页16KB的页大小混合使用。</span></code></p>
+</div>
+<ol class="arabic simple">
+<li><p>设置基础页大小</p></li>
+</ol>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// 设置CSR.TLBIDX.PS域，保证后面的tlb指令正常使用。具体可查看CSR.TLBIDX寄存器</span>
+<span class="n">write_csr_pagesize</span><span class="p">(</span><span class="n">PS_DEFAULT_SIZE</span><span class="p">);</span>
+
+<span class="c1">// 设置STLBPS的值</span>
+<span class="n">write_csr_stlbpgsize</span><span class="p">(</span><span class="n">PS_DEFAULT_SIZE</span><span class="p">);</span>
+
+<span class="c1">// 设置TLBRefill时PS专用页大小值，具体可看CSR.TLBREHI寄存器。</span>
+<span class="n">write_csr_tlbrefill_pagesize</span><span class="p">(</span><span class="n">PS_DEFAULT_SIZE</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>下面是上面的具体实现，我们设置页大小为4K页，也可以配置为16KB或者64KB页大小。</p>
+<p>后续我们都是按照4KB页大小来处理初始化。</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// 设置页大小，方便TLB后续指令需要</span>
+
+<span class="cp">#define  CSR_TLBIDX_PS_SHIFT     24</span>
+<span class="cp">#define  CSR_TLBIDX_SIZE         CSR_TLBIDX_PS_SHIFT</span>
+<span class="cp">#define  CSR_TLBIDX_SIZEM        0x3f000000</span>
+
+<span class="cm">/* TLB related CSR registers */</span>
+<span class="cp">#define LOONGARCH_CSR_TLBIDX     0x10  </span><span class="cm">/* TLB Index, EHINV, PageSize, NP */</span>
+<span class="cp">#define LOONGARCH_CSR_STLBPGSIZE 0x1e</span>
+
+
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">write_csr_pagesize</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">   </span><span class="n">csr_xchg32</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">CSR_TLBIDX_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">CSR_TLBIDX_SIZEM</span><span class="p">,</span><span class="w"> </span><span class="n">LOONGARCH_CSR_TLBIDX</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cp">#define csr_xchg32(val, mask, reg) __csrxchg_w(val, mask, reg)</span>
+
+<span class="c1">// __csrxchg_w 是指令csrxchg的包装，如下示例所示：</span>
+
+<span class="c1">// csrxchg   rd, rj, csr_num</span>
+<span class="c1">// 新写入的值val, 存放在rd寄存器，rj存放需要些位的掩码的值（如果是位1就是对应的位可以写入，否则不变）</span>
+
+<span class="cp">#define PS_DEFAULT_SIZE PS_4K</span>
+<span class="cp">#define PS_4K     0x0000000c</span>
+
+<span class="cp">#define write_csr_stlbpgsize(val)   csr_write32(val, LOONGARCH_CSR_STLBPGSIZE)</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">write_csr_tlbrefill_pagesize</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">   </span><span class="n">csr_xchg</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">CSR_TLBREHI_PS_SHIFT</span><span class="p">,</span><span class="w"> </span><span class="n">CSR_TLBREHI_PS</span><span class="p">,</span><span class="w"> </span><span class="n">LOONGARCH_CSR_TLBREHI</span><span class="p">);</span>
+<span class="p">}</span>
+
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>设置软件或者硬件PTW相关设置。</p></li>
+</ol>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setup_ptwalker</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">   </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">pwctl0</span><span class="p">,</span><span class="w"> </span><span class="n">pwctl1</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">pgd_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">pgd_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">pud_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">pud_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">pmd_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">pmd_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">pte_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">pte_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">   </span><span class="n">pgd_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PGDIR_SHIFT</span><span class="p">;</span>
+<span class="w">   </span><span class="n">pgd_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PAGE_SHIFT</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="cp">#if CONFIG_PGTABLE_LEVELS &gt; 3</span>
+<span class="w">   </span><span class="n">pud_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PUD_SHIFT</span><span class="p">;</span>
+<span class="w">   </span><span class="n">pud_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PAGE_SHIFT</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="cp">#endif</span>
+<span class="cp">#if CONFIG_PGTABLE_LEVELS &gt; 2</span>
+<span class="w">   </span><span class="n">pmd_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PMD_SHIFT</span><span class="p">;</span>
+<span class="w">   </span><span class="n">pmd_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PAGE_SHIFT</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="cp">#endif</span>
+<span class="w">   </span><span class="n">pte_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PAGE_SHIFT</span><span class="p">;</span>
+<span class="w">   </span><span class="n">pte_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PAGE_SHIFT</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+
+<span class="w">   </span><span class="n">pwctl0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pte_i</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">pte_w</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">pmd_i</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">pmd_w</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">15</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">pud_i</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">pud_w</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">25</span><span class="p">;</span>
+<span class="w">   </span><span class="n">pwctl1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pgd_i</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">pgd_w</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+
+
+<span class="w">   </span><span class="c1">// 如果是启用了硬件的PTW的话，还需要额外设置PWCH的HPTW_En</span>
+<span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">cpu_has_ptw</span><span class="p">)</span>
+<span class="w">      </span><span class="n">pwctl1</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">CSR_PWCTL1_PTW</span><span class="p">;</span>
+
+<span class="w">   </span><span class="c1">// 将配置写入CSR中</span>
+<span class="w">   </span><span class="n">csr_write</span><span class="p">(</span><span class="n">pwctl0</span><span class="p">,</span><span class="w"> </span><span class="n">LOONGARCH_CSR_PWCTL0</span><span class="p">);</span>
+<span class="w">   </span><span class="n">csr_write</span><span class="p">(</span><span class="n">pwctl1</span><span class="p">,</span><span class="w"> </span><span class="n">LOONGARCH_CSR_PWCTL1</span><span class="p">);</span>
+<span class="w">   </span>
+<span class="w">   </span><span class="c1">// 设置内核的全局目录基址PGD</span>
+<span class="w">   </span><span class="n">csr_write</span><span class="p">(</span><span class="n">virt_to_pgdcsr</span><span class="p">(</span><span class="n">swapper_pg_dir</span><span class="p">),</span><span class="w"> </span><span class="n">LOONGARCH_CSR_PGDH</span><span class="p">);</span>
+<span class="w">   </span>
+<span class="w">   </span><span class="c1">// 先初始化用户PGDL为无效的页表基址</span>
+<span class="w">   </span><span class="n">csr_write</span><span class="p">(</span><span class="n">virt_to_pgdcsr</span><span class="p">(</span><span class="n">invalid_pg_dir</span><span class="p">),</span><span class="w"> </span><span class="n">LOONGARCH_CSR_PGDL</span><span class="p">);</span>
+<span class="w">   </span><span class="n">csr_write</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">smp_processor_id</span><span class="p">(),</span><span class="w"> </span><span class="n">LOONGARCH_CSR_TMID</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>根据我们上个章节的描述，Linux初始化的时候，使用了LoongArch的PWCH中的<code class="docutils literal notranslate"><span class="pre">Dir3_base</span></code>和<code class="docutils literal notranslate"><span class="pre">Dir3_width</span></code>，</p>
+<p>设置<code class="docutils literal notranslate"><span class="pre">Dir4_base</span> <span class="pre">=</span> <span class="pre">0</span></code>和<code class="docutils literal notranslate"><span class="pre">Dir4_width</span> <span class="pre">=</span> <span class="pre">0</span></code>。</p>
+<p>也就是说Linux LoongArch是按照下面的设置</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>配置的页表级数</th>
+<th>启用的PWCH相关配置</th>
+<th>启动的PWCL相关配置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2级页表(16KB)</td>
+<td>Dir4_base = 0, Dir4_width = 0 <br> Dir3_base = 25, Dir3_width = 11</td>
+<td>Dir2_base = 0, Dir2_width = 0 <br> Dir1_base = 0, Dir1_width = 0 <br> PTbase = 14, PTwidth = 11</td>
+</tr>
+<tr>
+<td>2级页表(64KB)</td>
+<td>Dir4_base = 0, Dir4_width = 0 <br> Dir3_base = 29, Dir3_width = 13</td>
+<td>Dir2_base = 0, Dir2_width = 0 <br> Dir1_base = 0, Dir1_width = 0 <br> PTbase = 16, PTwidth = 13</td>
+</tr>
+<tr>
+<td>3级页表(4KB)</td>
+<td>Dir4_base = 0, Dir4_width = 0 <br> Dir3_base = 30, Dir3_width = 9</td>
+<td>Dir2_base = 0, Dir2_width = 0 <br> Dir1_base = 21, Dir1_width = 9 <br> PTbase = 12, PTwidth = 9</td>
+</tr>
+<tr>
+<td>3级页表(16KB)</td>
+<td>Dir4_base = 0, Dir4_width = 0 <br> Dir3_base = 36, Dir3_width = 11</td>
+<td>Dir2_base = 0, Dir2_width = 0 <br> Dir1_base = 25, Dir1_width = 11 <br> PTbase = 14, PTwidth = 11</td>
+</tr>
+<tr>
+<td>3级页表(64KB)</td>
+<td>Dir4_base = 0, Dir4_width = 0 <br> Dir3_base = 42, Dir3_width = 13</td>
+<td>Dir2_base = 0, Dir2_width = 0 <br> Dir1_base = 29, Dir1_width = 13 <br> PTbase = 16, PTwidth = 13</td>
+</tr>
+<tr>
+<td>4级页表(4KB)</td>
+<td>Dir4_base = 0, Dir4_width = 0 <br> Dir3_base = 39, Dir3_width = 9</td>
+<td>Dir2_base = 30, Dir2_width = 9 <br> Dir1_base = 21, Dir1_width = 9 <br> PTbase = 12, PTwidth = 9</td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic simple" start="3">
+<li><p>设置TLB相关的例外配置</p></li>
+</ol>
+<p>异常号如下所示，具体的使用说明我们在下一章详细说明！</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/* ExStatus.ExcCode */</span>
+<span class="cp">#define EXCCODE_RSV     0  </span><span class="cm">/* Reserved */</span>
+<span class="cp">#define EXCCODE_TLBL    1  </span><span class="cm">/* TLB miss on a load */</span>
+<span class="cp">#define EXCCODE_TLBS    2  </span><span class="cm">/* TLB miss on a store */</span>
+<span class="cp">#define EXCCODE_TLBI    3  </span><span class="cm">/* TLB miss on a ifetch */</span>
+<span class="cp">#define EXCCODE_TLBM    4  </span><span class="cm">/* TLB modified fault */</span>
+<span class="cp">#define EXCCODE_TLBNR      5  </span><span class="cm">/* TLB Read-Inhibit exception */</span>
+<span class="cp">#define EXCCODE_TLBNX      6  </span><span class="cm">/* TLB Execution-Inhibit exception */</span>
+<span class="cp">#define EXCCODE_TLBPE      7  </span><span class="cm">/* TLB Privilege Error */</span>
+<span class="cp">#define EXCCODE_ADE     8  </span><span class="cm">/* Address Error */</span>
+<span class="w">   </span><span class="cp">#define EXSUBCODE_ADEF     0  </span><span class="cm">/* Fetch Instruction */</span>
+<span class="w">   </span><span class="cp">#define EXSUBCODE_ADEM     1  </span><span class="cm">/* Access Memory*/</span>
+<span class="cp">#define EXCCODE_ALE     9  </span><span class="cm">/* Unalign Access */</span>
+<span class="cp">#define EXCCODE_BCE     10 </span><span class="cm">/* Bounds Check Error */</span>
+<span class="cp">#define EXCCODE_SYS     11 </span><span class="cm">/* System call */</span>
+<span class="cp">#define EXCCODE_BP      12 </span><span class="cm">/* Breakpoint */</span>
+<span class="cp">#define EXCCODE_INE     13 </span><span class="cm">/* Inst. Not Exist */</span>
+<span class="cp">#define EXCCODE_IPE     14 </span><span class="cm">/* Inst. Privileged Error */</span>
+<span class="cp">#define EXCCODE_FPDIS      15 </span><span class="cm">/* FPU Disabled */</span>
+<span class="cp">#define EXCCODE_LSXDIS     16 </span><span class="cm">/* LSX Disabled */</span>
+<span class="cp">#define EXCCODE_LASXDIS    17 </span><span class="cm">/* LASX Disabled */</span>
+<span class="cp">#define EXCCODE_FPE     18 </span><span class="cm">/* Floating Point Exception */</span>
+<span class="w">   </span><span class="cp">#define EXCSUBCODE_FPE     0  </span><span class="cm">/* Floating Point Exception */</span>
+<span class="w">   </span><span class="cp">#define EXCSUBCODE_VFPE    1  </span><span class="cm">/* Vector Exception */</span>
+<span class="cp">#define EXCCODE_WATCH      19 </span><span class="cm">/* WatchPoint Exception */</span>
+<span class="w">   </span><span class="cp">#define EXCSUBCODE_WPEF    0  </span><span class="cm">/* ... on Instruction Fetch */</span>
+<span class="w">   </span><span class="cp">#define EXCSUBCODE_WPEM    1  </span><span class="cm">/* ... on Memory Accesses */</span>
+<span class="cp">#define EXCCODE_BTDIS      20 </span><span class="cm">/* Binary Trans. Disabled */</span>
+<span class="cp">#define EXCCODE_BTE     21 </span><span class="cm">/* Binary Trans. Exception */</span>
+<span class="cp">#define EXCCODE_GSPR    22 </span><span class="cm">/* Guest Privileged Error */</span>
+<span class="cp">#define EXCCODE_HVC     23 </span><span class="cm">/* Hypercall */</span>
+<span class="cp">#define EXCCODE_GCM     24 </span><span class="cm">/* Guest CSR modified */</span>
+<span class="w">   </span><span class="cp">#define EXCSUBCODE_GCSC    0  </span><span class="cm">/* Software caused */</span>
+<span class="w">   </span><span class="cp">#define EXCSUBCODE_GCHC    1  </span><span class="cm">/* Hardware caused */</span>
+<span class="cp">#define EXCCODE_SE      25 </span><span class="cm">/* Security */</span>
+</pre></div>
+</div>
+<div class="highlight-c notranslate" id="exception-table-example"><div class="highlight"><pre><span></span><span class="c1">// 所有异常表</span>
+<span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">exception_table</span><span class="p">[</span><span class="n">EXCCODE_INT_START</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="p">[</span><span class="mi">0</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">EXCCODE_INT_START</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handle_reserved</span><span class="p">,</span>
+
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBI</span><span class="p">]</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_load</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBL</span><span class="p">]</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_load</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBS</span><span class="p">]</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_store</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBM</span><span class="p">]</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_modify</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBNR</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_protect</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBNX</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_protect</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBPE</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_protect</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_ADE</span><span class="p">]</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">handle_ade</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_ALE</span><span class="p">]</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">handle_ale</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_BCE</span><span class="p">]</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">handle_bce</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_SYS</span><span class="p">]</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">handle_sys</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_BP</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_bp</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_INE</span><span class="p">]</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">handle_ri</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_IPE</span><span class="p">]</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">handle_ri</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_FPDIS</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_fpu</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_LSXDIS</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">handle_lsx</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_LASXDIS</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handle_lasx</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_FPE</span><span class="p">]</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">handle_fpe</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_WATCH</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_watch</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_BTDIS</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_lbt</span><span class="p">,</span>
+<span class="p">};</span>
+
+
+<span class="c1">// 将handle_tlb_refill的代码拷贝到tlbrentry中。</span>
+<span class="n">memcpy</span><span class="p">((</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">tlbrentry</span><span class="p">,</span><span class="w"> </span><span class="n">handle_tlb_refill</span><span class="p">,</span><span class="w"> </span><span class="mh">0x80</span><span class="p">);</span>
+
+<span class="c1">//将上述的拷贝结果同步，执行idbr指令</span>
+<span class="n">local_flush_icache_range</span><span class="p">(</span><span class="n">tlbrentry</span><span class="p">,</span><span class="w"> </span><span class="n">tlbrentry</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0x80</span><span class="p">);</span>
+
+<span class="c1">//将和TLB相关的异常处理代码拷贝到各自的例外入口处</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EXCCODE_TLBL</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">EXCCODE_TLBPE</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="w">   </span><span class="n">set_handler</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">VECSIZE</span><span class="p">,</span><span class="w"> </span><span class="n">exception_table</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">VECSIZE</span><span class="p">);</span>
+
+<span class="c1">// 将TLB Refill的入口写入CSR.TLBRENTRY寄存器中</span>
+<span class="n">csr_write64</span><span class="p">(</span><span class="n">tlbrentry</span><span class="p">,</span><span class="w"> </span><span class="n">LOONGARCH_CSR_TLBRENTRY</span><span class="p">);</span>
+
+<span class="c1">// 设置例外入口CSR.EENTRY</span>
+<span class="n">csr_write64</span><span class="p">(</span><span class="n">eentry</span><span class="p">,</span><span class="w"> </span><span class="n">LOONGARCH_CSR_EENTRY</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>这里需要有以下需要注意：</p>
+<ul class="simple">
+<li><p>LoongArch的TLB Refill例外由于使用频率高，因此单独设立了例外入口。</p></li>
+<li><p>TLB的其他与TLB相关的例外，比如PIL，PIS，PIF等异常，使用的是和CSR.EENTRY相关。具体怎么配置我们在下一章详细介绍
+这里只需要知道，需要设置！</p></li>
+</ul>
+<p>到此为止，基本的初始化设置已经完成，剩下的我们主要讨论如何内核使用！</p>
+</section>
+<section id="id2">
+<h2><span class="section-number">4.7.2. </span>如何从直接地址翻译模式到映射地址翻译模式<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>假设我们CPU上电后，操作权限交给了Kernel，此时我们还是运行在物理地址0x200000，此时虚拟地址等于物理地址。</p>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>复位将重新处理器核中的所有逻辑，将电路置于确定的状态。这里将给出复位后处理器的状态的定义。</p>
+<p>复位后第一条指令的 PC 是 0x1C000000。由于复位撤销后 MMU 一定处于直接地址翻译模式，所以复</p>
+<p>位后所取的第一条指令的物理地址也是 0x1C000000。</p>
+<p>复位撤销后，处于确定状态的寄存器内容有：</p>
+<ul class="simple">
+<li><p>CSR.CRMD 的 PLV=0，IE=0，DA=1，PG=0，DATF=0，DATM=0，WE=0；</p></li>
+<li><p>CSR.EUEN 的 FPUen、VPUen、XVPUen、BTUen 均为 0；</p></li>
+<li><p>CSR.MISC 中的所有可配置位均为 0；</p></li>
+<li><p>CSR.ECFG 中的 VS 和 LIE 均为 0；</p></li>
+<li><p>CSR.ESTAT 中 IS[1:0]均为 0；</p></li>
+<li><p>CSR.RVACFG 中的 RDVA=0；</p></li>
+<li><p>CSR.TCFG 的 En=0；</p></li>
+<li><p>CSR.LLBCTL 的 KLO=0；</p></li>
+<li><p>CSR.TLBRERA 的 IsTLBR=0；</p></li>
+<li><p>CSR.ERRCTL 的 IsMERR=0；</p></li>
+<li><p>所有实现的 CSR.DMW 中的 PLV0~PLV3 均为 0；</p></li>
+<li><p>所有实现的 CSR.PMCFG 中除 EvCode 之外的所有可配置位均为 0；</p></li>
+<li><p>所有实现的数据断点控制 CSR 中的所有可配置位均为 0；</p></li>
+<li><p>所有实现的指令断点控制 CSR 中的所有可配置位均为 0；</p></li>
+<li><p>CSR.DBG 中的 DS=0。</p></li>
+</ul>
+</div>
+<p>具体涉及到的相关配置寄存器，请查看上个章节我们的描述！</p>
+<p>下面我们会示例介绍几种kernel使用的场景和初始化的方式。供操作系统使用，既可以单独使用，也可以组合使用。</p>
+<ol class="arabic">
+<li><p><strong>步骤1</strong>： 操作系统Kernel在CPU上电的时候，此时CPU处于<strong>直接地址翻译模式</strong>, 此时<code class="docutils literal notranslate"><span class="pre">DA=0</span> <span class="pre">&amp;&amp;</span> <span class="pre">PG=1</span></code></p>
+<p>此时CPU的地址模式是： 虚拟地址等于物理地址，VA = PA。</p>
+<p>此时访问内存的类型，通过CSR.CRMD的DATF和DATM决定。</p>
+<p>可以设置 CSR.CRMD.DATF = 2’b01，这时<strong>CPU取指的路径</strong>通过Cache读取（如果Cache缺失，在访问内存），<br />
+如果不设置也就是默认 CSR.CRMD.DATF = 2’b00，指令从内存中读取，不经过Cache。</p>
+<p>通用设置CSR.CRMD.DATM = 2’b01，这是访存指令load/store也是通过Cache读取数据，<br />
+如果不设置也就是默认 <code class="docutils literal notranslate"><span class="pre">CSR.CRMD.DATM</span> <span class="pre">=</span> <span class="pre">2'b00</span></code>，数据直接从内存读取或者写回，不经过Cache。</p>
+</li>
+<li><p><strong>步骤2</strong>： 如果Kernel(此时CPU还是处于直接地址翻译模式)想要使用<strong>直接映射模式</strong>，需要做一些初始化的工作
+为使能直接映射模式（DMW方式）做准备。</p>
+<p>主要操作如下：</p>
+<ul>
+<li><p>初始化相关DMW[x]寄存器，比如下面所示：
+假设我们的Kernel运行在0x9000xxxxxxxxxxxxxxxx的地址上</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nf">li.d</span><span class="w">  </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0x9000000000000011</span>
+<span class="nf">csrwr</span><span class="w"> </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0x180</span><span class="w"> </span><span class="c1">// 设置DMW0， PLV0，Cache</span>
+</pre></div>
+</div>
+</li>
+<li><p>确认当前的PC是运行在0x9000xxxxxxxxxxxxxxxx上，如果没有需要跳转到此地址去。
+如下所示：</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="c1">// 首先将虚拟地址的基址加载到寄存器t0上。</span>
+<span class="nf">li.d</span><span class="w">   </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0x9000000000000000</span>
+
+<span class="c1">// 将当前指令的地址加载到寄存器t1上</span>
+<span class="nf">pcaddi</span><span class="w"> </span><span class="no">$t1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="c1">// 将上一条指令的地址t1，加上基址t0，再赋值到t0，此时</span>
+<span class="c1">// t0保存着上一条指令的地址（加上了虚拟地址偏移）</span>
+<span class="nf">or</span><span class="w">     </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="no">$t1</span>
+
+<span class="c1">// 此时我们需要跳转到上面pcaddi地址加C的位置，也就是隔了三条指令，</span>
+<span class="c1">// 如果pcaddi指令的地址，加上三条指令，正好是下条指令的地址，也就真好跳转到新的地址上了。</span>
+<span class="nf">jirl</span><span class="w">   </span><span class="no">$zero</span><span class="p">,</span><span class="w"> </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0xc</span>
+</pre></div>
+</div>
+</li>
+<li><p>此时，我们已经准备好了虚拟地址，下一步就是打开CSR.CRMD寄存器的配置</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="c1">// PLV=0, IE=0, DA=0, PG=1</span>
+<span class="nf">li.w</span><span class="w">   </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0xb0</span><span class="w">  </span>
+<span class="no">csrwr</span><span class="w">  </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0x0</span>
+</pre></div>
+</div>
+<p>此时我们已经工作在<strong>直接映射模式</strong>，注意此时我们还是在使用DMW，并没有开启页表映射的相关机制。</p>
+<p>如果想要开启页表的机制<strong>页表映射模式</strong>，可以初始化相关的寄存器，初始化TLB寄存器后，
+就可以使用页表映射来进行虚实地址转换了。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>步骤3</strong>： 如果不想使用步骤2的直接映射模式，想直接进入<strong>页表映射模式</strong>，也是可以的。<br />
+此时，我们需要做的事情如下所示： （CPU目前处于<code class="docutils literal notranslate"><span class="pre">DA=0</span> <span class="pre">&amp;&amp;</span> <span class="pre">PG=1</span></code>， 直接地址翻译模式）<br />
+假设我们的虚拟地址是0xffff_fxxx_xxxx_xxxx，到物理地址xxx_xxxx_xxxx的映射。</p>
+<ul>
+<li><p>先可以做一些简单的其他相关初始化工作。</p></li>
+<li><p>此时我们需要准备初始化我们的TLB寄存器，
+比如设置PGDL和PGDH，以及PWCL和PWCH等，还要设置异常入口等。</p></li>
+<li><p>准备一个临时的页表关系，将当前物理地址映射到虚拟地址。比如
+VA[47:0] = PA[47:0]。将页表表项按照我们上个章节，在内存中建立映射的关系。</p>
+<p>注意此时一定要建立一个虚拟地址等于物理地址的映射关系！（可以参考下章节的代码例子）</p>
+</li>
+<li><p>接着设置CSR.CRMD的DA和PG<code class="docutils literal notranslate"><span class="pre">DA=0</span> <span class="pre">&amp;&amp;</span> <span class="pre">PG=1</span></code>，即打开我们的MMU，使能映射地址翻译模式！</p></li>
+<li><p>建立对应目标虚拟地址和物理地址的映射关系：比如0xffff_fxxx_xxxx_xxxx，到物理地址xxx_xxxx_xxxx的映射关系。</p>
+<p>注意将页表同步到内存后，使用刷新DCache,ICache和TLB，确保没有旧的无效映射关系！</p>
+</li>
+<li><p>这时候，再跳转到目标的虚拟地址</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="c1">// 注意此时加载的虚拟地址偏移可根据实际情况来设置！</span>
+<span class="nf">li.d</span><span class="w">   </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0xfffff00000000000</span>
+<span class="nf">pcaddi</span><span class="w"> </span><span class="no">$t1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span>
+<span class="nf">or</span><span class="w">     </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="no">$t1</span>
+<span class="nf">jirl</span><span class="w">   </span><span class="no">$zero</span><span class="p">,</span><span class="w"> </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0xc</span>
+</pre></div>
+</div>
+</li>
+<li><p>接着我们可以接着处理剩余的内核初始化工作流程！</p></li>
+<li><p>此时我们就执行在<strong>页表映射模式</strong>下，所有的虚拟地址的转换，都是通过页表来翻译。</p></li>
+</ul>
+</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>从上面的初始化步骤可以看出，步骤1是我们必须存在的过程。后面，我们可能只选择直接地址翻译模式，或者直接使用页表映射模式
+或者两者都同时存在。</p>
+<p>一般，在kernel刚获得执行权后，我们会初始化直接使用<strong>直接地址翻译模式</strong>，后续再如果有需要我们再设置页表映射模式。
+这样kernel在后续内核态的时候直接使用DMW，而不用进行页表映射，极大的加速了访问（因为页表映射模式还要访问TLB，可能还要访问内存等），而且操作方便简单！</p>
+<p>或者对于熟悉<strong>页表映射模式</strong>的开发者，可以不用DMW的方式，直接按照步骤三的方式，初始化页表TLB相关内容，直接使用页表翻译虚实地址。
+都是可以的。</p>
+<p>比如，Linux就是使用<strong>直接地址翻译模式</strong>和<strong>页表映射模式</strong>，而一些简单的嵌入式内核，只有一种特权模式，可以使用<strong>直接地址翻译模式</strong>来处理。</p>
+</div>
+</section>
+<section id="id3">
+<h2><span class="section-number">4.7.3. </span>如何建立虚拟地址到物理地址的映射关系<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>下面的例子我们假设采用三级页表，使用4KB页大小。</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">__create_2MB_mapping</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span>
+<span class="w">   </span><span class="c1">/// map 2MB</span>
+
+<span class="w">   </span><span class="kt">long</span><span class="w"> </span><span class="n">vir_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x1800000000</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">long</span><span class="w"> </span><span class="n">phy_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x1C000000</span><span class="p">;</span>
+
+<span class="w">   </span><span class="kt">long</span><span class="w"> </span><span class="n">phy_pfn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="p">)</span><span class="w"> </span><span class="n">phy_base</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">_PFN_SHIFT</span><span class="p">;</span>
+
+<span class="w">   </span><span class="c1">// 首先建立PGD页表，PGD基址是pgd_table</span>
+<span class="w">   </span><span class="n">pgd_t</span><span class="o">*</span><span class="w"> </span><span class="n">gptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pgd_table</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pgd_index</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">vir_base</span><span class="p">);</span>
+
+<span class="w">   </span><span class="c1">// 存放下一级PMD的基址</span>
+<span class="w">   </span><span class="o">*</span><span class="p">(</span><span class="kt">long</span><span class="o">*</span><span class="p">)</span><span class="n">gptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="p">)</span><span class="n">pmd_table</span><span class="p">;</span>
+<span class="w">   </span>
+<span class="w">   </span><span class="c1">// 建立PMD对应的映射</span>
+<span class="w">   </span><span class="n">pmd_t</span><span class="o">*</span><span class="w"> </span><span class="n">pmdptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmd_table</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pmd_index</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">vir_base</span><span class="p">);</span>
+<span class="w">   </span>
+<span class="w">   </span><span class="c1">// 存放下一级PTE的基址</span>
+<span class="w">   </span><span class="o">*</span><span class="p">((</span><span class="kt">long</span><span class="o">*</span><span class="p">)</span><span class="n">pmdptr</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="p">)</span><span class="n">pte_table</span><span class="p">;</span>
+<span class="w">   </span>
+<span class="w">   </span><span class="c1">// 为每一个PTE建立一个映射物理页。</span>
+<span class="w">   </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">PTRS_PER_PTE</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">pte_t</span><span class="o">*</span><span class="w"> </span><span class="n">pteptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pte_table</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">      </span><span class="c1">// *(pteptr) = pfn_pte((phy_pfn+i), PAGE_KERNEL);</span>
+<span class="w">      </span>
+<span class="w">      </span><span class="c1">// 在叶子节点页表，还需要增加相应的页表属性，比如PAGE_KERNEL，或者PAGE_USER</span>
+<span class="w">      </span><span class="o">*</span><span class="p">(</span><span class="n">pteptr</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pfn_pte</span><span class="p">((</span><span class="n">phy_pfn</span><span class="o">+</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">PAGE_USER</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+
+</pre></div>
+</div>
+<p>上面假设虚拟地址是0x1800000000，对应需要映射的物理地址是0x1C000000。</p>
+<p>上述中第Level 1级页表，也就是PTE，我们建立了<code class="docutils literal notranslate"><span class="pre">PTRS_PER_PTE=512</span></code>个物理页大小<code class="docutils literal notranslate"><span class="pre">PAGE_SIZE=4KB</span></code><br />
+所以上述的映射的内存总大小为:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Total_MEM_Size</span> <span class="o">=</span> <span class="n">PAGE_SIZE</span> <span class="o">*</span> <span class="n">PTRS_PER_PTE</span> <span class="o">=</span> <span class="mi">4</span><span class="n">KB</span> <span class="o">*</span> <span class="mi">512</span> <span class="o">=</span> <span class="mi">2</span><span class="n">MB</span>
+</pre></div>
+</div>
+<p>下面是页表表项相关的定义：</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Page table bits */</span>
+<span class="cp">#define  _PAGE_VALID_SHIFT      0</span>
+<span class="cp">#define  _PAGE_ACCESSED_SHIFT   0  </span><span class="cm">/* Reuse Valid for Accessed */</span>
+<span class="cp">#define  _PAGE_DIRTY_SHIFT      1</span>
+<span class="cp">#define  _PAGE_PLV_SHIFT        2  </span><span class="cm">/* 2~3, two bits */</span>
+<span class="cp">#define  _CACHE_SHIFT           4  </span><span class="cm">/* 4~5, two bits */</span>
+<span class="cp">#define  _PAGE_GLOBAL_SHIFT     6</span>
+<span class="cp">#define  _PAGE_HUGE_SHIFT       6  </span><span class="cm">/* HUGE is a PMD bit */</span>
+<span class="cp">#define  _PAGE_PRESENT_SHIFT    7</span>
+<span class="cp">#define  _PAGE_WRITE_SHIFT      8</span>
+<span class="cp">#define  _PAGE_MODIFIED_SHIFT   9</span>
+<span class="cp">#define  _PAGE_PROTNONE_SHIFT   10</span>
+<span class="cp">#define  _PAGE_SPECIAL_SHIFT    11</span>
+<span class="cp">#define  _PAGE_HGLOBAL_SHIFT    12 </span><span class="cm">/* HGlobal is a PMD bit */</span>
+<span class="cp">#define  _PAGE_PFN_SHIFT        12</span>
+<span class="cp">#define  _PAGE_PFN_END_SHIFT    48</span>
+<span class="cp">#define  _PAGE_NO_READ_SHIFT    61</span>
+<span class="cp">#define  _PAGE_NO_EXEC_SHIFT    62</span>
+<span class="cp">#define  _PAGE_RPLV_SHIFT       63</span>
+
+<span class="cp">#define _ULCAST_ (unsigned long)</span>
+
+<span class="cm">/* Used only by software */</span>
+<span class="cp">#define _PAGE_PRESENT   (_ULCAST_(1) &lt;&lt; _PAGE_PRESENT_SHIFT)</span>
+<span class="cp">#define _PAGE_WRITE     (_ULCAST_(1) &lt;&lt; _PAGE_WRITE_SHIFT)</span>
+<span class="cp">#define _PAGE_ACCESSED  (_ULCAST_(1) &lt;&lt; _PAGE_ACCESSED_SHIFT)</span>
+<span class="cp">#define _PAGE_MODIFIED  (_ULCAST_(1) &lt;&lt; _PAGE_MODIFIED_SHIFT)</span>
+<span class="cp">#define _PAGE_PROTNONE  (_ULCAST_(1) &lt;&lt; _PAGE_PROTNONE_SHIFT)</span>
+<span class="cp">#define _PAGE_SPECIAL   (_ULCAST_(1) &lt;&lt; _PAGE_SPECIAL_SHIFT)</span>
+
+<span class="cm">/* Used by TLB hardware (placed in EntryLo*) */</span>
+<span class="cp">#define _PAGE_VALID     (_ULCAST_(1) &lt;&lt; _PAGE_VALID_SHIFT)</span>
+<span class="cp">#define _PAGE_DIRTY     (_ULCAST_(1) &lt;&lt; _PAGE_DIRTY_SHIFT)</span>
+<span class="cp">#define _PAGE_PLV       (_ULCAST_(3) &lt;&lt; _PAGE_PLV_SHIFT)</span>
+<span class="cp">#define _PAGE_GLOBAL    (_ULCAST_(1) &lt;&lt; _PAGE_GLOBAL_SHIFT)</span>
+<span class="cp">#define _PAGE_HUGE      (_ULCAST_(1) &lt;&lt; _PAGE_HUGE_SHIFT)</span>
+<span class="cp">#define _PAGE_HGLOBAL   (_ULCAST_(1) &lt;&lt; _PAGE_HGLOBAL_SHIFT)</span>
+<span class="cp">#define _PAGE_NO_READ   (_ULCAST_(1) &lt;&lt; _PAGE_NO_READ_SHIFT)</span>
+<span class="cp">#define _PAGE_NO_EXEC   (_ULCAST_(1) &lt;&lt; _PAGE_NO_EXEC_SHIFT)</span>
+<span class="cp">#define _PAGE_RPLV      (_ULCAST_(1) &lt;&lt; _PAGE_RPLV_SHIFT)</span>
+<span class="cp">#define _CACHE_MASK     (_ULCAST_(3) &lt;&lt; _CACHE_SHIFT)</span>
+<span class="cp">#define _PFN_SHIFT      (PAGE_SHIFT - 12 + _PAGE_PFN_SHIFT)</span>
+
+<span class="cp">#define PLV_KERN        0</span>
+<span class="cp">#define PLV_USER        3</span>
+<span class="cp">#define PLV_MASK        0x3</span>
+
+<span class="cp">#define _PAGE_USER     (PLV_USER &lt;&lt; _PAGE_PLV_SHIFT)</span>
+<span class="cp">#define _PAGE_KERN     (PLV_KERN &lt;&lt; _PAGE_PLV_SHIFT)</span>
+
+<span class="cp">#define _PFN_MASK      (~((_ULCAST_(1) &lt;&lt; (_PFN_SHIFT)) - 1) &amp; \</span>
+<span class="cp">                       ((_ULCAST_(1) &lt;&lt; (_PAGE_PFN_END_SHIFT)) - 1))</span>
+
+<span class="cp">#define _CACHE_SUC     (0&lt;&lt;_CACHE_SHIFT) </span><span class="cm">/* Strong-ordered UnCached */</span>
+<span class="cp">#define _CACHE_CC      (1&lt;&lt;_CACHE_SHIFT) </span><span class="cm">/* Coherent Cached */</span>
+<span class="cp">#define _CACHE_WUC     (2&lt;&lt;_CACHE_SHIFT) </span><span class="cm">/* Weak-ordered UnCached */</span>
+
+
+<span class="cp">#define __READABLE     (_PAGE_VALID)</span>
+<span class="cp">#define __WRITEABLE    (_PAGE_DIRTY | _PAGE_WRITE)</span>
+
+<span class="cp">#define PAGE_KERNEL     __pgprot(_PAGE_PRESENT | __READABLE | __WRITEABLE | \</span>
+<span class="cp">                                 _PAGE_GLOBAL | _PAGE_KERN | _CACHE_CC)</span>
+<span class="cp">#define PAGE_KERNEL_SUC __pgprot(_PAGE_PRESENT | __READABLE | __WRITEABLE | \</span>
+<span class="cp">                                 _PAGE_GLOBAL | _PAGE_KERN |  _CACHE_SUC)</span>
+<span class="cp">#define PAGE_KERNEL_WUC __pgprot(_PAGE_PRESENT | __READABLE | __WRITEABLE | \</span>
+<span class="cp">                                 _PAGE_GLOBAL | _PAGE_KERN |  _CACHE_WUC)</span>
+
+<span class="cp">#define PAGE_USER       __pgprot(_PAGE_PRESENT | __READABLE | __WRITEABLE | \</span>
+<span class="cp">                                 _PAGE_USER | _CACHE_CC)</span>
+
+</pre></div>
+</div>
+<p>下面是操作页表的一些函数：</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define PAGE_SHIFT   12</span>
+<span class="cp">#define PAGE_SIZE    (1UL &lt;&lt; PAGE_SHIFT)</span>
+
+<span class="cp">#define PTRS_PER_PGD ((PAGE_SIZE) &gt;&gt; 3)</span>
+<span class="cp">#define PTRS_PER_PUD ((PAGE_SIZE) &gt;&gt; 3)</span>
+<span class="cp">#define PTRS_PER_PMD ((PAGE_SIZE) &gt;&gt; 3)</span>
+<span class="cp">#define PTRS_PER_PTE ((PAGE_SIZE) &gt;&gt; 3)</span>
+
+<span class="cp">#define PMD_SHIFT (PAGE_SHIFT + (PAGE_SHIFT + PTE_ORDER - 3))</span>
+<span class="cp">#define PMD_SIZE  (1UL &lt;&lt; PMD_SHIFT)</span>
+<span class="cp">#define PMD_MASK  (~(PMD_SIZE-1))</span>
+
+<span class="cp">#define PUD_SHIFT (PMD_SHIFT + (PAGE_SHIFT + PMD_ORDER - 3))</span>
+<span class="cp">#define PUD_SIZE  (1UL &lt;&lt; PUD_SHIFT)</span>
+<span class="cp">#define PUD_MASK  (~(PUD_SIZE-1))</span>
+
+<span class="cp">#define PGD_SHIFT (PMD_SHIFT + (PAGE_SHIFT + PMD_ORDER - 3))</span>
+<span class="cp">#define PGDIR_SHIFT  (PMD_SHIFT + (PAGE_SHIFT + PMD_ORDER - 3))</span>
+
+<span class="cp">#define PGDIR_SIZE   (1UL &lt;&lt; PGDIR_SHIFT)</span>
+<span class="cp">#define PGDIR_MASK   (~(PGDIR_SIZE-1))</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="nf">pte_index</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">address</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">address</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">PAGE_SHIFT</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">PTRS_PER_PTE</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="nf">pmd_index</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">address</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">address</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">PMD_SHIFT</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">PTRS_PER_PMD</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="nf">pud_index</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">address</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">address</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">PUD_SHIFT</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">PTRS_PER_PUD</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="cp">#define pgd_index(a)  (((a) &gt;&gt; PGDIR_SHIFT) &amp; (PTRS_PER_PGD - 1))</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="n">pgd_t</span><span class="w"> </span><span class="o">*</span><span class="nf">pgd_offset_pgd</span><span class="p">(</span><span class="n">pgd_t</span><span class="w"> </span><span class="o">*</span><span class="n">pgd</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">address</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">pgd</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pgd_index</span><span class="p">(</span><span class="n">address</span><span class="p">));</span>
+<span class="p">};</span>
+
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h2><span class="section-number">4.7.4. </span>页表的遍历页表<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>假设我们现在使用4K页，或者2M页面，使用软件重填机制（硬件重填机制相似），<br />
+访问一个虚拟地址为0xfffff8007898的地址。</p>
+<p>下面我们按照Kernel的视角来看如何处理。</p>
+<p>我们还是以Linux内核代码为例说明。</p>
+<p>假设内核有下面的汇编代码需要执行：</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nf">li.d</span><span class="w">  </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0xfffff8007898</span>
+<span class="nf">ld.d</span><span class="w">  </span><span class="no">$t1</span><span class="p">,</span><span class="w"> </span><span class="no">$t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span>
+</pre></div>
+</div>
+<p>此时当执行指令<code class="docutils literal notranslate"><span class="pre">ld.d</span>&#160; <span class="pre">$t1,</span> <span class="pre">$t0,</span> <span class="pre">0</span></code>时，首先</p>
+<p>CPU按照<a class="reference internal" href="tlb_struct.html#cpu-inner-tlb-lookup"><span class="std std-ref"><u>内部TLB查找流程</u></span></a>看是否有对应的STLB和MTLB命中，
+如果没有命中的话，直接抛出TLB重填例外。</p>
+</section>
+<section id="tlb">
+<h2><span class="section-number">4.7.5. </span>情况1. 如果TLB中没有映射<a class="headerlink" href="#tlb" title="Link to this heading"></a></h2>
+<p>如果CPU抛出TLB重填例外，此时CPU跳转到CSR.TLBRENTRY也就是<code class="docutils literal notranslate"><span class="pre">handle_tlb_refill</span></code>
+函数执行，具体的分析看<a class="reference internal" href="tlb_ptw.html#three-level-page-table-refill"><span class="std std-ref"><u>三级页表重填的示例代码</u></span></a>。</p>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>当触发 TLB 重填例外时，处理器硬件会进行如下操作：</p>
+<p>❖将 CSR.CRMD 的 PLV、IE 分别存到 CSR.TLBRPRMD 的 PPLV、PIE 中，然后将 CSR.CRMD 的<br />
+PLV 置为 0，IE 置为 0，DA 置为 1，PG 置为 0；</p>
+<p>❖对于支持 Watch 功能的实现，还要将 CSR.CRMD 的 WE 存到 CSR.TLBRPRMD 的 PWE 中，然后<br />
+将 CSR.CRMD 的 WE 置为 0；</p>
+<p>❖将触发例外指令的 PC 的[GRLEN-1:2]位记录到 CSR.TLBRERA 的 ERA 域中，将 CSR.TLBRERA<br />
+的 IsTLBR 置为 1；</p>
+<p>❖将触发该例外的访存虚地址（如果是取指触发的则就是 PC）记录到 CSR.TLBRBADV 中，将虚地<br />
+址的[PALEN-1:13]位记录到 CSR.TLBREHI 的 VPPN 域中；</p>
+<p>❖跳转到 CSR.TLBRENTTRY 所配置的例外入口处取指。</p>
+<p>当软件执行 ERTN 指令从 TLB 重填例外执行返回时，处理器硬件会完成如下操作：</p>
+<p>❖将 CSR.TLBRPRMD 中的 PPLV、PIE 值恢复到 CSR.CRMD 的 PLV、IE 中；</p>
+<p>❖对于支持 Watch 功能的实现，还要将 CSR.TLBRPRMD 中的 PWE 值恢复到 CSR.CRMD 的 WE 中；</p>
+<p>❖将 CSR.CRMD 的 DA 置为 0，PG 置为 1；</p>
+<p>❖将 CSR.TLBRERA 的 IsTLBR 置为 0；</p>
+<p>❖跳转到 CSR.TLBRERA 所记录的地址处取指。</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>TLB软件重填使用频率高，因此代码都比较精简，一般情况下，代码都是通用的！可参看我们上个章节给出的例子，需要结合CSR.PWCH和CSR.PWCL寄存器。</p>
+</div>
+<p>TLB重填完成后，会继续执行访存指令<code class="docutils literal notranslate"><span class="pre">ld.d</span>&#160; <span class="pre">$t1,</span> <span class="pre">$t0,</span> <span class="pre">0</span></code></p>
+<p>CPU按照<a class="reference internal" href="tlb_struct.html#cpu-inner-tlb-lookup"><span class="std std-ref"><u>内部TLB查找流程</u></span></a>由于我们已经进行了TLB重填异常处理，因此我们
+肯定会命中TLB表项。</p>
+<p>然后我们继续分析下面的情况。</p>
+</section>
+<section id="v-0">
+<h2><span class="section-number">4.7.6. </span>情况2. 如果页表项的V=0<a class="headerlink" href="#v-0" title="Link to this heading"></a></h2>
+<p>如此CPU查找到TLB的表项中V=0，也就是说，此虚拟地址对应的物理页不存在，因此会抛出异常</p>
+<p>此时区分访存的类型，抛出不同的异常处理：</p>
+<ul class="simple">
+<li><p>FETCH : SignalException(PIF) #报取指操作页无效例外</p></li>
+<li><p>LOAD:   SignalException(PIL) #报 load 操作页无效例外</p></li>
+<li><p>STORE : SignalException(PIS) #报 store 操作页无效例外</p></li>
+</ul>
+<p>按照我们当前的例子，我们是load指令出了异常，因此执行PIL异常处理。</p>
+<p>按照上面的初始化流程<a class="reference internal" href="#exception-table-example"><u>异常初始化</u></a>，此时CPU执行对应异常号为<code class="docutils literal notranslate"><span class="pre">EXCCODE_TLBL</span></code>的例外。</p>
+<p>也就是执行函数handle_tlb_load，下面分析Linux中LoongArch有关的历程代码。</p>
+<div class="highlight-text notranslate" id="example-handle-tlb-load"><div class="highlight"><pre><span></span>SYM_CODE_START(handle_tlb_load)
+   UNWIND_HINT_UNDEFINED
+   csrwr    t0, EXCEPTION_KS0
+   csrwr    t1, EXCEPTION_KS1
+   csrwr    ra, EXCEPTION_KS2
+
+   /*
+    * The vmalloc handling is not in the hotpath.
+    */
+   csrrd    t0, LOONGARCH_CSR_BADV
+   bltz     t0, vmalloc_load
+   csrrd    t1, LOONGARCH_CSR_PGDL
+
+vmalloc_done_load:
+   /* Get PGD offset in bytes */
+   bstrpick.d  ra, t0, PTRS_PER_PGD_BITS + PGDIR_SHIFT - 1, PGDIR_SHIFT
+   alsl.d      t1, ra, t1, 3
+#if CONFIG_PGTABLE_LEVELS &gt; 3
+   ld.d     t1, t1, 0
+   bstrpick.d  ra, t0, PTRS_PER_PUD_BITS + PUD_SHIFT - 1, PUD_SHIFT
+   alsl.d      t1, ra, t1, 3
+#endif
+#if CONFIG_PGTABLE_LEVELS &gt; 2
+   ld.d     t1, t1, 0
+   bstrpick.d  ra, t0, PTRS_PER_PMD_BITS + PMD_SHIFT - 1, PMD_SHIFT
+   alsl.d      t1, ra, t1, 3
+#endif
+   ld.d     ra, t1, 0
+
+   /*
+    * For huge tlb entries, pmde doesn&#39;t contain an address but
+    * instead contains the tlb pte. Check the PAGE_HUGE bit and
+    * see if we need to jump to huge tlb processing.
+    */
+   rotri.d     ra, ra, _PAGE_HUGE_SHIFT + 1
+   bltz     ra, tlb_huge_update_load
+
+   rotri.d     ra, ra, 64 - (_PAGE_HUGE_SHIFT + 1)
+   bstrpick.d  t0, t0, PTRS_PER_PTE_BITS + PAGE_SHIFT - 1, PAGE_SHIFT
+   alsl.d      t1, t0, ra, _PTE_T_LOG2
+
+#ifdef CONFIG_SMP
+smp_pgtable_change_load:
+   ll.d     t0, t1, 0
+#else
+   ld.d     t0, t1, 0
+#endif
+   andi     ra, t0, _PAGE_PRESENT
+   beqz     ra, nopage_tlb_load
+
+   ori      t0, t0, _PAGE_VALID
+#ifdef CONFIG_SMP
+   sc.d     t0, t1, 0
+   beqz     t0, smp_pgtable_change_load
+#else
+   st.d     t0, t1, 0
+#endif
+   tlbsrch
+   bstrins.d   t1, zero, 3, 3
+   ld.d     t0, t1, 0
+   ld.d     t1, t1, 8
+   csrwr    t0, LOONGARCH_CSR_TLBELO0
+   csrwr    t1, LOONGARCH_CSR_TLBELO1
+   tlbwr
+
+   csrrd    t0, EXCEPTION_KS0
+   csrrd    t1, EXCEPTION_KS1
+   csrrd    ra, EXCEPTION_KS2
+   ertn
+
+#ifdef CONFIG_64BIT
+vmalloc_load:
+   la_abs      t1, swapper_pg_dir
+   b     vmalloc_done_load
+#endif
+
+   /* This is the entry point of a huge page. */
+tlb_huge_update_load:
+#ifdef CONFIG_SMP
+   ll.d     ra, t1, 0
+#else
+   rotri.d     ra, ra, 64 - (_PAGE_HUGE_SHIFT + 1)
+#endif
+   andi     t0, ra, _PAGE_PRESENT
+   beqz     t0, nopage_tlb_load
+
+#ifdef CONFIG_SMP
+   ori      t0, ra, _PAGE_VALID
+   sc.d     t0, t1, 0
+   beqz     t0, tlb_huge_update_load
+   ori      t0, ra, _PAGE_VALID
+#else
+   ori      t0, ra, _PAGE_VALID
+   st.d     t0, t1, 0
+#endif
+   csrrd    ra, LOONGARCH_CSR_ASID
+   csrrd    t1, LOONGARCH_CSR_BADV
+   andi     ra, ra, CSR_ASID_ASID
+   invtlb      INVTLB_ADDR_GFALSE_AND_ASID, ra, t1
+
+   /*
+    * A huge PTE describes an area the size of the
+    * configured huge page size. This is twice the
+    * of the large TLB entry size we intend to use.
+    * A TLB entry half the size of the configured
+    * huge page size is configured into entrylo0
+    * and entrylo1 to cover the contiguous huge PTE
+    * address space.
+    */
+   /* Huge page: Move Global bit */
+   xori     t0, t0, _PAGE_HUGE
+   lu12i.w     t1, _PAGE_HGLOBAL &gt;&gt; 12
+   and      t1, t0, t1
+   srli.d      t1, t1, (_PAGE_HGLOBAL_SHIFT - _PAGE_GLOBAL_SHIFT)
+   or    t0, t0, t1
+
+   move     ra, t0
+   csrwr    ra, LOONGARCH_CSR_TLBELO0
+
+   /* Convert to entrylo1 */
+   addi.d      t1, zero, 1
+   slli.d      t1, t1, (HPAGE_SHIFT - 1)
+   add.d    t0, t0, t1
+   csrwr    t0, LOONGARCH_CSR_TLBELO1
+
+   /* Set huge page tlb entry size */
+   addu16i.d   t0, zero, (CSR_TLBIDX_PS &gt;&gt; 16)
+   addu16i.d   t1, zero, (PS_HUGE_SIZE &lt;&lt; (CSR_TLBIDX_PS_SHIFT - 16))
+   csrxchg     t1, t0, LOONGARCH_CSR_TLBIDX
+
+   tlbfill
+
+   addu16i.d   t0, zero, (CSR_TLBIDX_PS &gt;&gt; 16)
+   addu16i.d   t1, zero, (PS_DEFAULT_SIZE &lt;&lt; (CSR_TLBIDX_PS_SHIFT - 16))
+   csrxchg     t1, t0, LOONGARCH_CSR_TLBIDX
+
+   csrrd    t0, EXCEPTION_KS0
+   csrrd    t1, EXCEPTION_KS1
+   csrrd    ra, EXCEPTION_KS2
+   ertn
+
+nopage_tlb_load:
+   dbar     0x700
+   csrrd    ra, EXCEPTION_KS2
+   la_abs      t0, tlb_do_page_fault_0
+   jr    t0
+SYM_CODE_END(handle_tlb_load)
+</pre></div>
+</div>
+<p>过程如下：</p>
+<ul class="simple">
+<li><p>先保存handle_tlb_load使用的临时寄存器到CSR.SAVE[x]中。</p></li>
+<li><p>读出出错的地址从CSR.BADV寄存器。</p></li>
+<li><p>分析出错地址是内核地址还是用户地址空间，针对不同的历程，走不同的处理方法。</p></li>
+<li><p>从CSR.PGDL中得出全局页表基址，然后分析其PGD，PMD，PTE</p></li>
+<li><p>判断PTE是否存在，<code class="docutils literal notranslate"><span class="pre">andi</span> <span class="pre">$ra,</span> <span class="pre">$t0,</span> <span class="pre">_PAGE_PRESENT</span></code>, 如果不存在，跳转到nopage_tlb_load中执行。</p></li>
+<li><p>nopage_tlb_load是对 tlb_do_page_fault的包装函数。</p></li>
+<li><p>执行函数LoongArch下的do_page_fault函数：</p></li>
+</ul>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="n">asmlinkage</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">__kprobes</span><span class="w"> </span><span class="n">do_page_fault</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">pt_regs</span><span class="w"> </span><span class="o">*</span><span class="n">regs</span><span class="p">,</span>
+<span class="w">           </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">write</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">address</span><span class="p">)</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">     </span><span class="n">irqentry_state_t</span><span class="w"> </span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">irqentry_enter</span><span class="p">(</span><span class="n">regs</span><span class="p">);</span>
+<span class="w">  </span>
+<span class="w">     </span><span class="cm">/* Enable interrupt if enabled in parent context */</span>
+<span class="w">     </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">likely</span><span class="p">(</span><span class="n">regs</span><span class="o">-&gt;</span><span class="n">csr_prmd</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">CSR_PRMD_PIE</span><span class="p">))</span>
+<span class="w">        </span><span class="n">local_irq_enable</span><span class="p">();</span>
+<span class="w">  </span>
+<span class="w">     </span><span class="n">__do_page_fault</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span><span class="w"> </span><span class="n">write</span><span class="p">,</span><span class="w"> </span><span class="n">address</span><span class="p">);</span>
+<span class="w">  </span>
+<span class="w">     </span><span class="n">local_irq_disable</span><span class="p">();</span>
+<span class="w">  </span>
+<span class="w">     </span><span class="n">irqentry_exit</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>进入内核的公共处理函数<code class="docutils literal notranslate"><span class="pre">fault</span> <span class="pre">=</span> <span class="pre">handle_mm_fault(vma,</span> <span class="pre">address,</span> <span class="pre">flags,</span> <span class="pre">regs)</span></code>执行：</p></li>
+</ul>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="n">vm_fault_t</span><span class="w"> </span><span class="n">handle_mm_fault</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">vm_area_struct</span><span class="w"> </span><span class="o">*</span><span class="n">vma</span><span class="p">,</span>
+<span class="w">               </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">address</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">flags</span><span class="p">,</span>
+<span class="w">               </span><span class="k">struct</span><span class="w"> </span><span class="nc">pt_regs</span><span class="w"> </span><span class="o">*</span><span class="n">regs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">handle_mm_fault</span></code> 函数会执行我们上章节页表的遍历过程，分配物理页，设置对应的页表表项，然后返回。</p>
+</section>
+<section id="d-0">
+<h2><span class="section-number">4.7.7. </span>情况3. 如果写操作页表项D=0<a class="headerlink" href="#d-0" title="Link to this heading"></a></h2>
+<p>如果访存的是一个Store指令，比如<code class="docutils literal notranslate"><span class="pre">st.d</span>&#160; <span class="pre">$t1,</span> <span class="pre">$t0,</span> <span class="pre">0</span></code>时，store指令操作的虚地址在 TLB 中找到了匹配，且    V=1，且特权等级合规的项，但是该页 表项的 D 位为 0，将触发页修改例外PME例外。</p>
+<p>PME按照我们上面的初始化，此时CPU执行对应异常号为<code class="docutils literal notranslate"><span class="pre">EXCCODE_TLBM</span></code>的例外。</p>
+<p>也就是执行函数handle_tlb_modify，下面分析Linux中LoongArch有关PME的处理历程代码。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SYM_CODE_START</span><span class="p">(</span><span class="n">handle_tlb_modify</span><span class="p">)</span>
+   <span class="n">UNWIND_HINT_UNDEFINED</span>
+   <span class="n">csrwr</span>    <span class="n">t0</span><span class="p">,</span> <span class="n">EXCEPTION_KS0</span>
+   <span class="n">csrwr</span>    <span class="n">t1</span><span class="p">,</span> <span class="n">EXCEPTION_KS1</span>
+   <span class="n">csrwr</span>    <span class="n">ra</span><span class="p">,</span> <span class="n">EXCEPTION_KS2</span>
+
+   <span class="o">/*</span>
+    <span class="o">*</span> <span class="n">The</span> <span class="n">vmalloc</span> <span class="n">handling</span> <span class="ow">is</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">hotpath</span><span class="o">.</span>
+    <span class="o">*/</span>
+   <span class="n">csrrd</span>    <span class="n">t0</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_BADV</span>
+   <span class="n">bltz</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">vmalloc_modify</span>
+   <span class="n">csrrd</span>    <span class="n">t1</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_PGDL</span>
+
+<span class="n">vmalloc_done_modify</span><span class="p">:</span>
+   <span class="o">/*</span> <span class="n">Get</span> <span class="n">PGD</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">bytes</span> <span class="o">*/</span>
+   <span class="n">bstrpick</span><span class="o">.</span><span class="n">d</span>  <span class="n">ra</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PTRS_PER_PGD_BITS</span> <span class="o">+</span> <span class="n">PGDIR_SHIFT</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">PGDIR_SHIFT</span>
+   <span class="n">alsl</span><span class="o">.</span><span class="n">d</span>      <span class="n">t1</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">3</span>
+<span class="c1">#if CONFIG_PGTABLE_LEVELS &gt; 3</span>
+   <span class="n">ld</span><span class="o">.</span><span class="n">d</span>     <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+   <span class="n">bstrpick</span><span class="o">.</span><span class="n">d</span>  <span class="n">ra</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PTRS_PER_PUD_BITS</span> <span class="o">+</span> <span class="n">PUD_SHIFT</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">PUD_SHIFT</span>
+   <span class="n">alsl</span><span class="o">.</span><span class="n">d</span>      <span class="n">t1</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">3</span>
+<span class="c1">#endif</span>
+<span class="c1">#if CONFIG_PGTABLE_LEVELS &gt; 2</span>
+   <span class="n">ld</span><span class="o">.</span><span class="n">d</span>     <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+   <span class="n">bstrpick</span><span class="o">.</span><span class="n">d</span>  <span class="n">ra</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PTRS_PER_PMD_BITS</span> <span class="o">+</span> <span class="n">PMD_SHIFT</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">PMD_SHIFT</span>
+   <span class="n">alsl</span><span class="o">.</span><span class="n">d</span>      <span class="n">t1</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">3</span>
+<span class="c1">#endif</span>
+   <span class="n">ld</span><span class="o">.</span><span class="n">d</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+
+   <span class="o">/*</span>
+    <span class="o">*</span> <span class="n">For</span> <span class="n">huge</span> <span class="n">tlb</span> <span class="n">entries</span><span class="p">,</span> <span class="n">pmde</span> <span class="n">doesn</span><span class="s1">&#39;t contain an address but</span>
+    <span class="o">*</span> <span class="n">instead</span> <span class="n">contains</span> <span class="n">the</span> <span class="n">tlb</span> <span class="n">pte</span><span class="o">.</span> <span class="n">Check</span> <span class="n">the</span> <span class="n">PAGE_HUGE</span> <span class="n">bit</span> <span class="ow">and</span>
+    <span class="o">*</span> <span class="n">see</span> <span class="k">if</span> <span class="n">we</span> <span class="n">need</span> <span class="n">to</span> <span class="n">jump</span> <span class="n">to</span> <span class="n">huge</span> <span class="n">tlb</span> <span class="n">processing</span><span class="o">.</span>
+    <span class="o">*/</span>
+   <span class="n">rotri</span><span class="o">.</span><span class="n">d</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">_PAGE_HUGE_SHIFT</span> <span class="o">+</span> <span class="mi">1</span>
+   <span class="n">bltz</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">tlb_huge_update_modify</span>
+
+   <span class="n">rotri</span><span class="o">.</span><span class="n">d</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="mi">64</span> <span class="o">-</span> <span class="p">(</span><span class="n">_PAGE_HUGE_SHIFT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+   <span class="n">bstrpick</span><span class="o">.</span><span class="n">d</span>  <span class="n">t0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PTRS_PER_PTE_BITS</span> <span class="o">+</span> <span class="n">PAGE_SHIFT</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">PAGE_SHIFT</span>
+   <span class="n">alsl</span><span class="o">.</span><span class="n">d</span>      <span class="n">t1</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">_PTE_T_LOG2</span>
+
+<span class="c1">#ifdef CONFIG_SMP</span>
+<span class="n">smp_pgtable_change_modify</span><span class="p">:</span>
+   <span class="n">ll</span><span class="o">.</span><span class="n">d</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+<span class="c1">#else</span>
+   <span class="n">ld</span><span class="o">.</span><span class="n">d</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+<span class="c1">#endif</span>
+   <span class="n">andi</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">_PAGE_WRITE</span>
+   <span class="n">beqz</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">nopage_tlb_modify</span>
+
+   <span class="n">ori</span>      <span class="n">t0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="p">(</span><span class="n">_PAGE_VALID</span> <span class="o">|</span> <span class="n">_PAGE_DIRTY</span> <span class="o">|</span> <span class="n">_PAGE_MODIFIED</span><span class="p">)</span>
+<span class="c1">#ifdef CONFIG_SMP</span>
+   <span class="n">sc</span><span class="o">.</span><span class="n">d</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+   <span class="n">beqz</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">smp_pgtable_change_modify</span>
+<span class="c1">#else</span>
+   <span class="n">st</span><span class="o">.</span><span class="n">d</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+<span class="c1">#endif</span>
+   <span class="n">tlbsrch</span>
+   <span class="n">bstrins</span><span class="o">.</span><span class="n">d</span>   <span class="n">t1</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span>
+   <span class="n">ld</span><span class="o">.</span><span class="n">d</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+   <span class="n">ld</span><span class="o">.</span><span class="n">d</span>     <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">8</span>
+   <span class="n">csrwr</span>    <span class="n">t0</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_TLBELO0</span>
+   <span class="n">csrwr</span>    <span class="n">t1</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_TLBELO1</span>
+   <span class="n">tlbwr</span>
+
+   <span class="n">csrrd</span>    <span class="n">t0</span><span class="p">,</span> <span class="n">EXCEPTION_KS0</span>
+   <span class="n">csrrd</span>    <span class="n">t1</span><span class="p">,</span> <span class="n">EXCEPTION_KS1</span>
+   <span class="n">csrrd</span>    <span class="n">ra</span><span class="p">,</span> <span class="n">EXCEPTION_KS2</span>
+   <span class="n">ertn</span>
+
+<span class="c1">#ifdef CONFIG_64BIT</span>
+<span class="n">vmalloc_modify</span><span class="p">:</span>
+   <span class="n">la_abs</span>      <span class="n">t1</span><span class="p">,</span> <span class="n">swapper_pg_dir</span>
+   <span class="n">b</span>     <span class="n">vmalloc_done_modify</span>
+<span class="c1">#endif</span>
+
+   <span class="o">/*</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">entry</span> <span class="n">point</span> <span class="n">of</span> <span class="n">a</span> <span class="n">huge</span> <span class="n">page</span><span class="o">.</span> <span class="o">*/</span>
+<span class="n">tlb_huge_update_modify</span><span class="p">:</span>
+<span class="c1">#ifdef CONFIG_SMP</span>
+   <span class="n">ll</span><span class="o">.</span><span class="n">d</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+<span class="c1">#else</span>
+   <span class="n">rotri</span><span class="o">.</span><span class="n">d</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="mi">64</span> <span class="o">-</span> <span class="p">(</span><span class="n">_PAGE_HUGE_SHIFT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="c1">#endif</span>
+   <span class="n">andi</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">_PAGE_WRITE</span>
+   <span class="n">beqz</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">nopage_tlb_modify</span>
+
+<span class="c1">#ifdef CONFIG_SMP</span>
+   <span class="n">ori</span>      <span class="n">t0</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="p">(</span><span class="n">_PAGE_VALID</span> <span class="o">|</span> <span class="n">_PAGE_DIRTY</span> <span class="o">|</span> <span class="n">_PAGE_MODIFIED</span><span class="p">)</span>
+   <span class="n">sc</span><span class="o">.</span><span class="n">d</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+   <span class="n">beqz</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">tlb_huge_update_modify</span>
+   <span class="n">ori</span>      <span class="n">t0</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="p">(</span><span class="n">_PAGE_VALID</span> <span class="o">|</span> <span class="n">_PAGE_DIRTY</span> <span class="o">|</span> <span class="n">_PAGE_MODIFIED</span><span class="p">)</span>
+<span class="c1">#else</span>
+   <span class="n">ori</span>      <span class="n">t0</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="p">(</span><span class="n">_PAGE_VALID</span> <span class="o">|</span> <span class="n">_PAGE_DIRTY</span> <span class="o">|</span> <span class="n">_PAGE_MODIFIED</span><span class="p">)</span>
+   <span class="n">st</span><span class="o">.</span><span class="n">d</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="mi">0</span>
+<span class="c1">#endif</span>
+   <span class="n">csrrd</span>    <span class="n">ra</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_ASID</span>
+   <span class="n">csrrd</span>    <span class="n">t1</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_BADV</span>
+   <span class="n">andi</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">CSR_ASID_ASID</span>
+   <span class="n">invtlb</span>      <span class="n">INVTLB_ADDR_GFALSE_AND_ASID</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">t1</span>
+
+   <span class="o">/*</span>
+    <span class="o">*</span> <span class="n">A</span> <span class="n">huge</span> <span class="n">PTE</span> <span class="n">describes</span> <span class="n">an</span> <span class="n">area</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">the</span>
+    <span class="o">*</span> <span class="n">configured</span> <span class="n">huge</span> <span class="n">page</span> <span class="n">size</span><span class="o">.</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">twice</span> <span class="n">the</span>
+    <span class="o">*</span> <span class="n">of</span> <span class="n">the</span> <span class="n">large</span> <span class="n">TLB</span> <span class="n">entry</span> <span class="n">size</span> <span class="n">we</span> <span class="n">intend</span> <span class="n">to</span> <span class="n">use</span><span class="o">.</span>
+    <span class="o">*</span> <span class="n">A</span> <span class="n">TLB</span> <span class="n">entry</span> <span class="n">half</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">configured</span>
+    <span class="o">*</span> <span class="n">huge</span> <span class="n">page</span> <span class="n">size</span> <span class="ow">is</span> <span class="n">configured</span> <span class="n">into</span> <span class="n">entrylo0</span>
+    <span class="o">*</span> <span class="ow">and</span> <span class="n">entrylo1</span> <span class="n">to</span> <span class="n">cover</span> <span class="n">the</span> <span class="n">contiguous</span> <span class="n">huge</span> <span class="n">PTE</span>
+    <span class="o">*</span> <span class="n">address</span> <span class="n">space</span><span class="o">.</span>
+    <span class="o">*/</span>
+   <span class="o">/*</span> <span class="n">Huge</span> <span class="n">page</span><span class="p">:</span> <span class="n">Move</span> <span class="n">Global</span> <span class="n">bit</span> <span class="o">*/</span>
+   <span class="n">xori</span>     <span class="n">t0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">_PAGE_HUGE</span>
+   <span class="n">lu12i</span><span class="o">.</span><span class="n">w</span>     <span class="n">t1</span><span class="p">,</span> <span class="n">_PAGE_HGLOBAL</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span>
+   <span class="ow">and</span>      <span class="n">t1</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span>
+   <span class="n">srli</span><span class="o">.</span><span class="n">d</span>      <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="p">(</span><span class="n">_PAGE_HGLOBAL_SHIFT</span> <span class="o">-</span> <span class="n">_PAGE_GLOBAL_SHIFT</span><span class="p">)</span>
+   <span class="ow">or</span>    <span class="n">t0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span>
+
+   <span class="n">move</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">t0</span>
+   <span class="n">csrwr</span>    <span class="n">ra</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_TLBELO0</span>
+
+   <span class="o">/*</span> <span class="n">Convert</span> <span class="n">to</span> <span class="n">entrylo1</span> <span class="o">*/</span>
+   <span class="n">addi</span><span class="o">.</span><span class="n">d</span>      <span class="n">t1</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="mi">1</span>
+   <span class="n">slli</span><span class="o">.</span><span class="n">d</span>      <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="p">(</span><span class="n">HPAGE_SHIFT</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+   <span class="n">add</span><span class="o">.</span><span class="n">d</span>    <span class="n">t0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span>
+   <span class="n">csrwr</span>    <span class="n">t0</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_TLBELO1</span>
+
+   <span class="o">/*</span> <span class="n">Set</span> <span class="n">huge</span> <span class="n">page</span> <span class="n">tlb</span> <span class="n">entry</span> <span class="n">size</span> <span class="o">*/</span>
+   <span class="n">addu16i</span><span class="o">.</span><span class="n">d</span>   <span class="n">t0</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="p">(</span><span class="n">CSR_TLBIDX_PS</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">)</span>
+   <span class="n">addu16i</span><span class="o">.</span><span class="n">d</span>   <span class="n">t1</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="p">(</span><span class="n">PS_HUGE_SIZE</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">CSR_TLBIDX_PS_SHIFT</span> <span class="o">-</span> <span class="mi">16</span><span class="p">))</span>
+   <span class="n">csrxchg</span>     <span class="n">t1</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_TLBIDX</span>
+
+   <span class="n">tlbfill</span>
+
+   <span class="o">/*</span> <span class="n">Reset</span> <span class="n">default</span> <span class="n">page</span> <span class="n">size</span> <span class="o">*/</span>
+   <span class="n">addu16i</span><span class="o">.</span><span class="n">d</span>   <span class="n">t0</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="p">(</span><span class="n">CSR_TLBIDX_PS</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">)</span>
+   <span class="n">addu16i</span><span class="o">.</span><span class="n">d</span>   <span class="n">t1</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="p">(</span><span class="n">PS_DEFAULT_SIZE</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">CSR_TLBIDX_PS_SHIFT</span> <span class="o">-</span> <span class="mi">16</span><span class="p">))</span>
+   <span class="n">csrxchg</span>     <span class="n">t1</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_TLBIDX</span>
+
+   <span class="n">csrrd</span>    <span class="n">t0</span><span class="p">,</span> <span class="n">EXCEPTION_KS0</span>
+   <span class="n">csrrd</span>    <span class="n">t1</span><span class="p">,</span> <span class="n">EXCEPTION_KS1</span>
+   <span class="n">csrrd</span>    <span class="n">ra</span><span class="p">,</span> <span class="n">EXCEPTION_KS2</span>
+   <span class="n">ertn</span>
+
+<span class="n">nopage_tlb_modify</span><span class="p">:</span>
+   <span class="n">dbar</span>     <span class="mh">0x700</span>
+   <span class="n">csrrd</span>    <span class="n">ra</span><span class="p">,</span> <span class="n">EXCEPTION_KS2</span>
+   <span class="n">la_abs</span>      <span class="n">t0</span><span class="p">,</span> <span class="n">tlb_do_page_fault_1</span>
+   <span class="n">jr</span>    <span class="n">t0</span>
+<span class="n">SYM_CODE_END</span><span class="p">(</span><span class="n">handle_tlb_modify</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>其处理逻辑和上面的章节的<a class="reference internal" href="#example-handle-tlb-load"><u>handle_tlb_load</u></a>主题逻辑差异不大，但是<br />
+有几个需要注意下的是：</p>
+<ul>
+<li><p>将内存PTE读取后，首先要判断PTE属性是否可写<code class="docutils literal notranslate"><span class="pre">andi</span>&#160; <span class="pre">$t0,</span> <span class="pre">$ra,</span> <span class="pre">_PAGE_WRITE</span></code></p></li>
+<li><p>如果PTE不可写，直接走nopage_tlb_modify分支，</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nl">nopage_tlb_modify:</span>
+<span class="w">   </span><span class="nf">dbar</span><span class="w">     </span><span class="mi">0x700</span>
+<span class="w">   </span><span class="nf">csrrd</span><span class="w">    </span><span class="no">ra</span><span class="p">,</span><span class="w"> </span><span class="no">EXCEPTION_KS2</span>
+<span class="w">   </span><span class="nf">la_abs</span><span class="w">   </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">tlb_do_page_fault_1</span>
+</pre></div>
+</div>
+<p>而nopage_tlb_modify实际上会调用LoongArch的__do_page_fault函数，这个函数会判断<br />
+这个Store操作是否合法，如果不合法的话，会发送信号，结束进程。</p>
+</li>
+<li><p>假设这个PTE是可写的，而此时PTE没有置_PAGE_DIRTY，会将页表设置<br />
+<code class="docutils literal notranslate"><span class="pre">ori</span>&#160; <span class="pre">$t0,</span> <span class="pre">$t0,</span> <span class="pre">(_PAGE_VALID</span> <span class="pre">|</span> <span class="pre">_PAGE_DIRTY</span> <span class="pre">|</span> <span class="pre">_PAGE_MODIFIED)</span></code>
+写回到内存中。</p></li>
+<li><p>同时为了优化TLB重填，将PTE对应的奇数偶数页加载到了TLB中，避免了再一次进入TLB refill历程。</p></li>
+<li><p>最后ertn返回到出现异常的地方继续执行！</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2><span class="section-number">4.7.8. </span>情况4. 如果权限不合法<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<p>假设上述的熟悉情况都正确，但是权限不能匹配，则此时执行如下的异常：</p>
+<ul class="simple">
+<li><p>页特权等级不合规例外（PPI）：访存操作的虚地址在 TLB 中找到了匹配且 V=1 的项，但是访问的特权等<br />
+级不合规，将触发该例外。特权等级不合规体现为，该页表项的 RPLV=0 且 CSR.CRMD.PLV 值大<br />
+于页表项中的 PLV；或是该页表项的 RPLV=1 且 CSR.CRMD.PLV 不等于页表项中的 PLV。</p></li>
+<li><p>页不可读例外（PNR）：load 操作的虚地址在 TLB 中找到了匹配，且 V=1，且特权等级合规的项，但是该<br />
+页表项的 NR 位为 1，将触发该例外。</p></li>
+<li><p>页不可执行例外（PNX）：取指操作的虚地址在 TLB 中找到了匹配，且 V=1，且特权等级合规的项，但是<br />
+该页表项的 NX 位为 1，将触发该例外。</p></li>
+</ul>
+<p>Linux对于这三种和内存管理相关的权限异常，使用了同一个例外处理函数：</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBNR</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_protect</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBNX</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_protect</span><span class="p">,</span>
+<span class="w">   </span><span class="p">[</span><span class="n">EXCCODE_TLBPE</span><span class="p">]</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_protect</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>都是handle_tlb_protect处理函数，下面我们看handle_tlb_protect的具体内容。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SYM_CODE_START</span><span class="p">(</span><span class="n">handle_tlb_protect</span><span class="p">)</span>
+   <span class="n">UNWIND_HINT_UNDEFINED</span>
+   <span class="n">BACKUP_T0T1</span>
+   <span class="n">SAVE_ALL</span>
+   <span class="n">move</span>     <span class="n">a0</span><span class="p">,</span> <span class="n">sp</span>
+   <span class="n">move</span>     <span class="n">a1</span><span class="p">,</span> <span class="n">zero</span>
+   <span class="n">csrrd</span>    <span class="n">a2</span><span class="p">,</span> <span class="n">LOONGARCH_CSR_BADV</span>
+   <span class="n">REG_S</span>    <span class="n">a2</span><span class="p">,</span> <span class="n">sp</span><span class="p">,</span> <span class="n">PT_BVADDR</span>
+   <span class="n">la_abs</span>      <span class="n">t0</span><span class="p">,</span> <span class="n">do_page_fault</span>
+   <span class="n">jirl</span>     <span class="n">ra</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="mi">0</span>
+   <span class="n">RESTORE_ALL_AND_RET</span>
+<span class="n">SYM_CODE_END</span><span class="p">(</span><span class="n">handle_tlb_protect</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>上述的处理逻辑如下：</p>
+<ul class="simple">
+<li><p>保存所有出异常时的寄存器</p></li>
+<li><p>进入do_page_fault函数执行。</p></li>
+</ul>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">asmlinkage</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">__kprobes</span><span class="w"> </span><span class="n">do_page_fault</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">pt_regs</span><span class="w"> </span><span class="o">*</span><span class="n">regs</span><span class="p">,</span>
+<span class="w">         </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">write</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">address</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">   </span><span class="n">irqentry_state_t</span><span class="w"> </span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">irqentry_enter</span><span class="p">(</span><span class="n">regs</span><span class="p">);</span>
+
+<span class="w">   </span><span class="cm">/* Enable interrupt if enabled in parent context */</span>
+<span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">likely</span><span class="p">(</span><span class="n">regs</span><span class="o">-&gt;</span><span class="n">csr_prmd</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">CSR_PRMD_PIE</span><span class="p">))</span>
+<span class="w">      </span><span class="n">local_irq_enable</span><span class="p">();</span>
+
+<span class="w">   </span><span class="n">__do_page_fault</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span><span class="w"> </span><span class="n">write</span><span class="p">,</span><span class="w"> </span><span class="n">address</span><span class="p">);</span>
+
+<span class="w">   </span><span class="n">local_irq_disable</span><span class="p">();</span>
+
+<span class="w">   </span><span class="n">irqentry_exit</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">__do_page_fault</span></code>会判断操作的合法性。如果不合法，就会发送信号，然后结束进程。</p>
+</section>
+<section id="ptw">
+<h2><span class="section-number">4.7.9. </span>如果使能硬件PTW<a class="headerlink" href="#ptw" title="Link to this heading"></a></h2>
+<p>上述我们是假设使用软件TLB重填时的处理流程，因为我们需要考虑一些加速优化的方法。</p>
+<p>但是如果使用硬件HPTW的话，我们处理的过程变得相对简单，如下初始化的时候的代码：</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">cpu_has_ptw</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">exception_table</span><span class="p">[</span><span class="n">EXCCODE_TLBI</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_load_ptw</span><span class="p">;</span>
+<span class="w">      </span><span class="n">exception_table</span><span class="p">[</span><span class="n">EXCCODE_TLBL</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_load_ptw</span><span class="p">;</span>
+<span class="w">      </span><span class="n">exception_table</span><span class="p">[</span><span class="n">EXCCODE_TLBS</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_store_ptw</span><span class="p">;</span>
+<span class="w">      </span><span class="n">exception_table</span><span class="p">[</span><span class="n">EXCCODE_TLBM</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handle_tlb_modify_ptw</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>而这几个处理函数如下所示：</p>
+<p><code class="docutils literal notranslate"><span class="pre">handle_tlb_load_ptw</span></code>处理PIL异常</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nf">SYM_CODE_START</span><span class="p">(</span><span class="no">handle_tlb_load_ptw</span><span class="p">)</span>
+<span class="w">   </span><span class="nf">UNWIND_HINT_UNDEFINED</span>
+<span class="w">   </span><span class="nf">csrwr</span><span class="w">    </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">LOONGARCH_CSR_KS0</span>
+<span class="w">   </span><span class="nf">csrwr</span><span class="w">    </span><span class="no">t1</span><span class="p">,</span><span class="w"> </span><span class="no">LOONGARCH_CSR_KS1</span>
+<span class="w">   </span><span class="nf">la_abs</span><span class="w">      </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">tlb_do_page_fault_0</span>
+<span class="w">   </span><span class="nf">jr</span><span class="w">    </span><span class="no">t0</span>
+<span class="nf">SYM_CODE_END</span><span class="p">(</span><span class="no">handle_tlb_load_ptw</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">handle_tlb_store_ptw</span></code>处理PIS异常</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nf">SYM_CODE_START</span><span class="p">(</span><span class="no">handle_tlb_store_ptw</span><span class="p">)</span>
+<span class="w">   </span><span class="nf">UNWIND_HINT_UNDEFINED</span>
+<span class="w">   </span><span class="nf">csrwr</span><span class="w">    </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">LOONGARCH_CSR_KS0</span>
+<span class="w">   </span><span class="nf">csrwr</span><span class="w">    </span><span class="no">t1</span><span class="p">,</span><span class="w"> </span><span class="no">LOONGARCH_CSR_KS1</span>
+<span class="w">   </span><span class="nf">la_abs</span><span class="w">      </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">tlb_do_page_fault_1</span>
+<span class="w">   </span><span class="nf">jr</span><span class="w">    </span><span class="no">t0</span>
+<span class="nf">SYM_CODE_END</span><span class="p">(</span><span class="no">handle_tlb_store_ptw</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">handle_tlb_modify_ptw</span></code>处理PME异常</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nf">SYM_CODE_START</span><span class="p">(</span><span class="no">handle_tlb_modify_ptw</span><span class="p">)</span>
+<span class="w">   </span><span class="nf">UNWIND_HINT_UNDEFINED</span>
+<span class="w">   </span><span class="nf">csrwr</span><span class="w">    </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">LOONGARCH_CSR_KS0</span>
+<span class="w">   </span><span class="nf">csrwr</span><span class="w">    </span><span class="no">t1</span><span class="p">,</span><span class="w"> </span><span class="no">LOONGARCH_CSR_KS1</span>
+<span class="w">   </span><span class="nf">la_abs</span><span class="w">      </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">tlb_do_page_fault_1</span>
+<span class="w">   </span><span class="nf">jr</span><span class="w">    </span><span class="no">t0</span>
+<span class="nf">SYM_CODE_END</span><span class="p">(</span><span class="no">handle_tlb_modify_ptw</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>他们最后都调用了<strong>do_page_fault</strong>函数来进行页表的处理。</p>
+<p>另外的异常情况PPI，PNR和PNX，和上面的一致，都是使用<code class="docutils literal notranslate"><span class="pre">handle_tlb_protect</span></code>处理函数。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+    <a href="tlb_ptw.html" class="btn btn-neutral float-left" title="4.5. 多级页表结构" accesskey="p"
+      rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+    <a href="../trap/index.html" class="btn btn-neutral float-right" title="5. 中断与异常系统" accesskey="n"
+      rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+  </div>
+
+  <hr />
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022-2026, 龙芯中科技术有限公司。
+      <span class="lastupdated">最后更新于 2026年2月10日 11:15:08.
+      </span>
+
+      <!-- 
+      <span class="footer-aside">
+        <a href="../../龙芯实验室文档.pdf" class="fa fa-file-pdf-o">&nbsp下载 PDF</a>
+      </span>
+       -->
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

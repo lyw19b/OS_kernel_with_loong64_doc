@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>12. FAQ &mdash; 龙芯实验室文档 V1.0 文档</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=b01b2dd9" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.jpg"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=3f0bcac8"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+        <script src="../../_static/translations.js?v=beaddf03"></script>
+        <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="12.1. FAQ-25" href="faq-25.html" />
+    <link rel="prev" title="11.1. TODO" href="../virt/todo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          <a href="../../index.html" class="icon icon-home">
+            龙芯实验室文档
+          </a>
+              <div class="version">
+                V1.0
+              </div>
+<div role="search">
+  <form id="evas-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preparation/index.html">1. 准备工作</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/preface.html">1.1. 前言</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/preface.html#id2">1.1.1. 更新说明</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/preface.html#id3">1.1.2. 仓库地址</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/tools.html">1.2. 工具链说明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#gcc">1.2.1. GCC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#llvm">1.2.2. LLVM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#rust">1.2.3. Rust</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/tools.html#id2">1.3. 模拟器</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#qemu">1.3.1. QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#la-emu">1.3.2. LA_EMU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/tools.html#id3">1.4. 操作系统编译</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#loongnix">1.4.1. LoongNix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#uos">1.4.2. UOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#deepin">1.4.3. Deepin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#aosc">1.4.4. AOSC(安同)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#linux-kernel">1.4.5. Linux kernel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../toolchains/index.html">2. 工具链</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/gcc.html">2.1. GCC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id1">2.1.1. GCC的相关概念</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id2">2.1.1.1. GCC的基本定义与起源</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id4">2.1.1.2. GCC支持的语言与平台</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id5">2.1.1.3. GCC的核心功能与特点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id6">2.1.1.4. GCC的最新进展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id7">2.1.1.5. GCC的应用场景</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id8">2.1.2. 交叉编译器</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id9">2.1.3. 常见的类别组合</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id12">2.1.4. 如何编译交叉编译器</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#loongarch64-linux-gnu-sf">2.1.4.1. 如何编译loongarch64-linux-gnu[sf]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#loongarch64-linux-musl-sf">2.1.4.2. 如何编译loongarch64-linux-musl[sf]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#crtn-crti-crtbegin-crtend">2.1.4.3. crtn, crti, crtbegin, crtend有什么区别</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id22">2.1.5. 常用的参数与选项</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id23">2.1.5.1. GCC常见的参数</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#picpie">2.1.5.2. PIC与PIE的区别是什么</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#loongarch">2.1.5.3. 与LoongArch相关的选项说明</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#c-c">2.1.5.4. C/C++ 预处理器内嵌的宏定义</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/binutils.html">2.2. Binutils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#gnu-binutils">2.2.1. GNU Binutils的相关说明</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id1">2.2.1.1. <strong>核心定位与背景</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id2">2.2.1.2. <strong>重要组成部分与功能</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id5">2.2.1.3. <strong>应用场景</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#ld">2.2.2. ld链接器</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id6">2.2.2.1. LD的参数说明</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#readelf">2.2.3. 如何正确的使用readelf</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id7">2.2.3.1. 基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id11">2.2.3.2. 二、高级用法</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id14">2.2.3.3. 三、实战示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id18">2.2.3.4. 四、与其他工具对比</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#objdump">2.2.4. objdump</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id19">2.2.4.1. 一、基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id25">2.2.4.2. 二、高级用法</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id31">2.2.4.3. 三、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id36">2.2.4.4. 四、与其他工具对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id37">2.2.4.5. 五、注意事项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id38">2.2.4.6. 六、实战示例</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#objcopy">2.2.5. objcopy</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id42">2.2.5.1. 一、基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id46">2.2.5.2. 二、高级功能</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id51">2.2.5.3. 三、参数详解</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id52">2.2.5.4. 四、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id56">2.2.5.5. 五、常见问题与解决</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id60">2.2.5.6. 六、与其他工具对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id61">2.2.5.7. 七、总结</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/rust.html">2.3. Rust</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#id1">2.3.1. Rust的概念</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id2">2.3.1.1. Rust的起源与发展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id3">2.3.1.2. Rust的核心特性</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id4">2.3.1.3. Rust的应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id5">2.3.1.4. Rust的最新进展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id6">2.3.1.5. Rust的优缺点</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#loongarchtarget">2.3.2. LoongArch支持的target有哪些</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#loongarch">2.3.3. 与LoongArch相关的具体参数那些</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#laexe">2.3.4. 简单的例子说明如何编译成LA架构的EXE文件</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/builtin.html">2.4. 内嵌的函数与指令包装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/builtin.html#gcc">2.4.1. GCC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/builtin.html#llvm">2.4.2. LLVM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/builtin.html#rust">2.4.3. Rust</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/builtin.html#loongarch">2.4.3.1. LoongArch包的相关内容</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/assembly.html">2.5. 汇编代码与链接脚本</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/assembly.html#loongarch">2.5.1. 与LoongArch相关的汇编指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id2">2.5.1.1. 伪汇编指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id3">2.5.1.2. 地址加载指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id4">2.5.1.3. 内嵌汇编</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id5">2.5.1.4. 参考阅读</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/assembly.html#id6">2.5.2. 链接脚本</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id7">2.5.2.1. 一、基础语法结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id8">2.5.2.2. 二、核心命令与操作</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id13">2.5.2.3. 三、高级功能</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id17">2.5.2.4. 四、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id21">2.5.2.5. 五、实战示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id24">2.5.2.6. 六、调试与验证</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id25">2.5.2.7. 七、总结</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id26">2.5.2.8. 以LoongArch为例说明链接脚本</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/library.html">2.6. 一些常用的库函数</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#glibc">2.6.1. GLIBC</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id2">2.6.1.1. 一、核心功能与作用</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id3">2.6.1.2. 二、架构与实现细节</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id4">2.6.1.3. 三、版本演进与升级风险</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id5">2.6.1.4. 四、与其他运行库的对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id6">2.6.1.5. 五、开发与调试工具</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#musl">2.6.2. MUSL</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#musl-c">2.6.2.1. Musl C 库详解</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id15">2.6.2.2. 总结</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#memcpy">2.6.3. memcpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#memmove">2.6.4. memmove</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#memset">2.6.5. memset</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../privilege_isa/index.html">3. 特权态指令</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html">3.1. CSR寄存器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html#id1">3.2. CSR指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrrd">3.2.1. CSRRD指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrwr">3.2.2. CSRWR指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrxchg">3.2.3. CSRXCHG指令</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html#iocsr">3.3. IOCSR指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#iocsrrd">3.3.1. IOCSRRD指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#iocsrwr">3.3.2. IOCSRWR指令</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/cacop_insn.html">3.4. CPUCFG 指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/cacop_insn.html#cacop">3.5. CACOP 指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/tlb_insn.html">3.6. TLB 与页表指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id1">3.6.1. TLB 相关指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbsrch">3.6.1.1. TLBSRCH</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbrd">3.6.1.2. TLBRD</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbwr">3.6.1.3. TLBWR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbfill">3.6.1.4. TLBFILL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbclr">3.6.1.5. TLBCLR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbflush">3.6.1.6. TLBFLUSH</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#invtlb">3.6.1.7. INVTLB</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id2">3.6.2. 页表查找指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#lddir">3.6.2.1. LDDIR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#ldpte">3.6.2.2. LDPTE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id3">3.6.3. 应用示例</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html">3.7. ERTN指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html#idle">3.8. IDLE指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html#syscall">3.9. SysCALL指令</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mmu/index.html">4. 内存管理</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_struct.html">4.1. LoongArch的地址管理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id2">4.1.1. 直接地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id3">4.1.2. 映射地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id4">4.1.3. 存储访问的类型</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_struct.html#loongarchtlb">4.2. LoongArch的TLB结构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id5">4.2.1. 逻辑组织结构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#tlb-cpu">4.2.2. TLB的表项（以CPU的视觉）</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_struct.html#tlb">4.3. TLB的管理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id6">4.3.1. TLB的一些概念区分</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id7">4.3.2. TLB相关的指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#tlbcsr">4.3.3. TLB相关的CSR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#tlb-excption-handle">4.3.4. TLB相关的例外</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#cputlb">4.3.5. CPU内部TLB查找流程示例</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/dmw.html">4.4. 直接映射翻译模式</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/dmw.html#csr-dmw-0-3">4.4.1. CSR.DMW[0-3]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/dmw.html#id2">4.4.2. 操作系统中如何使用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/dmw.html#dmw">4.4.2.1. DMW的优点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/dmw.html#id3">4.4.2.2. DMW的缺点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/dmw.html#id4">4.4.2.3. 代码示例如何在内核中使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_ptw.html">4.5. 多级页表结构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id2">4.5.1. 设计背景与必要性</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id3">4.5.1.1. 多级页表的结构与层级</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id4">4.5.1.2. 地址转换流程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id5">4.5.1.3. 多级页表的优势</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id6">4.5.1.4. 优化机制</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id7">4.5.1.5. 对比不同架构的页表设计</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#loongarch">4.5.2. LoongArch的多级页表结构</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#kernel">4.5.2.1. Kernel如何初始化设置多级页表结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#kb">4.5.2.2. 二级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id8">4.5.2.3. 二级页表，16KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id9">4.5.2.4. 三级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id10">4.5.2.5. 三级页表，16KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id11">4.5.2.6. 四级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id12">4.5.2.7. 四级页表，16KB页大小</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id13">4.5.3. 内存中的页表表项（Kernel视角）</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id14">4.5.3.1. 基本页表（叶子节点）</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id15">4.5.3.2. 大页页表（叶子节点）</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#no-leaf-pg-entry">4.5.3.3. 中间指向下一级目录的地址的页表(非叶子节点页表)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id17">4.5.4. 页表的遍历</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#k">4.5.4.1. 以一个例子4K页为例说明：</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#m">4.5.4.2. 以一个例子2M页为例说明：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_ptw.html#cputlb">4.6. 从内存中的页表表项到CPU中的TLB</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#tlbrefill-softeware-ptw">4.6.1. TLBRefill (Softeware PTW)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#csr">4.6.1.1. 相关的CSR寄存器</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id18">4.6.1.2. 重填示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id19">4.6.1.3. 两级页表的示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#three-level-page-table-refill">4.6.1.4. 三级页表的示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id21">4.6.1.5. 四级页表的示例代码</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#hardware-ptw">4.6.2. Hardware PTW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id22">4.6.3. 页表的刷新</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id23">4.6.3.1. 页表为什么需要刷新</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id24">4.6.3.2. 页表刷新的指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id25">4.6.3.3. 页表刷新的例子</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/page_table_in_kernel.html">4.7. Kernel与MMU</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id1">4.7.1. 地址翻译相关的初始化</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id2">4.7.2. 如何从直接地址翻译模式到映射地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id3">4.7.3. 如何建立虚拟地址到物理地址的映射关系</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id4">4.7.4. 页表的遍历页表</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#tlb">4.7.5. 情况1. 如果TLB中没有映射</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#v-0">4.7.6. 情况2. 如果页表项的V=0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#d-0">4.7.7. 情况3. 如果写操作页表项D=0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id5">4.7.8. 情况4. 如果权限不合法</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#ptw">4.7.9. 如果使能硬件PTW</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../trap/index.html">5. 中断与异常系统</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../trap/interrupt.html">5.1. 中断</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id2">5.1.1. 线中断</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#ipi">5.1.1.1. 核间中断IPI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id3">5.1.1.2. 定时器中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id4">5.1.1.3. 性能计数器中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id5">5.1.1.4. 外部硬中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id6">5.1.1.5. 内部软中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id7">5.1.1.6. 中断号</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id8">5.1.2. 消息中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id9">5.1.3. 中断的优先级</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id10">5.1.3.1. 线中断的优先级</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id11">5.1.3.2. 消息中断的优先级</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id12">5.1.4. 中断的打开与关闭</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id13">5.1.5. 中断的入口地址</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id14">5.1.6. 中断的处理流程</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/exception.html">5.2. 例外</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id2">5.2.1. 例外的优先级</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id3">5.2.2. 例外的入口地址</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id4">5.2.3. 例外的处理过程</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#id5">5.2.3.1. 普通例外的处理过程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#tlb">5.2.3.2. TLB 重填例外硬件处理过程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#id6">5.2.3.3. 机器错误例外硬件处理过程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/trap_in_kernel.html">5.3. Kernel与异常</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#expection-entry-selection">5.3.1. 异常的入口地址选择</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id2">5.3.1.1. “统一式”的入口地址</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id3">5.3.1.2. “分离式”的入口地址</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id4">5.3.2. 异常的初始化</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id5">5.3.2.1. 统一式的初始化</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id7">5.3.2.2. 分离式的初始化</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#cpu">5.3.3. 异常发生时，CPU做了什么</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/trap_in_kernel.html#id9">5.4. 特殊异常的处理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id10">5.4.1. 定时器中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id11">5.4.2. 系统调用</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id12">5.4.3. 非对齐访问</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../smp/index.html">6. SMP多核系统</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../smp/smp.html">6.1. SMP与LoongArch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#ipi">6.1.1. IPI中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#id1">6.1.2. 如何通信</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#id2">6.1.3. 如何初始化</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../smp/smp.html#linuxsmp">6.2. Linux中SMP的处理（与架构相关）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../abi/index.html">7. 程序二进制接口</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html">7.1. 新旧世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id2">7.2. 旧世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id3">7.3. 新世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id4">7.4. 新旧世界的区分</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/abi.html">7.5. ABI 2.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/index.html">8. 调试方法与技巧</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../debug/debug_env.html">8.1. LoongArch最小debug环境搭建</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#linux-ramdisk">8.1.1. 制作Linux RamDisk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#qemu">8.1.2. 如何在 QEMU 中调试</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#id1">8.1.3. 设置断点</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../debug/debug_gdb.html">8.2. GDB的使用</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id1">8.2.1. 交叉编译环境中的GDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id2">8.2.2. 常见的GDB命令示例</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id3">8.2.3. 调试指令常见失效状况</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/index.html">9. 平台相关</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../platform/qemu.html">9.1. QEMU</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/qemu.html#virt">9.1.1. Virt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/qemu.html#id1">9.1.2. 设备</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/3a5000.html">9.2. 3A5000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id1">9.2.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id2">9.2.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id3">9.2.3. 地址空间</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../platform/3a5000.html#id4">9.2.3.1. 结点间物理地址空间</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../platform/3a5000.html#id5">9.2.3.2. 结点内物理地址空间</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/3a6000.html">9.3. 3A6000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a6000.html#id1">9.3.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a6000.html#id2">9.3.2. 芯片架构</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k3000.html">9.4. 2k3000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k3000.html#id1">9.4.1. 芯片参数</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k1000la.html">9.5. 2k1000LA芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id1">9.5.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id2">9.5.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id3">9.5.3. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id4">9.5.4. 地址空间</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k0500.html">9.6. 2k0500芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id1">9.6.1. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id2">9.6.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id3">9.6.3. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id4">9.6.4. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id5">9.6.5. 地址空间</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id6">9.6.6. 中断配置</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k0300.html">9.7. 2k0300芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id1">9.7.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id2">9.7.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id3">9.7.3. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id4">9.7.4. 地址空间</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id5">9.7.5. 中断配置及路由</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../simd/index.html">10. 高级应用：SMID与向量指令</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../simd/todo.html">10.1. TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../virt/index.html">11. 高级应用：LVZ与虚拟化扩展</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../virt/todo.html">11.1. TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">12. FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq-25.html">12.1. FAQ-25</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">龙芯实验室文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">12. </span>FAQ</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="faq">
+<h1><span class="section-number">12. </span>FAQ<a class="headerlink" href="#faq" title="Link to this heading"></a></h1>
+<p>本章节主要收集往年遇到的LoongArch相关的问题，可参考相关的回答！</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="faq-25.html">12.1. FAQ-25</a></li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+    <a href="../virt/todo.html" class="btn btn-neutral float-left" title="11.1. TODO" accesskey="p"
+      rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+    <a href="faq-25.html" class="btn btn-neutral float-right" title="12.1. FAQ-25" accesskey="n"
+      rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+  </div>
+
+  <hr />
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022-2026, 龙芯中科技术有限公司。
+      <span class="lastupdated">最后更新于 2026年2月10日 11:15:08.
+      </span>
+
+      <!-- 
+      <span class="footer-aside">
+        <a href="../../龙芯实验室文档.pdf" class="fa fa-file-pdf-o">&nbsp下载 PDF</a>
+      </span>
+       -->
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

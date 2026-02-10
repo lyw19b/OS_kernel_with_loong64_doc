@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2.5. 汇编代码与链接脚本 &mdash; 龙芯实验室文档 V1.0 文档</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=b01b2dd9" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.jpg"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=3f0bcac8"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+        <script src="../../_static/translations.js?v=beaddf03"></script>
+        <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="2.6. 一些常用的库函数" href="library.html" />
+    <link rel="prev" title="2.4. 内嵌的函数与指令包装" href="builtin.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          <a href="../../index.html" class="icon icon-home">
+            龙芯实验室文档
+          </a>
+              <div class="version">
+                V1.0
+              </div>
+<div role="search">
+  <form id="evas-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preparation/index.html">1. 准备工作</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/preface.html">1.1. 前言</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/preface.html#id2">1.1.1. 更新说明</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/preface.html#id3">1.1.2. 仓库地址</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/tools.html">1.2. 工具链说明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#gcc">1.2.1. GCC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#llvm">1.2.2. LLVM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#rust">1.2.3. Rust</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/tools.html#id2">1.3. 模拟器</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#qemu">1.3.1. QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#la-emu">1.3.2. LA_EMU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../preparation/tools.html#id3">1.4. 操作系统编译</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#loongnix">1.4.1. LoongNix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#uos">1.4.2. UOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#deepin">1.4.3. Deepin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#aosc">1.4.4. AOSC(安同)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preparation/tools.html#linux-kernel">1.4.5. Linux kernel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">2. 工具链</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gcc.html">2.1. GCC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gcc.html#id1">2.1.1. GCC的相关概念</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#id2">2.1.1.1. GCC的基本定义与起源</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#id4">2.1.1.2. GCC支持的语言与平台</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#id5">2.1.1.3. GCC的核心功能与特点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#id6">2.1.1.4. GCC的最新进展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#id7">2.1.1.5. GCC的应用场景</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gcc.html#id8">2.1.2. 交叉编译器</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gcc.html#id9">2.1.3. 常见的类别组合</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gcc.html#id12">2.1.4. 如何编译交叉编译器</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#loongarch64-linux-gnu-sf">2.1.4.1. 如何编译loongarch64-linux-gnu[sf]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#loongarch64-linux-musl-sf">2.1.4.2. 如何编译loongarch64-linux-musl[sf]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#crtn-crti-crtbegin-crtend">2.1.4.3. crtn, crti, crtbegin, crtend有什么区别</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gcc.html#id22">2.1.5. 常用的参数与选项</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#id23">2.1.5.1. GCC常见的参数</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#picpie">2.1.5.2. PIC与PIE的区别是什么</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#loongarch">2.1.5.3. 与LoongArch相关的选项说明</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gcc.html#c-c">2.1.5.4. C/C++ 预处理器内嵌的宏定义</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="binutils.html">2.2. Binutils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="binutils.html#gnu-binutils">2.2.1. GNU Binutils的相关说明</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id1">2.2.1.1. <strong>核心定位与背景</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id2">2.2.1.2. <strong>重要组成部分与功能</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id5">2.2.1.3. <strong>应用场景</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="binutils.html#ld">2.2.2. ld链接器</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id6">2.2.2.1. LD的参数说明</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="binutils.html#readelf">2.2.3. 如何正确的使用readelf</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id7">2.2.3.1. 基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id11">2.2.3.2. 二、高级用法</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id14">2.2.3.3. 三、实战示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id18">2.2.3.4. 四、与其他工具对比</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="binutils.html#objdump">2.2.4. objdump</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id19">2.2.4.1. 一、基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id25">2.2.4.2. 二、高级用法</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id31">2.2.4.3. 三、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id36">2.2.4.4. 四、与其他工具对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id37">2.2.4.5. 五、注意事项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id38">2.2.4.6. 六、实战示例</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="binutils.html#objcopy">2.2.5. objcopy</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id42">2.2.5.1. 一、基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id46">2.2.5.2. 二、高级功能</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id51">2.2.5.3. 三、参数详解</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id52">2.2.5.4. 四、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id56">2.2.5.5. 五、常见问题与解决</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id60">2.2.5.6. 六、与其他工具对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="binutils.html#id61">2.2.5.7. 七、总结</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rust.html">2.3. Rust</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rust.html#id1">2.3.1. Rust的概念</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rust.html#id2">2.3.1.1. Rust的起源与发展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rust.html#id3">2.3.1.2. Rust的核心特性</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rust.html#id4">2.3.1.3. Rust的应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rust.html#id5">2.3.1.4. Rust的最新进展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rust.html#id6">2.3.1.5. Rust的优缺点</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rust.html#loongarchtarget">2.3.2. LoongArch支持的target有哪些</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rust.html#loongarch">2.3.3. 与LoongArch相关的具体参数那些</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rust.html#laexe">2.3.4. 简单的例子说明如何编译成LA架构的EXE文件</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="builtin.html">2.4. 内嵌的函数与指令包装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="builtin.html#gcc">2.4.1. GCC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="builtin.html#llvm">2.4.2. LLVM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="builtin.html#rust">2.4.3. Rust</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="builtin.html#loongarch">2.4.3.1. LoongArch包的相关内容</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.5. 汇编代码与链接脚本</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#loongarch">2.5.1. 与LoongArch相关的汇编指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">2.5.1.1. 伪汇编指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">2.5.1.2. 地址加载指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">2.5.1.3. 内嵌汇编</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">2.5.1.4. 参考阅读</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">2.5.2. 链接脚本</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id7">2.5.2.1. 一、基础语法结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id8">2.5.2.2. 二、核心命令与操作</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id13">2.5.2.3. 三、高级功能</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id17">2.5.2.4. 四、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id21">2.5.2.5. 五、实战示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id24">2.5.2.6. 六、调试与验证</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id25">2.5.2.7. 七、总结</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id26">2.5.2.8. 以LoongArch为例说明链接脚本</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="library.html">2.6. 一些常用的库函数</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="library.html#glibc">2.6.1. GLIBC</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="library.html#id2">2.6.1.1. 一、核心功能与作用</a></li>
+<li class="toctree-l4"><a class="reference internal" href="library.html#id3">2.6.1.2. 二、架构与实现细节</a></li>
+<li class="toctree-l4"><a class="reference internal" href="library.html#id4">2.6.1.3. 三、版本演进与升级风险</a></li>
+<li class="toctree-l4"><a class="reference internal" href="library.html#id5">2.6.1.4. 四、与其他运行库的对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="library.html#id6">2.6.1.5. 五、开发与调试工具</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#musl">2.6.2. MUSL</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="library.html#musl-c">2.6.2.1. Musl C 库详解</a></li>
+<li class="toctree-l4"><a class="reference internal" href="library.html#id15">2.6.2.2. 总结</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#memcpy">2.6.3. memcpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#memmove">2.6.4. memmove</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#memset">2.6.5. memset</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../privilege_isa/index.html">3. 特权态指令</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html">3.1. CSR寄存器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html#id1">3.2. CSR指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrrd">3.2.1. CSRRD指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrwr">3.2.2. CSRWR指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrxchg">3.2.3. CSRXCHG指令</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html#iocsr">3.3. IOCSR指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#iocsrrd">3.3.1. IOCSRRD指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#iocsrwr">3.3.2. IOCSRWR指令</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/cacop_insn.html">3.4. CPUCFG 指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/cacop_insn.html#cacop">3.5. CACOP 指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/tlb_insn.html">3.6. TLB 与页表指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id1">3.6.1. TLB 相关指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbsrch">3.6.1.1. TLBSRCH</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbrd">3.6.1.2. TLBRD</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbwr">3.6.1.3. TLBWR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbfill">3.6.1.4. TLBFILL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbclr">3.6.1.5. TLBCLR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbflush">3.6.1.6. TLBFLUSH</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#invtlb">3.6.1.7. INVTLB</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id2">3.6.2. 页表查找指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#lddir">3.6.2.1. LDDIR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#ldpte">3.6.2.2. LDPTE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id3">3.6.3. 应用示例</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html">3.7. ERTN指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html#idle">3.8. IDLE指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html#syscall">3.9. SysCALL指令</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mmu/index.html">4. 内存管理</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_struct.html">4.1. LoongArch的地址管理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id2">4.1.1. 直接地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id3">4.1.2. 映射地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id4">4.1.3. 存储访问的类型</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_struct.html#loongarchtlb">4.2. LoongArch的TLB结构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id5">4.2.1. 逻辑组织结构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#tlb-cpu">4.2.2. TLB的表项（以CPU的视觉）</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_struct.html#tlb">4.3. TLB的管理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id6">4.3.1. TLB的一些概念区分</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id7">4.3.2. TLB相关的指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#tlbcsr">4.3.3. TLB相关的CSR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#tlb-excption-handle">4.3.4. TLB相关的例外</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#cputlb">4.3.5. CPU内部TLB查找流程示例</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/dmw.html">4.4. 直接映射翻译模式</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/dmw.html#csr-dmw-0-3">4.4.1. CSR.DMW[0-3]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/dmw.html#id2">4.4.2. 操作系统中如何使用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/dmw.html#dmw">4.4.2.1. DMW的优点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/dmw.html#id3">4.4.2.2. DMW的缺点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/dmw.html#id4">4.4.2.3. 代码示例如何在内核中使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_ptw.html">4.5. 多级页表结构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id2">4.5.1. 设计背景与必要性</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id3">4.5.1.1. 多级页表的结构与层级</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id4">4.5.1.2. 地址转换流程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id5">4.5.1.3. 多级页表的优势</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id6">4.5.1.4. 优化机制</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id7">4.5.1.5. 对比不同架构的页表设计</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#loongarch">4.5.2. LoongArch的多级页表结构</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#kernel">4.5.2.1. Kernel如何初始化设置多级页表结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#kb">4.5.2.2. 二级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id8">4.5.2.3. 二级页表，16KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id9">4.5.2.4. 三级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id10">4.5.2.5. 三级页表，16KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id11">4.5.2.6. 四级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id12">4.5.2.7. 四级页表，16KB页大小</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id13">4.5.3. 内存中的页表表项（Kernel视角）</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id14">4.5.3.1. 基本页表（叶子节点）</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id15">4.5.3.2. 大页页表（叶子节点）</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#no-leaf-pg-entry">4.5.3.3. 中间指向下一级目录的地址的页表(非叶子节点页表)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id17">4.5.4. 页表的遍历</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#k">4.5.4.1. 以一个例子4K页为例说明：</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#m">4.5.4.2. 以一个例子2M页为例说明：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_ptw.html#cputlb">4.6. 从内存中的页表表项到CPU中的TLB</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#tlbrefill-softeware-ptw">4.6.1. TLBRefill (Softeware PTW)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#csr">4.6.1.1. 相关的CSR寄存器</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id18">4.6.1.2. 重填示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id19">4.6.1.3. 两级页表的示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#three-level-page-table-refill">4.6.1.4. 三级页表的示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id21">4.6.1.5. 四级页表的示例代码</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#hardware-ptw">4.6.2. Hardware PTW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id22">4.6.3. 页表的刷新</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id23">4.6.3.1. 页表为什么需要刷新</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id24">4.6.3.2. 页表刷新的指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id25">4.6.3.3. 页表刷新的例子</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/page_table_in_kernel.html">4.7. Kernel与MMU</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id1">4.7.1. 地址翻译相关的初始化</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id2">4.7.2. 如何从直接地址翻译模式到映射地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id3">4.7.3. 如何建立虚拟地址到物理地址的映射关系</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id4">4.7.4. 页表的遍历页表</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#tlb">4.7.5. 情况1. 如果TLB中没有映射</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#v-0">4.7.6. 情况2. 如果页表项的V=0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#d-0">4.7.7. 情况3. 如果写操作页表项D=0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id5">4.7.8. 情况4. 如果权限不合法</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#ptw">4.7.9. 如果使能硬件PTW</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../trap/index.html">5. 中断与异常系统</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../trap/interrupt.html">5.1. 中断</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id2">5.1.1. 线中断</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#ipi">5.1.1.1. 核间中断IPI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id3">5.1.1.2. 定时器中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id4">5.1.1.3. 性能计数器中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id5">5.1.1.4. 外部硬中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id6">5.1.1.5. 内部软中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id7">5.1.1.6. 中断号</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id8">5.1.2. 消息中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id9">5.1.3. 中断的优先级</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id10">5.1.3.1. 线中断的优先级</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id11">5.1.3.2. 消息中断的优先级</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id12">5.1.4. 中断的打开与关闭</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id13">5.1.5. 中断的入口地址</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id14">5.1.6. 中断的处理流程</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/exception.html">5.2. 例外</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id2">5.2.1. 例外的优先级</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id3">5.2.2. 例外的入口地址</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id4">5.2.3. 例外的处理过程</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#id5">5.2.3.1. 普通例外的处理过程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#tlb">5.2.3.2. TLB 重填例外硬件处理过程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#id6">5.2.3.3. 机器错误例外硬件处理过程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/trap_in_kernel.html">5.3. Kernel与异常</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#expection-entry-selection">5.3.1. 异常的入口地址选择</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id2">5.3.1.1. “统一式”的入口地址</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id3">5.3.1.2. “分离式”的入口地址</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id4">5.3.2. 异常的初始化</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id5">5.3.2.1. 统一式的初始化</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id7">5.3.2.2. 分离式的初始化</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#cpu">5.3.3. 异常发生时，CPU做了什么</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/trap_in_kernel.html#id9">5.4. 特殊异常的处理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id10">5.4.1. 定时器中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id11">5.4.2. 系统调用</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id12">5.4.3. 非对齐访问</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../smp/index.html">6. SMP多核系统</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../smp/smp.html">6.1. SMP与LoongArch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#ipi">6.1.1. IPI中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#id1">6.1.2. 如何通信</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#id2">6.1.3. 如何初始化</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../smp/smp.html#linuxsmp">6.2. Linux中SMP的处理（与架构相关）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../abi/index.html">7. 程序二进制接口</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html">7.1. 新旧世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id2">7.2. 旧世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id3">7.3. 新世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id4">7.4. 新旧世界的区分</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/abi.html">7.5. ABI 2.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/index.html">8. 调试方法与技巧</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../debug/debug_env.html">8.1. LoongArch最小debug环境搭建</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#linux-ramdisk">8.1.1. 制作Linux RamDisk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#qemu">8.1.2. 如何在 QEMU 中调试</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#id1">8.1.3. 设置断点</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../debug/debug_gdb.html">8.2. GDB的使用</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id1">8.2.1. 交叉编译环境中的GDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id2">8.2.2. 常见的GDB命令示例</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id3">8.2.3. 调试指令常见失效状况</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/index.html">9. 平台相关</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../platform/qemu.html">9.1. QEMU</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/qemu.html#virt">9.1.1. Virt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/qemu.html#id1">9.1.2. 设备</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/3a5000.html">9.2. 3A5000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id1">9.2.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id2">9.2.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id3">9.2.3. 地址空间</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../platform/3a5000.html#id4">9.2.3.1. 结点间物理地址空间</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../platform/3a5000.html#id5">9.2.3.2. 结点内物理地址空间</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/3a6000.html">9.3. 3A6000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a6000.html#id1">9.3.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a6000.html#id2">9.3.2. 芯片架构</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k3000.html">9.4. 2k3000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k3000.html#id1">9.4.1. 芯片参数</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k1000la.html">9.5. 2k1000LA芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id1">9.5.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id2">9.5.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id3">9.5.3. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id4">9.5.4. 地址空间</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k0500.html">9.6. 2k0500芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id1">9.6.1. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id2">9.6.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id3">9.6.3. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id4">9.6.4. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id5">9.6.5. 地址空间</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id6">9.6.6. 中断配置</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k0300.html">9.7. 2k0300芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id1">9.7.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id2">9.7.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id3">9.7.3. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id4">9.7.4. 地址空间</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id5">9.7.5. 中断配置及路由</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../simd/index.html">10. 高级应用：SMID与向量指令</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../simd/todo.html">10.1. TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../virt/index.html">11. 高级应用：LVZ与虚拟化扩展</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../virt/todo.html">11.1. TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">12. FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../faq/faq-25.html">12.1. FAQ-25</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">龙芯实验室文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html"><span class="section-number">2. </span>工具链</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">2.5. </span>汇编代码与链接脚本</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1><span class="section-number">2.5. </span>汇编代码与链接脚本<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<section id="loongarch">
+<h2><span class="section-number">2.5.1. </span>与LoongArch相关的汇编指令<a class="headerlink" href="#loongarch" title="Link to this heading"></a></h2>
+<p>本小节主要涉及汇编相关的内容，帮助理解LoongArch底层指令。</p>
+<p>LoongArch的汇编指令例子如下所示（下面代码的功能就是一个打印<code class="docutils literal notranslate"><span class="pre">printf(&quot;LoongArch!\n&quot;)</span></code>）：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>	.globl	global_val
+	.align	3
+	.type	global_val, @object
+	.size	global_val, 8
+global_val:
+	.space	8
+	
+	.globl	global_val_int
+	.align	2
+	.type	global_val_int, @object
+	.size	global_val_int, 4
+global_val_int:
+	.space	4
+
+	.section	.rodata
+	.align	3
+.local_strings:
+	.ascii	&quot;LoongArch!\000&quot;
+
+# code here...
+.text
+.align	2
+.globl	main
+.type	main, @function
+main:
+	addi.d	$r3,$r3,-32
+	
+	st.d	$r1,$r3,24
+	st.d	$r22,$r3,16
+
+	addi.d	$r22,$r3,32
+
+	or	    $r12,$r4,$r0
+	st.d	$r5,$r22,-32
+	st.w	$r12,$r22,-20
+	
+	la.local	$r12,global_val
+	addi.w	$r13,$r0,1234			# 0x4d2
+	stptr.d	$r13,$r12,0
+	
+	la.local	$r12,global_val_int
+	addi.w	$r13,$r0,1234			# 0x4d2
+	stptr.w	$r13,$r12,0
+	
+	la.local	$r4, .local_strings
+	bl	    %plt(puts)
+	or	    $r12,$r0,$r0
+	or	    $r4,$r12,$r0
+	ld.d	$r1,$r3,24
+
+	ld.d	$r22,$r3,16
+
+	addi.d	$r3,$r3,32
+	jr	$r1
+
+.LFE0:
+	.size	main, .-main
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>LoongArch的汇编指令的寄存器都是以<code class="docutils literal notranslate"><span class="pre">$</span></code>开始的，比如寄存器a0，在汇编中写作<code class="docutils literal notranslate"><span class="pre">$a0</span></code>。</p>
+<p>如果见到没有带$符号的，首先查找有没有如下的定义：</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define a0	$r4	</span><span class="cm">/* argument registers, a0/a1 reused as v0/v1 for return value */</span>
+<span class="cp">#define a1	$r5</span>
+<span class="cp">#define a2	$r6</span>
+<span class="cp">#define a3	$r7</span>
+<span class="cp">#define a4	$r8</span>
+<span class="cp">#define a5	$r9</span>
+</pre></div>
+</div>
+<p>如果没有上面的汇编定义，直接书写汇编器会报错。（其实是汇编器在预处理时，将符号进行了替换）</p>
+<p>之所以出现上面宏定义的方式，是为了书写方便，也和其他架构的书写方式保持一致。其实mips也是采用这样的方式。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>shell&gt;&gt;<span class="w"> </span>loongarch64-linux-musl-gcc<span class="w"> </span>test_asm_main.S<span class="w"> </span>-o<span class="w"> </span>test_asm_main.S.o<span class="w"> </span>-c
+test_asm_main.S:<span class="w"> </span>Assembler<span class="w"> </span>messages:
+test_asm_main.S:15:<span class="w"> </span>Error:<span class="w"> </span>no<span class="w"> </span>match<span class="w"> </span>insn:<span class="w"> </span>move<span class="w">	</span>a0,a1
+</pre></div>
+</div>
+<p>还需要注意的是：寄存器编号的写法也有两种方式：</p>
+<ul>
+<li><p>采用ABI的方式书写，比如下面的汇编指令写法，例如</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>addi.d		$a5, $a5, 8
+</pre></div>
+</div>
+</li>
+<li><p>按照<code class="docutils literal notranslate"><span class="pre">r+寄存器编号</span></code>的方式书写，例如</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>addi.d		$r9, $r9, 8
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<blockquote>
+<div><p>LoongArch架构有32个通用寄存器，使用<code class="docutils literal notranslate"><span class="pre">$r0-$r31</span></code>表示，其中<code class="docutils literal notranslate"><span class="pre">$r0</span> <span class="pre">或者</span> <span class="pre">$zero</span></code>总是保持0值，在LA32中，这些寄存器的宽度是32位，
+在LA64中，这些寄存器的宽度是64位。其中我们使用<code class="docutils literal notranslate"><span class="pre">$r1</span></code>作为返回地址的寄存器<code class="docutils literal notranslate"><span class="pre">$ra</span></code>，<code class="docutils literal notranslate"><span class="pre">$r3</span></code>作为栈指针<code class="docutils literal notranslate"><span class="pre">$sp</span></code>。</p>
+</div></blockquote>
+<blockquote>
+<div><p>LoongArch架构有32个浮点寄存器，使用<code class="docutils literal notranslate"><span class="pre">$f0-$f31</span></code>表示。有8个状态标志寄存器，<code class="docutils literal notranslate"><span class="pre">$fcc0-$fcc7</span></code>，每个寄存器的宽度是
+1位，存放的是浮点比较指令<code class="docutils literal notranslate"><span class="pre">fcmp</span></code>的结果。另外还有4个浮点状态寄存器，<code class="docutils literal notranslate"><span class="pre">$fcsr0-$fcsr3</span></code>，每个寄存器宽度是32位，其中<code class="docutils literal notranslate"><span class="pre">$fcsr1-$fcsr3</span></code>是状态寄存器<code class="docutils literal notranslate"><span class="pre">$fcsr0</span></code>部分域值的别名。具体可查看<a class="reference external" href="https://loongson.cn/uploads/images/2025032109191292796.%E9%BE%99%E6%9E%B6%E6%9E%84%E5%8F%82%E8%80%83%E6%89%8B%E5%86%8C%E5%8D%B7%E4%B8%80_r1p11.pdf">龙芯架构参考手册 卷一：基础架构</a>。</p>
+</div></blockquote>
+<section id="id2">
+<h3><span class="section-number">2.5.1.1. </span>伪汇编指令<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>move指令</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>move  $rd, $rj
+</pre></div>
+</div>
+<p>描述： 将rj寄存器的值复制到rd寄存器中。move是一个伪汇编指令，在LoongArch的指令手册是没有的，他是<code class="docutils literal notranslate"><span class="pre">or</span> <span class="pre">$rd,</span> <span class="pre">$rj,</span> <span class="pre">$zero</span></code>指令的别名(alias)。</p>
+<p>比如： <code class="docutils literal notranslate"> <span class="pre">move</span> <span class="pre">$a0,</span> <span class="pre">$a1</span></code></p>
+<p>我们使用objdump反汇编出它的原始指令。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>loongarch64-linux-gnu-gcc<span class="w"> </span>test_asm_main.S<span class="w"> </span>-o<span class="w"> </span>test_asm_main.S.o<span class="w"> </span>-c
+$<span class="w"> </span>loongarch64-linux-gnu-objdump<span class="w"> </span>-alD<span class="w"> </span>-M<span class="w"> </span>no-aliases,numeric<span class="w"> </span>test_asm_main.S.o<span class="w"> </span>&gt;<span class="w"> </span>test_asm_main.S.o.s
+</pre></div>
+</div>
+<p>其中使用objdump -M no-aliases可以显示原始的指令，如下所示：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>or          	$r4, $r5, $r0
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>li.d/li.w指令</p></li>
+</ol>
+<p>语法：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>li.w  $rd, imm32
+li.d  $rd, imm64
+</pre></div>
+</div>
+<p>描述：<code class="docutils literal notranslate"><span class="pre">li.w</span></code>是将 imm32（32位立即数）加载到rd中，如果imm32查出了32位立即数的范围，汇编器会报错。</p>
+<p><code class="docutils literal notranslate"><span class="pre">li.w</span> <span class="pre">$a0,</span> <span class="pre">0x123456789abc</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">Fatal</span> <span class="pre">error:</span> <span class="pre">li</span> <span class="pre">overflow:</span> <span class="pre">hi32:0x1234</span> <span class="pre">lo32:0x56789abc</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">li.d</span></code>是将 imm64（64位立即数）加载到rd中。</p>
+<p>实际上汇编器会把<code class="docutils literal notranslate"><span class="pre">li.w和li.d</span></code>伪指令使用指令序列<code class="docutils literal notranslate"><span class="pre">lu12i.w,</span> <span class="pre">ori,</span> <span class="pre">lu32i.d和lu52i.d</span></code>指令替换。</p>
+<p>下面是示例代码 <code class="docutils literal notranslate"><span class="pre">li.w</span> <span class="pre">$t0,</span> <span class="pre">imm32</span></code>的展开指令：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>lu12i.w     $t0, imm32[31:12]
+ori         $t0, $t0, imm32[11:0]
+</pre></div>
+</div>
+<p>下面是示例代码 <code class="docutils literal notranslate"><span class="pre">li.d</span> <span class="pre">$t0,</span> <span class="pre">imm64</span></code>的展开指令：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>lu12i.w     $t0, imm64[31:12]
+ori         $t0, $t0, imm64[11:0]
+lu32i.d     $t0, imm64[51:32]
+lu52i.d     $t0, $t0, imm64[63:52]
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>上述代码的指令拆分序列会进行优化，比如<code class="docutils literal notranslate"><span class="pre">ori</span>&#160; <span class="pre">$t0,</span> <span class="pre">$t0,</span> <span class="pre">imm64[11:0]</span></code>
+假设我们加载的imm64[11:0]是0的话，这条指令时没有必要执行的。</p>
+<p>因此会被优化掉，所以有时候li.d指令反汇编过来并不是严格意义
+上对应的四条指令，有时候可能是1-3条等等。</p>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>jr和ret伪指令</p></li>
+</ol>
+<p>语法：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>jr  $t0
+ret
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">jr</span>&#160; <span class="pre">$t0</span></code>是跳转到$t0的地址去执行，它的指令<code class="docutils literal notranslate"><span class="pre">jirl</span>&#160;&#160; <span class="pre">$zero,</span> <span class="pre">$t0,</span> <span class="pre">0</span></code>的别称。</p>
+<p><code class="docutils literal notranslate"><span class="pre">ret</span></code>是函数返回指令，她是指令<code class="docutils literal notranslate"><span class="pre">jirl</span> <span class="pre">$zero,</span> <span class="pre">$ra,</span> <span class="pre">0</span></code>的别称。</p>
+<ol class="arabic simple" start="4">
+<li><p>call36和tail36</p></li>
+</ol>
+<p>call36的语法是： <code class="docutils literal notranslate"><span class="pre">call36</span>&#160; <span class="pre">symbol_name</span></code>，意思是跳转到symbol_name地址去执行。它的实际反汇编是</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pcaddu18i  $ra, %call36(symbol_name)
+jirl       $ra, $ra, 0
+</pre></div>
+</div>
+<p>tail36的语法是： <code class="docutils literal notranslate"><span class="pre">tail36</span>&#160; <span class="pre">$rd,</span> <span class="pre">symbol_name</span></code>，意思是跳转到symbol_name地址去执行, 同时将返回地址保存到$rd, ，它也使用$rd寄存器作为中间保存临时地址。它的实际反汇编是</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pcaddu18i  $rd, %call36(symbol_name)
+jirl       $zero, $rd, 0
+</pre></div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">小心</p>
+<p>tail36需要一个寄存器，而call36默认使用$ra寄存器。</p>
+<p>需要注意下，这两个伪汇编指令的跳转地址范围</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="p">[</span><span class="n">PC</span><span class="o">-</span><span class="mi">128</span><span class="n">GiB</span><span class="o">-</span><span class="mh">0x20000</span><span class="p">,</span> <span class="n">PC</span><span class="o">+</span><span class="mi">128</span><span class="n">GiB</span><span class="o">-</span><span class="mh">0x20000</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>分支指令伪汇编</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>bgt    $rj, $rd, si18 or symbol
+ble    $rj, $rd, si18 or symbol
+bgtu   $rj, $rd, si18 or symbol
+bleu   $rj, $rd, si18 or symbol
+</pre></div>
+</div>
+<p>上述指令时LoongArch指令手册没有的，但是可以使用别的指令来实现，下面是它具体LoongArch指令的对应关系</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th><strong>伪汇编指令</strong></th>
+<th><strong>具体的含义</strong></th>
+<th><strong>实际的指令</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bgt    $rj, $rd, si18 or symbol</code></td>
+<td>if (signed($rj) &gt; signed($rd)) 则跳转到目标地址</td>
+<td><code>blt $rd, $rj, si18 or symbol</code></td>
+</tr>
+<tr>
+<td><code>ble    $rj, $rd, si18 or symbol</code></td>
+<td>if (signed($rj) &lt;= signed($rd)) 则跳转到目标地址</td>
+<td><code>bge $rd, $rj, si18 or symbol</code></td>
+</tr>
+<tr>
+<td><code>bgtu    $rj, $rd, si18 or symbol</code></td>
+<td>if (unsigned($rj) &gt; unsigned($rd)) 则跳转到目标地址</td>
+<td><code>bltu $rd, $rj, si18 or symbol</code></td>
+</tr>
+<tr>
+<td><code>bleu    $rj, $rd, si18 or symbol</code></td>
+<td>if (unsigned($rj)&lt;= unsigned($rd)) 则跳转到目标地址</td>
+<td><code>bgeu $rd, $rj, si18 or symbol</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition caution">
+<p class="admonition-title">小心</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>注意上述指令中，$rj, $rd的顺序！
+</pre></div>
+</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>bltz 	$rd, si18 or symbol
+bgtz 	$rd, si18 or symbol
+blez 	$rd, si18 or symbol
+bgez 	$rd, si18 or symbol
+</pre></div>
+</div>
+<p>上述指令时LoongArch指令手册没有的，但是可以使用别的指令来实现，下面是它具体LoongArch指令的对应关系</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th><strong>伪汇编指令</strong></th>
+<th><strong>具体的含义</strong></th>
+<th><strong>实际的指令</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bltz $rd, si18 or symbol</code></td>
+<td>if (signed($rd) &gt; 0) 则跳转到目标地址</td>
+<td><code>blt $rd, $zero, si18 or symbol</code></td>
+</tr>
+<tr>
+<td><code>bgtz $rd, si18 or symbol</code></td>
+<td>if (signed($rd) &lt; 0) 则跳转到目标地址</td>
+<td><code>blt $zero, $rd, si18 or symbol</code></td>
+</tr>
+<tr>
+<td><code>blez $rd, si18 or symbol</code></td>
+<td>if (signed($rd) &lt;= 0) 则跳转到目标地址</td>
+<td><code>bge $zero, $rd, si18 or symbol</code></td>
+</tr>
+<tr>
+<td><code>bgez $rd, si18 or symbol</code></td>
+<td>if (signed($rd) &gt;= 0) 则跳转到目标地址</td>
+<td><code>bge $rd, $zero, si18 or symbol</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="id3">
+<h3><span class="section-number">2.5.1.2. </span>地址加载指令<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>这个小节主要处理将一个地址加载到寄存器，这里面包含很多的知识点，因此单独作为一个小节来说明。</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">la.local</span>&#160; <span class="pre">$rd,</span> <span class="pre">sym_name</span></code></p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>la.local  $rd, sym_name
+</pre></div>
+</div>
+<p>la.local加载当前模块中的符号。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>la.local  $t0, sym_name
+</pre></div>
+</div>
+<p>实际会扩展成下面指令序列(采用默认的编译参数)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.local  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name) 
+addi.d     $t0, $t0, %pc_lo12(sym_name)
+</pre></div>
+</div>
+<p>如果使用as汇编器参数 <strong>-mla-local-with-abs</strong>，则会扩展成下面的指令序列</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>loongarch64-linux-musl-as<span class="w"> </span>test_asm_main.S<span class="w"> </span>-mla-local-with-abs<span class="w"> </span>-o<span class="w"> </span>test_asm_main.S.o<span class="w"> </span>-c
+$<span class="w"> </span>loongarch64-linux-musl-objdump<span class="w"> </span>-alDr<span class="w"> </span>-M<span class="w"> </span>no-aliases<span class="w"> </span>test_asm_main.S.o<span class="w"> </span>&gt;<span class="w"> </span>test_asm_main.S.o.s
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.local  $t0, sym_name
+
+实际扩展序列：
+lu12i.w   $t0, %abs_hi20(sym_name)
+ori       $t0, $t0, %abs_lo12(sym_name)
+lu32i.d   $t0, %abs64_lo20(sym_name)
+lu52i.d   $t0, $t0, %abs64_hi12(sym_name)
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">la.local</span>&#160; <span class="pre">$rd,</span> <span class="pre">$rj,</span> <span class="pre">sym_name</span></code></p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>la.local  $t0, $t1, sym_name
+</pre></div>
+</div>
+<p>上述语义是将sym_name符号的地址，加载到<code class="docutils literal notranslate"><span class="pre">$t0</span></code>寄存器中，此时<code class="docutils literal notranslate"><span class="pre">$t1</span></code>作为一个临时的寄存器存放中间的结果。</p>
+<p>实际会扩展成下面指令序列(采用默认的编译参数)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.local  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t1, $zero, %pc_lo12(sym_name)
+lu32i.d    $t1, %pc64_lo20(sym_name)
+lu52i.d    $t1, $t1, %pc64_hi12(sym_name)
+add.d      $t0, $t0, $t1
+</pre></div>
+</div>
+<p>其实就是将一条宏指令扩展成五条指令。</p>
+<ul class="simple">
+<li><p>如果使用as汇编器参数 <strong>-mla-local-with-abs</strong>，则会扩展成下面的指令序列</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.local  $t0, $t1, sym_name
+
+实际扩展序列：
+lu12i.w   $t0, %abs_hi20(sym_local)
+ori       $t0, $t0, %abs_lo12(sym_local)
+lu32i.d   $t0, %abs64_lo20(sym_local)
+lu52i.d   $t0, $t0, %abs64_hi12(sym_local)
+</pre></div>
+</div>
+<p>注意此时 <code class="docutils literal notranslate"><span class="pre">$t1</span></code>临时寄存器其实没有使用。宏指令替换成五条指令。</p>
+<div class="admonition caution">
+<p class="admonition-title">小心</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>注意 ``la.local  $t0, sym_name`` 是加载本模块的符号地址，此时的符号地址是小范围的， 大概在[-2G, 2G]。
+而``la.local  $t0, $t1, sym_name`` 是加载较大符号的范围地址。超出2G的符号使用此宏指令。
+</pre></div>
+</div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p><code class="docutils literal notranslate"><span class="pre">la.global</span>&#160; <span class="pre">$rd,</span> <span class="pre">sym_name</span></code></p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>la.global  $t0, sym_name
+</pre></div>
+</div>
+<p>加载一个全局符号sym_name地址，到寄存器<code class="docutils literal notranslate"><span class="pre">$t0</span></code>中。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.global  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %got_pc_hi20(sym_name)
+ld.d       $t0, $t0, %got_pc_lo12(sym_name)
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">la.global</span></code>是先获得符号位于GOT表的地址，然后将GOT表中符号的地址从内存中读取出来。此时涉及到一条访存指令。</p>
+<ul class="simple">
+<li><p>如果使用as汇编器参数 <strong>-mla-global-with-pcrel</strong>，则会扩展成下面的指令序列</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.global  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t0, $t0, %pc_lo12(sym_name)
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>如果使用as汇编器参数 <strong>-mla-global-with-abs</strong>，则会扩展成下面的指令序列</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.global  $t0, sym_name
+
+实际扩展序列：
+lu12i.w    $t0, %abs_hi20(sym_name)
+ori        $t0, $t0, %abs_lo12(sym_name)
+lu32i.d    $t0, %abs64_lo20(sym_name)
+lu52i.d    $t0, $t0, %abs64_hi12(sym_name)
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p><code class="docutils literal notranslate"><span class="pre">la.global</span>&#160; <span class="pre">$rd,</span> <span class="pre">$rj,</span> <span class="pre">sym_name</span></code></p></li>
+</ol>
+<p>上述语义是将sym_name符号的地址，加载到<code class="docutils literal notranslate"><span class="pre">$t0</span></code>寄存器中，此时<code class="docutils literal notranslate"><span class="pre">$t1</span></code>作为一个临时的寄存器存放中间的结果。</p>
+<p>实际会扩展成下面指令序列(采用默认的编译参数)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.global  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %got_pc_hi20(sym_name)
+addi.d     $t1, $zero, %got_pc_lo12(sym_name)
+lu32i.d    $t1, %got64_pc_lo20(sym_name)
+lu52i.d    $t1, $t1, %got64_pc_hi12(sym_name)
+ldx.d      $t0, $t0, $t1
+</pre></div>
+</div>
+<p>其实就是将一条宏指令扩展成五条指令。</p>
+<ul class="simple">
+<li><p>如果使用as汇编器参数 <strong>-mla-global-with-pcrel</strong>，则会扩展成下面的指令序列</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.global  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t1, $zero, %pc_lo12(sym_name)
+lu32i.d    $t1, %pc64_lo20(sym_name)
+lu52i.d    $t1, $t1, %pc64_hi12(sym_name)
+add.d      $t0, $t0, $t1
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>如果使用as汇编器参数 <strong>-mla-global-with-abs</strong>，则会扩展成下面的指令序列</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.global  $t0, $t1, sym_name
+
+实际扩展序列：
+lu12i.w    $t0, %abs_hi20(sym_name)
+ori        $t0, $t0, %abs_lo12(sym_name)
+lu32i.d    $t0, %abs64_lo20(sym_name)
+lu52i.d    $t0, $t0, %abs64_hi12(sym_name)
+</pre></div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">小心</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>注意 ``la.global  $t0, sym_name`` 是加载本模块的符号地址，此时的符号地址是小范围的， 大概在[-2G, 2G]。
+而``la.global  $t0, $t1, sym_name`` 是加载较大符号的范围地址。超出2G的符号使用此宏指令。
+
+可以使用参数 **\-mla-global-with-abs** 和 **\-mla-global-with-pcrel** 进行替换
+</pre></div>
+</div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p><code class="docutils literal notranslate"><span class="pre">la是la.global宏指令的别名</span></code></p></li>
+</ol>
+<p>也就是说， <code class="docutils literal notranslate"><span class="pre">la</span> <span class="pre">$t0,</span> <span class="pre">$t1,</span> <span class="pre">sym_name</span> </code> 和 <code class="docutils literal notranslate"><span class="pre">la.global</span>&#160; <span class="pre">$t0,</span> <span class="pre">$t1,</span> <span class="pre">sym_name</span></code>是相等的。</p>
+<ol class="arabic simple" start="6">
+<li><p><code class="docutils literal notranslate"><span class="pre">la.abs</span>&#160; <span class="pre">$t0,</span> <span class="pre">sym_name</span></code></p></li>
+</ol>
+<p>实际会扩展成下面指令序列(采用默认的编译参数)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.abs  $t0, sym_name
+
+实际扩展序列：
+lu12i.w    $t0, %abs_hi20(sym_name)
+ori        $t0, $t0, %abs_lo12(sym_name)
+lu32i.d    $t0, %abs64_lo20(sym_name)
+lu52i.d    $t0, $t0, %abs64_hi12(sym_name)
+</pre></div>
+</div>
+<ol class="arabic simple" start="7">
+<li><p><code class="docutils literal notranslate"><span class="pre">la.pcrel</span>&#160; <span class="pre">$t0,</span> <span class="pre">sym_name</span></code></p></li>
+</ol>
+<p>实际会扩展成下面指令序列(采用默认的编译参数)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.abs  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t0, $t0, %pc_lo12(sym_name)
+</pre></div>
+</div>
+<ol class="arabic simple" start="8">
+<li><p><code class="docutils literal notranslate"><span class="pre">la.pcrel</span>&#160; <span class="pre">$t0,</span> <span class="pre">$t1,</span> <span class="pre">sym_name</span></code></p></li>
+</ol>
+<p>实际会扩展成下面指令序列(采用默认的编译参数)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.abs  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %pc_hi20(sym_name)
+addi.d     $t1, $zero, %pc_lo12(sym_name)
+lu32i.d    $t1, %pc64_lo20(sym_name)
+lu52i.d    $t1, $t1, %pc64_hi12(sym_name)
+add.d      $t0, $t0, $t1
+</pre></div>
+</div>
+<ol class="arabic simple" start="9">
+<li><p><code class="docutils literal notranslate"><span class="pre">la.got</span>&#160; <span class="pre">$t0,</span> <span class="pre">sym_name</span></code>
+实际会扩展成下面指令序列(采用默认的编译参数)</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.got  $t0, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %got_pc_hi20(sym_name)
+ld.d       $t0, $t0, %got_pc_lo12(sym_name)
+</pre></div>
+</div>
+<ol class="arabic simple" start="10">
+<li><p><code class="docutils literal notranslate"><span class="pre">la.got</span>&#160; <span class="pre">$t0,</span> <span class="pre">$t1,</span> <span class="pre">sym_name</span></code></p></li>
+</ol>
+<p>实际会扩展成下面指令序列(采用默认的编译参数)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>原始伪代码：
+la.got  $t0, $t1, sym_name
+
+实际扩展序列：
+pcalau12i  $t0, %got_pc_hi20(sym_got_large)
+addi.d     $t1, $zero, %got_pc_lo12(sym_got_large)
+lu32i.d    $t1, %got64_pc_lo20(sym_got_large)
+lu52i.d    $t1, $t1, %got64_pc_hi12(sym_got_large)
+ldx.d      $t0, $t0, $t1
+</pre></div>
+</div>
+<ol class="arabic simple" start="11">
+<li><p><code class="docutils literal notranslate"><span class="pre">nop</span></code></p></li>
+</ol>
+<p>nop宏指令是一条空指令，不会对32个通用寄存器进行任何修改，只是将pc设置为pc+4指向下一条指令。</p>
+<p>指令编码为<code class="docutils literal notranslate"><span class="pre">0x03400000</span></code>， 等价于指令<code class="docutils literal notranslate"><span class="pre">andi</span>&#160; <span class="pre">$zero,</span> <span class="pre">$zero,</span> <span class="pre">0x0</span></code></p>
+</section>
+<section id="id4">
+<h3><span class="section-number">2.5.1.3. </span>内嵌汇编<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>内联汇编或者内嵌汇编(Inline Assembly)，允许在高级语言C/C++中嵌入汇编指令。</p>
+<p>比如下面的例子：</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">	</span><span class="k">asm</span><span class="w"> </span><span class="k">volatile</span><span class="p">(</span><span class="s">&quot;move $r23, $r24&quot;</span><span class="p">);</span>
+<span class="w">	</span><span class="k">asm</span><span class="w"> </span><span class="k">volatile</span><span class="p">(</span><span class="s">&quot;addi.w $r23, $r24, 1&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>有时候也写作下面的方式：</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">	</span><span class="n">__asm__</span><span class="w"> </span><span class="n">__volatile__</span><span class="p">(</span><span class="s">&quot;move $r23, $r24&quot;</span><span class="p">);</span>
+<span class="w">	</span><span class="n">__asm__</span><span class="w"> </span><span class="n">__volatile__</span><span class="p">(</span><span class="s">&quot;addi.w $r23, $r24, 1&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>内敛汇编的语法如下所示：</p>
+<p>asm volatile ( AssemblerTemplate
+: OutputOperands
+: InputOperands
+: Clobbers )</p>
+<p>asm goto(AssemblerTemplate
+: OutputOperands
+: InputOperands
+: Clobbers
+: GotoLabels)</p>
+<ol class="arabic simple">
+<li><p>OutputOperands</p></li>
+</ol>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">d1</span><span class="p">,</span><span class="w"> </span><span class="n">d2</span><span class="p">;</span>
+<span class="p">...</span><span class="w"> </span><span class="p">...</span>
+<span class="k">asm</span><span class="w"> </span><span class="k">volatile</span><span class="p">(</span><span class="s">&quot;add.w %0 , %1 , %2 </span><span class="se">\n\t</span><span class="s">&quot;</span>
+<span class="w">				</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;=r&quot;</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="w">				</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;r&quot;</span><span class="w"> </span><span class="p">(</span><span class="n">d1</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;r&quot;</span><span class="w"> </span><span class="p">(</span><span class="n">d2</span><span class="p">)</span><span class="o">:</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>上述例子中，<code class="docutils literal notranslate"><span class="pre">&quot;=r&quot;</span> <span class="pre">(result)</span></code>就是输出操作数，其中，<code class="docutils literal notranslate"><span class="pre">=r</span></code>是约束，r表示定点的寄存器，=表示输出。</p>
+<ol class="arabic simple" start="2">
+<li><p>InputOperands</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;r&quot;</span> <span class="pre">(d1),</span> <span class="pre">&quot;r&quot;</span> <span class="pre">(d2)</span></code>是输入操作数，r表示定点的寄存器，多个输入操作数使用<code class="docutils literal notranslate"><span class="pre">,</span></code>分割。</p>
+<ol class="arabic simple" start="3">
+<li><p>Clobbers
+指明AssemblerTemplate中的指令会修改的寄存器的值。
+<code class="docutils literal notranslate"><span class="pre">memory</span></code>表明内存会被修改。</p></li>
+</ol>
+<p>更多具体的约束可以查看<a class="reference external" href="https://github.com/gcc-mirror/gcc/blob/master/gcc/config/loongarch/constraints.md">GCC Constraints</a></p>
+</section>
+<section id="id5">
+<h3><span class="section-number">2.5.1.4. </span>参考阅读<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://github.com/loongson/la-asm-manual/releases/download/release-1.1/la-asm-manual-v1.1.pdf">Assembly Language Programming Guide LoongArch, 英文版</a></p></li>
+<li><p><a class="reference external" href="https://github.com/loongson/la-abi-specs/releases/download/v2.50/la-abi-v2.50.pdf">LoongArch ABI 2.50</a></p></li>
+</ol>
+</section>
+</section>
+<section id="id6">
+<h2><span class="section-number">2.5.2. </span>链接脚本<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>GNU LD 链接脚本是控制链接器行为的核心配置文件，通过定义内存布局、段分配规则和符号映射，实现对最终可执行文件或库的精确控制。以下是其核心语法和用法详解：</p>
+<hr class="docutils" />
+<section id="id7">
+<h3><span class="section-number">2.5.2.1. </span>一、基础语法结构<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<section id="memory">
+<h4><span class="section-number">2.5.2.1.1. </span>1. <strong>MEMORY 坽块</strong><a class="headerlink" href="#memory" title="Link to this heading"></a></h4>
+<p>定义物理内存区域及其属性，格式为：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>MEMORY
+{
+  名称 (属性) : ORIGIN = 起始地址, LENGTH = 大小
+}
+</pre></div>
+</div>
+<ul>
+<li><p><strong>属性</strong>：<code class="docutils literal notranslate"><span class="pre">r</span></code>（可读）、<code class="docutils literal notranslate"><span class="pre">w</span></code>（可写）、<code class="docutils literal notranslate"><span class="pre">x</span></code>（可执行）、<code class="docutils literal notranslate"><span class="pre">a</span></code>（可分配）、<code class="docutils literal notranslate"><span class="pre">i</span></code>（已初始化）等，用 <code class="docutils literal notranslate"><span class="pre">!</span></code> 反转属性。</p></li>
+<li><p><strong>示例</strong>：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 2M   # Flash存储器，只读可执行
+RAM (rwx)   : ORIGIN = 0x20000000, LENGTH = 128K # RAM，可读写执行
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="sections">
+<h4><span class="section-number">2.5.2.1.2. </span>2. <strong>SECTIONS 块</strong><a class="headerlink" href="#sections" title="Link to this heading"></a></h4>
+<p>定义段的放置规则，格式为：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>SECTIONS
+{
+  段名称 : [AT(加载地址)] [ALIGN(对齐值)] {
+    内容规则
+  } &gt;目标内存区域
+}
+</pre></div>
+</div>
+<ul>
+<li><p><strong>关键概念</strong>：</p>
+<ul class="simple">
+<li><p><strong>VMA（Virtual Memory Address）</strong>：运行时地址。</p></li>
+<li><p><strong>LMA（Load Memory Address）</strong>：加载地址（默认与 VMA 相同）。</p></li>
+</ul>
+</li>
+<li><p><strong>示例</strong>：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>.text : {
+  *(.text)       # 合并所有输入文件的 .text 段
+  KEEP(*(.init)) # 保留初始化段不被优化
+} &gt;FLASH AT&gt;FLASH # 运行在 Flash，加载地址也为 Flash
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id8">
+<h3><span class="section-number">2.5.2.2. </span>二、核心命令与操作<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<section id="id9">
+<h4><span class="section-number">2.5.2.2.1. </span>1. <strong>段内容控制</strong><a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
+<ul>
+<li><p><strong>通配符匹配</strong>：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*(.text)</span></code>：所有输入文件的 <code class="docutils literal notranslate"><span class="pre">.text</span></code> 段。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lib*.a:(.text)</span></code>：所有 <code class="docutils literal notranslate"><span class="pre">lib</span></code> 开头的库文件的 <code class="docutils literal notranslate"><span class="pre">.text</span></code> 段。</p></li>
+</ul>
+</li>
+<li><p><strong>排除规则</strong>：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>*(EXCLUDE_FILE(boot.o) .text)  # 排除 boot.o 的 .text 段
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id10">
+<h4><span class="section-number">2.5.2.2.2. </span>2. <strong>符号操作</strong><a class="headerlink" href="#id10" title="Link to this heading"></a></h4>
+<ul>
+<li><p><strong>符号赋值</strong>：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>_start = 0x8000000;        # 定义入口地址
+data_start = ADDR(.data);  # 获取 .data 段地址
+</pre></div>
+</div>
+</li>
+<li><p><strong>PROVIDE 关键字</strong>：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PROVIDE(etext = .);        # 若未定义 etext，则设为当前地址
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id11">
+<h4><span class="section-number">2.5.2.2.3. </span>3. <strong>内存对齐与填充</strong><a class="headerlink" href="#id11" title="Link to this heading"></a></h4>
+<ul>
+<li><p><strong>对齐</strong>：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>. = ALIGN(4);              # 对齐到 4 字节边界
+.text : ALIGN(16) { ... }  # 段起始地址对齐到 16 字节
+</pre></div>
+</div>
+</li>
+<li><p><strong>填充</strong>：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>.bss : {
+  *(.bss)
+  FILL(0x90)               # 用 0x90 填充剩余空间
+}
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id12">
+<h4><span class="section-number">2.5.2.2.4. </span>4. <strong>动态表达式</strong><a class="headerlink" href="#id12" title="Link to this heading"></a></h4>
+<ul>
+<li><p><strong>SIZEOF(section)</strong>：获取段大小。</p></li>
+<li><p><strong>ADDR(section)</strong>：获取段起始地址。</p></li>
+<li><p><strong>NEXT(address)</strong>：返回对齐后的下一个地址。</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>.data : {
+  *(.data)
+  _data_end = . + SIZEOF(.data);  # 计算 .data 结束地址
+}
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id13">
+<h3><span class="section-number">2.5.2.3. </span>三、高级功能<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<section id="id14">
+<h4><span class="section-number">2.5.2.3.1. </span>1. <strong>多内存区域管理</strong><a class="headerlink" href="#id14" title="Link to this heading"></a></h4>
+<p>通过 <code class="docutils literal notranslate"><span class="pre">MEMORY</span></code> 定义多个区域，结合 <code class="docutils literal notranslate"><span class="pre">&gt;region</span></code> 指定段存放位置：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>MEMORY
+{
+  ROM (rx)  : ORIGIN = 0x0, LENGTH = 32K
+  RAM (rwx) : ORIGIN = 0x8000, LENGTH = 128K
+}
+
+SECTIONS
+{
+  .text : { *(.text) } &gt;ROM
+  .data : { *(.data) } &gt;RAM AT&gt;ROM  # 数据从 ROM 加载到 RAM
+}
+</pre></div>
+</div>
+</section>
+<section id="id15">
+<h4><span class="section-number">2.5.2.3.2. </span>2. <strong>段叠加与覆盖</strong><a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>OVERLAY</strong>：允许段重叠加载（需配合 <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> 命令）。</p></li>
+<li><p><strong>PHDRS</strong>：定义程序头表（如 ELF 的加载段）。</p></li>
+</ul>
+</section>
+<section id="id16">
+<h4><span class="section-number">2.5.2.3.3. </span>3. <strong>错误检查</strong><a class="headerlink" href="#id16" title="Link to this heading"></a></h4>
+<ul>
+<li><p><strong>ASSERT</strong>：条件不满足时终止链接。</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ASSERT(_end &lt;= 0x20000000, &quot;内存溢出&quot;)
+</pre></div>
+</div>
+</li>
+<li><p><strong>NOCROSSREFS</strong>：禁止段间交叉引用。</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>NOCROSSREFS(.text .data)  # .text 和 .data 不可相互引用
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id17">
+<h3><span class="section-number">2.5.2.4. </span>四、典型应用场景<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<section id="id18">
+<h4><span class="section-number">2.5.2.4.1. </span>1. <strong>嵌入式开发</strong><a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
+<ul>
+<li><p><strong>Flash-RAM 分离</strong>：将代码段（.text）放在 Flash，数据段（.data）从 Flash 加载到 RAM：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>SECTIONS
+{
+  .text : { *(.text) } &gt;FLASH
+  .data : { *(.data) } &gt;RAM AT&gt;FLASH
+  .bss  : { *(.bss) } &gt;RAM
+}
+</pre></div>
+</div>
+</li>
+<li><p><strong>启动代码</strong>：通过 <code class="docutils literal notranslate"><span class="pre">KEEP(*(.init))</span></code> 保留初始化代码。</p></li>
+</ul>
+</section>
+<section id="id19">
+<h4><span class="section-number">2.5.2.4.2. </span>2. <strong>库文件优化</strong><a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>隐藏符号</strong>：使用 <code class="docutils literal notranslate"><span class="pre">HIDDEN(symbol)</span></code> 限制符号可见性。</p></li>
+<li><p><strong>强制分配</strong>：<code class="docutils literal notranslate"><span class="pre">FORCE_COMMON_ALLOCATION</span></code> 为未初始化符号分配空间。</p></li>
+</ul>
+</section>
+<section id="id20">
+<h4><span class="section-number">2.5.2.4.3. </span>3. <strong>安全加固</strong><a class="headerlink" href="#id20" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>反调试</strong>：通过 <code class="docutils literal notranslate"><span class="pre">PHDRS</span></code> 修改程序头，隐藏调试信息。</p></li>
+<li><p><strong>代码混淆</strong>：重命名符号或调整段顺序。</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id21">
+<h3><span class="section-number">2.5.2.5. </span>五、实战示例<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<section id="id22">
+<h4><span class="section-number">2.5.2.5.1. </span>示例 1：简单链接脚本<a class="headerlink" href="#id22" title="Link to this heading"></a></h4>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>MEMORY
+{
+  FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 512K
+  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 128K
+}
+
+SECTIONS
+{
+  .text : {
+    KEEP(*(.isr_vector))  # 保留中断向量表
+    *(.text)
+  } &gt;FLASH
+
+  .data : {
+    *(.data)
+  } &gt;RAM AT&gt;FLASH
+
+  .bss : {
+    *(.bss)
+    *(COMMON)
+  } &gt;RAM
+}
+</pre></div>
+</div>
+</section>
+<section id="id23">
+<h4><span class="section-number">2.5.2.5.2. </span>示例 2：动态数据加载<a class="headerlink" href="#id23" title="Link to this heading"></a></h4>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>SECTIONS
+{
+  .rodata : {
+    *(.rodata)
+  } &gt;FLASH
+
+  .data : {
+    _data_load = LOADADDR(.data);  # 记录加载地址
+    _data_start = ADDR(.data);     # 记录运行地址
+    *(.data)
+  } &gt;RAM AT&gt;_data_load
+}
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id24">
+<h3><span class="section-number">2.5.2.6. </span>六、调试与验证<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p><strong>查看段信息</strong>：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>loongarch64-linux-gnu-objdump<span class="w"> </span>-h<span class="w"> </span>test_main<span class="w">  </span><span class="c1"># 显示段布局</span>
+</pre></div>
+</div>
+<p>显示如下：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>test_main:     file format elf64-loongarch
+
+Sections:
+Idx Name          Size      VMA               LMA               File off  Algn
+  0 .interp       0000001e  0000000120000200  0000000120000200  00000200  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .hash         00000038  0000000120000220  0000000120000220  00000220  2**3
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  2 .gnu.hash     0000001c  0000000120000258  0000000120000258  00000258  2**3
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  3 .dynsym       000000d8  0000000120000278  0000000120000278  00000278  2**3
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  4 .dynstr       00000090  0000000120000350  0000000120000350  00000350  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  5 .rela.dyn     00000090  00000001200003e0  00000001200003e0  000003e0  2**3
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  6 .rela.plt     00000060  0000000120000470  0000000120000470  00000470  2**3
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  7 .plt          00000060  00000001200004d0  00000001200004d0  000004d0  2**4
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  8 .text         00000200  0000000120000540  0000000120000540  00000540  2**5
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  9 .rodata       0000000b  0000000120000740  0000000120000740  00000740  2**3
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+ 10 .eh_frame_hdr 00000014  000000012000074c  000000012000074c  0000074c  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+ 11 .eh_frame     0000003c  0000000120000760  0000000120000760  00000760  2**3
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+ 12 .init_array   00000008  000000012001fdf0  000000012001fdf0  0000fdf0  2**3
+                  CONTENTS, ALLOC, LOAD, DATA
+ 13 .fini_array   00000008  000000012001fdf8  000000012001fdf8  0000fdf8  2**3
+                  CONTENTS, ALLOC, LOAD, DATA
+ 14 .dynamic      000001b0  000000012001fe00  000000012001fe00  0000fe00  2**3
+                  CONTENTS, ALLOC, LOAD, DATA
+ 15 .got          00000040  000000012001ffb0  000000012001ffb0  0000ffb0  2**3
+                  CONTENTS, ALLOC, LOAD, DATA
+ 16 .got.plt      00000030  000000012001fff0  000000012001fff0  0000fff0  2**3
+                  CONTENTS, ALLOC, LOAD, DATA
+ 17 .sdata        00000008  0000000120020020  0000000120020020  00010020  2**3
+                  CONTENTS, ALLOC, LOAD, DATA
+ 18 .bss          00000038  0000000120020028  0000000120020028  00010028  2**3
+                  ALLOC
+ 19 .comment      00000012  0000000000000000  0000000000000000  00010028  2**0
+                  CONTENTS, READONLY
+ 20 .debug_aranges 00000030  0000000000000000  0000000000000000  0001003a  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 21 .debug_info   000000aa  0000000000000000  0000000000000000  0001006a  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 22 .debug_abbrev 00000071  0000000000000000  0000000000000000  00010114  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 23 .debug_line   00000062  0000000000000000  0000000000000000  00010185  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 24 .debug_str    0000009d  0000000000000000  0000000000000000  000101e7  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 25 .debug_line_str 0000003b  0000000000000000  0000000000000000  00010284  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+</pre></div>
+</div>
+</li>
+<li><p><strong>生成映射文件</strong>：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>loongarch64-linux-gnu-ld<span class="w"> </span>-T<span class="w"> </span>linker.ld<span class="w"> </span>-M<span class="o">=</span>map.txt<span class="w"> </span>main.c
+</pre></div>
+</div>
+</li>
+<li><p><strong>验证符号地址</strong>：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>loongarch64-linux-gnu-nm<span class="w"> </span>test_main<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>main<span class="w">  </span><span class="c1"># 检查 main 函数地址</span>
+</pre></div>
+</div>
+<p>显示如下：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>                  U __libc_start_main
+ 0000000120000704 T main
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="id25">
+<h3><span class="section-number">2.5.2.7. </span>七、总结<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<p>GNU LD 链接脚本通过 <strong>MEMORY</strong> 和 <strong>SECTIONS</strong> 两大核心块，结合符号操作、对齐填充和动态表达式，实现了对程序内存布局的完全控制。其典型应用包括嵌入式系统的 Flash-RAM 分离、库文件优化和安全加固。掌握链接脚本是进行底层开发和性能调优的关键技能。</p>
+</section>
+<section id="id26">
+<h3><span class="section-number">2.5.2.8. </span>以LoongArch为例说明链接脚本<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<p>下面是LoongArch平台GNU ld默认的链接脚本，按照上面的说明，我们分析下链接脚本。</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/* Script for -z combreloc */
+/* Copyright (C) 2014-2025 Free Software Foundation, Inc.
+   Copying and distribution of this script, with or without modification,
+   are permitted in any medium without royalty provided the copyright
+   notice and this notice are preserved.  */
+
+OUTPUT_FORMAT(&quot;elf64-loongarch&quot;, &quot;elf64-loongarch&quot;, &quot;elf64-loongarch&quot;)
+OUTPUT_ARCH(loongarch)
+
+ENTRY(_start)
+
+SEARCH_DIR(&quot;=/loongarch64-linux-musl/lib64&quot;); SEARCH_DIR(&quot;=/usr/local/lib64&quot;); SEARCH_DIR(&quot;=/lib64&quot;); SEARCH_DIR(&quot;=/usr/lib64&quot;); SEARCH_DIR(&quot;=/loongarch64-linux-musl/lib&quot;); SEARCH_DIR(&quot;=/usr/local/lib&quot;); SEARCH_DIR(&quot;=/lib&quot;); SEARCH_DIR(&quot;=/usr/lib&quot;);
+
+SECTIONS
+{
+  /* Read-only sections, merged into text segment: */
+  PROVIDE (__executable_start = SEGMENT_START(&quot;text-segment&quot;, 0x120000000));
+  . = SEGMENT_START(&quot;text-segment&quot;, 0x120000000) + SIZEOF_HEADERS;
+  /* Place the build-id as close to the ELF headers as possible.  This
+     maximises the chance the build-id will be present in core files,
+     which GDB can then use to locate the associated debuginfo file.  */
+  .note.gnu.build-id  : { *(.note.gnu.build-id) }
+  .interp         : { *(.interp) }
+  .hash           : { *(.hash) }
+  .gnu.hash       : { *(.gnu.hash) }
+  .dynsym         : { *(.dynsym) }
+  .dynstr         : { *(.dynstr) }
+  .gnu.version    : { *(.gnu.version) }
+  .gnu.version_d  : { *(.gnu.version_d) }
+  .gnu.version_r  : { *(.gnu.version_r) }
+  .rela.dyn       :
+    {
+      *(.rela.init)
+      *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
+      *(.rela.fini)
+      *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*)
+      *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
+      *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
+      *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*)
+      *(.rela.ctors)
+      *(.rela.dtors)
+      *(.rela.got)
+      *(.rela.sdata .rela.sdata.* .rela.gnu.linkonce.s.*)
+      *(.rela.sbss .rela.sbss.* .rela.gnu.linkonce.sb.*)
+      *(.rela.sdata2 .rela.sdata2.* .rela.gnu.linkonce.s2.*)
+      *(.rela.sbss2 .rela.sbss2.* .rela.gnu.linkonce.sb2.*)
+      *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
+      PROVIDE_HIDDEN (__rela_iplt_start = .);
+      *(.rela.iplt)
+      PROVIDE_HIDDEN (__rela_iplt_end = .);
+    }
+  .rela.plt       :
+    {
+      *(.rela.plt)
+    }
+  .relr.dyn : { *(.relr.dyn) }
+  /* Start of the executable code region.  */
+  .init           :
+  {
+    KEEP (*(SORT_NONE(.init)))
+  } =0x00004003
+  .plt            : { *(.plt) }
+  .iplt           : { *(.iplt) }
+  .text           :
+  {
+    *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+    *(.text.exit .text.exit.*)
+    *(.text.startup .text.startup.*)
+    *(.text.hot .text.hot.*)
+    *(SORT(.text.sorted.*))
+    *(.text .stub .text.* .gnu.linkonce.t.*)
+    /* .gnu.warning sections are handled specially by elf.em.  */
+    *(.gnu.warning)
+  } =0x00004003
+  .fini           :
+  {
+    KEEP (*(SORT_NONE(.fini)))
+  } =0x00004003
+  PROVIDE (__etext = .);
+  PROVIDE (_etext = .);
+  PROVIDE (etext = .);
+  /* Start of the Read Only Data region.  */
+  .rodata         : { *(.rodata .rodata.* .gnu.linkonce.r.*) }
+  .rodata1        : { *(.rodata1) }
+  .sdata2         :
+  {
+    *(.sdata2 .sdata2.* .gnu.linkonce.s2.*)
+  }
+  .sbss2          : { *(.sbss2 .sbss2.* .gnu.linkonce.sb2.*) }
+  .eh_frame_hdr   : { *(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*) }
+  .eh_frame       : ONLY_IF_RO { KEEP (*(.eh_frame)) *(.eh_frame.*) }
+  .sframe         : ONLY_IF_RO { *(.sframe) *(.sframe.*) }
+  .gcc_except_table   : ONLY_IF_RO { *(.gcc_except_table .gcc_except_table.*) }
+  .gnu_extab   : ONLY_IF_RO { *(.gnu_extab*) }
+  /* These sections are generated by the Sun/Oracle C++ compiler.  */
+  .exception_ranges   : ONLY_IF_RO { *(.exception_ranges*) }
+  /* Various note sections.  Placed here so that they are always included
+     in the read-only segment and not treated as orphan sections.  The
+     current orphan handling algorithm does place note sections after R/O
+     data, but this is not guaranteed to always be the case.  */
+  .note.build-id :      { *(.note.build-id) }
+  .note.GNU-stack :     { *(.note.GNU-stack) }
+  .note.gnu-property :  { *(.note.gnu-property) }
+  .note.ABI-tag :       { *(.note.ABI-tag) }
+  .note.package :       { *(.note.package) }
+  .note.dlopen :        { *(.note.dlopen) }
+  .note.netbsd.ident :  { *(.note.netbsd.ident) }
+  .note.openbsd.ident : { *(.note.openbsd.ident) }
+  /* Start of the Read Write Data region.  */
+  /* Adjust the address for the data segment.  We want to adjust up to
+     the same address within the page on the next page up.  */
+  . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE));
+  /* Exception handling.  */
+  .eh_frame       : ONLY_IF_RW { KEEP (*(.eh_frame)) *(.eh_frame.*) }
+  .sframe         : ONLY_IF_RW { *(.sframe) *(.sframe.*) }
+  .gnu_extab      : ONLY_IF_RW { *(.gnu_extab) }
+  .gcc_except_table   : ONLY_IF_RW { *(.gcc_except_table .gcc_except_table.*) }
+  .exception_ranges   : ONLY_IF_RW { *(.exception_ranges*) }
+  /* Thread Local Storage sections.  */
+  .tdata	  :
+   {
+     PROVIDE_HIDDEN (__tdata_start = .);
+     *(.tdata .tdata.* .gnu.linkonce.td.*)
+   }
+  .tbss		  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
+  .preinit_array    :
+  {
+    PROVIDE_HIDDEN (__preinit_array_start = .);
+    KEEP (*(.preinit_array))
+    PROVIDE_HIDDEN (__preinit_array_end = .);
+  }
+  .init_array    :
+  {
+    PROVIDE_HIDDEN (__init_array_start = .);
+    KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
+    KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
+    PROVIDE_HIDDEN (__init_array_end = .);
+  }
+  .fini_array    :
+  {
+    PROVIDE_HIDDEN (__fini_array_start = .);
+    KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
+    KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
+    PROVIDE_HIDDEN (__fini_array_end = .);
+  }
+  .ctors          :
+  {
+    /* gcc uses crtbegin.o to find the start of
+       the constructors, so we make sure it is
+       first.  Because this is a wildcard, it
+       doesn&#39;t matter if the user does not
+       actually link against crtbegin.o; the
+       linker won&#39;t look for a file to match a
+       wildcard.  The wildcard also means that it
+       doesn&#39;t matter which directory crtbegin.o
+       is in.  */
+    KEEP (*crtbegin.o(.ctors))
+    KEEP (*crtbegin?.o(.ctors))
+    /* We don&#39;t want to include the .ctor section from
+       the crtend.o file until after the sorted ctors.
+       The .ctor section from the crtend file contains the
+       end of ctors marker and it must be last */
+    KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .ctors))
+    KEEP (*(SORT(.ctors.*)))
+    KEEP (*(.ctors))
+  }
+  .dtors          :
+  {
+    KEEP (*crtbegin.o(.dtors))
+    KEEP (*crtbegin?.o(.dtors))
+    KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .dtors))
+    KEEP (*(SORT(.dtors.*)))
+    KEEP (*(.dtors))
+  }
+  .jcr            : { KEEP (*(.jcr)) }
+  .data.rel.ro : { *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*) *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*) }
+  .dynamic        : { *(.dynamic) }
+  .got            : { *(.got) *(.igot) }
+  . = DATA_SEGMENT_RELRO_END (SIZEOF (.got.plt) &gt;= 16 ? 16 : 0, .);
+  .got.plt        : { *(.got.plt) *(.igot.plt) }
+  .data           :
+  {
+    *(.data .data.* .gnu.linkonce.d.*)
+    SORT(CONSTRUCTORS)
+  }
+  .data1          : { *(.data1) }
+  /* We want the small data sections together, so single-instruction offsets
+     can access them all, and initialized data all before uninitialized, so
+     we can shorten the on-disk segment size.  */
+  .sdata          :
+  {
+    *(.sdata .sdata.* .gnu.linkonce.s.*)
+  }
+  _edata = .;
+  PROVIDE (edata = .);
+  . = ALIGN(ALIGNOF(NEXT_SECTION));
+  __bss_start = .;
+  .sbss           :
+  {
+    *(.dynsbss)
+    *(.sbss .sbss.* .gnu.linkonce.sb.*)
+    *(.scommon)
+  }
+  .bss            :
+  {
+    *(.dynbss)
+    *(.bss .bss.* .gnu.linkonce.b.*)
+    *(COMMON)
+    /* Align here to ensure that in the common case of there only being one
+       type of .bss section, the section occupies space up to _end.
+       Align after .bss to ensure correct alignment even if the
+       .bss section disappears because there are no input sections.
+       FIXME: Why do we need it? When there is no .bss section, we do not
+       pad the .data section.  */
+      . = ALIGN(. != 0 ? 64 / 8 : 1);
+  }
+  . = ALIGN(64 / 8);
+  /* Start of the Large Data region.  */
+  . = SEGMENT_START(&quot;ldata-segment&quot;, .);
+  . = ALIGN(64 / 8);
+  _end = .;
+  PROVIDE (end = .);
+  . = DATA_SEGMENT_END (.);
+  /* Start of the Tiny Data region.  */
+  /* Stabs debugging sections.  */
+  .stab          0 : { *(.stab) }
+  .stabstr       0 : { *(.stabstr) }
+  .stab.excl     0 : { *(.stab.excl) }
+  .stab.exclstr  0 : { *(.stab.exclstr) }
+  .stab.index    0 : { *(.stab.index) }
+  .stab.indexstr 0 : { *(.stab.indexstr) }
+  .comment 0 (INFO) : { *(.comment); LINKER_VERSION; }
+  .gnu.build.attributes : { *(.gnu.build.attributes .gnu.build.attributes.*) }
+  /* DWARF debug sections.
+     Symbols in the DWARF debugging sections are relative to the beginning
+     of the section so we begin them at 0.  */
+  /* DWARF 1.  */
+  .debug          0 : { *(.debug) }
+  .line           0 : { *(.line) }
+  /* GNU DWARF 1 extensions.  */
+  .debug_srcinfo  0 : { *(.debug_srcinfo) }
+  .debug_sfnames  0 : { *(.debug_sfnames) }
+  /* DWARF 1.1 and DWARF 2.  */
+  .debug_aranges  0 : { *(.debug_aranges) }
+  .debug_pubnames 0 : { *(.debug_pubnames) }
+  /* DWARF 2.  */
+  .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
+  .debug_abbrev   0 : { *(.debug_abbrev) }
+  .debug_line     0 : { *(.debug_line .debug_line.* .debug_line_end) }
+  .debug_frame    0 : { *(.debug_frame) }
+  .debug_str      0 : { *(.debug_str) }
+  .debug_loc      0 : { *(.debug_loc) }
+  .debug_macinfo  0 : { *(.debug_macinfo) }
+  /* SGI/MIPS DWARF 2 extensions.  */
+  .debug_weaknames 0 : { *(.debug_weaknames) }
+  .debug_funcnames 0 : { *(.debug_funcnames) }
+  .debug_typenames 0 : { *(.debug_typenames) }
+  .debug_varnames  0 : { *(.debug_varnames) }
+  /* DWARF 3.  */
+  .debug_pubtypes 0 : { *(.debug_pubtypes) }
+  .debug_ranges   0 : { *(.debug_ranges) }
+  /* DWARF 5.  */
+  .debug_addr     0 : { *(.debug_addr) }
+  .debug_line_str 0 : { *(.debug_line_str) }
+  .debug_loclists 0 : { *(.debug_loclists) }
+  .debug_macro    0 : { *(.debug_macro) }
+  .debug_names    0 : { *(.debug_names) }
+  .debug_rnglists 0 : { *(.debug_rnglists) }
+  .debug_str_offsets 0 : { *(.debug_str_offsets) }
+  .debug_sup      0 : { *(.debug_sup) }
+  .gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
+  /DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) *(.gnu_object_only) }
+}
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p>链接脚本中的注释使用<code class="docutils literal notranslate"><span class="pre">/*</span> <span class="pre">注释</span> <span class="pre">*/</span></code>来指定。</p></li>
+</ol>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/* Script for -z combreloc */
+/* Copyright (C) 2014-2025 Free Software Foundation, Inc.
+   Copying and distribution of this script, with or without modification,
+   are permitted in any medium without royalty provided the copyright
+   notice and this notice are preserved.  */
+</pre></div>
+</div>
+<hr class="docutils" />
+<ol class="arabic simple" start="2">
+<li><p>OUTPUT_FORMAT</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OUTPUT_FORMAT</span><span class="p">(</span><span class="n">bfdname</span><span class="p">)</span>
+<span class="n">OUTPUT_FORMAT</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">big</span><span class="p">,</span> <span class="n">little</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>OUTPUT_FORMAT指明输出可执行文件的格式。</p>
+<ul class="simple">
+<li><p>当只有一个参数时，输出目标对象格式。</p></li>
+</ul>
+<p>其输入的参数bfdname，可以使用一下命令查询：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>loongarch64-linux-gnu-objdump<span class="w"> </span>-i
+</pre></div>
+</div>
+<p>输出结果如下所示：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>BFD header file version (GNU Binutils) 2.43
+elf64-loongarch
+ (header little endian, data little endian)
+  Loongarch64
+elf32-loongarch
+ (header little endian, data little endian)
+  Loongarch64
+pei-loongarch64
+ (header little endian, data little endian)
+  Loongarch64
+elf64-little
+ (header little endian, data little endian)
+  Loongarch64
+elf64-big
+ (header big endian, data big endian)
+  Loongarch64
+elf32-little
+ (header little endian, data little endian)
+  Loongarch64
+elf32-big
+ (header big endian, data big endian)
+  Loongarch64
+srec
+ (header endianness unknown, data endianness unknown)
+  Loongarch64
+symbolsrec
+ (header endianness unknown, data endianness unknown)
+  Loongarch64
+verilog
+ (header endianness unknown, data endianness unknown)
+  Loongarch64
+tekhex
+ (header endianness unknown, data endianness unknown)
+  Loongarch64
+binary
+ (header endianness unknown, data endianness unknown)
+  Loongarch64
+ihex
+ (header endianness unknown, data endianness unknown)
+  Loongarch64
+plugin
+ (header little endian, data little endian)
+
+            elf64-loongarch elf32-loongarch pei-loongarch64 elf64-little 
+Loongarch64 elf64-loongarch elf32-loongarch pei-loongarch64 elf64-little
+
+            elf64-big elf32-little elf32-big srec symbolsrec verilog tekhex 
+Loongarch64 elf64-big elf32-little elf32-big srec symbolsrec verilog tekhex
+
+            binary ihex plugin 
+Loongarch64 binary ihex ------
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>当有三个参数时，<code class="docutils literal notranslate"><span class="pre">OUTPUT_FORMAT(default,</span> <span class="pre">big,</span> <span class="pre">little)</span></code>用法如下：</p></li>
+</ul>
+<p>如果传递给ld链接器的参数中没有<code class="docutils literal notranslate"><span class="pre">-EL</span></code>和<code class="docutils literal notranslate"><span class="pre">-EB</span></code>时，输入格式就是默认default</p>
+<p>如果传入的参数中有<code class="docutils literal notranslate"><span class="pre">-EB</span></code>时，输出格式为big格式</p>
+<p>如果传入的参数中有<code class="docutils literal notranslate"><span class="pre">-EL</span></code>时，输出格式为little格式</p>
+<p>例如：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OUTPUT_FORMAT</span><span class="p">(</span><span class="s2">&quot;elf64-loongarch&quot;</span><span class="p">,</span> <span class="s2">&quot;elf64-loongarch&quot;</span><span class="p">,</span> <span class="s2">&quot;elf64-loongarch&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>所有的输出不管传入参数是什么，都输出elf64-loongarch格式，即小端格式：<code class="docutils literal notranslate"><span class="pre">(header</span> <span class="pre">little</span> <span class="pre">endian,</span> <span class="pre">data</span> <span class="pre">little</span> <span class="pre">endian)</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OUTPUT_FORMAT</span><span class="p">(</span><span class="n">elf32</span><span class="o">-</span><span class="n">bigmips</span><span class="p">,</span> <span class="n">elf32</span><span class="o">-</span><span class="n">bigmips</span><span class="p">,</span> <span class="n">elf32</span><span class="o">-</span><span class="n">littlemips</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>表面默认输出时大端模式，如果参数包含<code class="docutils literal notranslate"><span class="pre">-EB</span></code>输出 大端格式elf32-bigmips，如果参数包含<code class="docutils literal notranslate"><span class="pre">-EL</span></code>输出小端格式elf32-littlemips。</p>
+<hr class="docutils" />
+<ol class="arabic simple" start="3">
+<li><p>OUTPUT_ARCH</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OUTPUT_ARCH</span><span class="p">(</span><span class="n">bfdarch</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>表明输出文件的架构类型。</p>
+<hr class="docutils" />
+<ol class="arabic simple" start="4">
+<li><p>ENTRY</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ENTRY</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>ENTRY指定可执行文件的入口地址，其输入是个符号。</p>
+<hr class="docutils" />
+<ol class="arabic simple" start="5">
+<li><p>SEARCH_DIR</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SEARCH_DIR</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SEARCH_DIR给ld链接器指令搜索库文件的路劲，类似于命令行输入<code class="docutils literal notranslate"><span class="pre">-L</span> <span class="pre">path</span></code>. SEARCH_DIR可以有过个。</p>
+<p>例如：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>SEARCH_DIR(&quot;=/loongarch64-linux-musl/lib64&quot;); SEARCH_DIR(&quot;=/usr/local/lib64&quot;); SEARCH_DIR(&quot;=/lib64&quot;); SEARCH_DIR(&quot;=/usr/lib64&quot;); SEARCH_DIR(&quot;=/loongarch64-linux-musl/lib&quot;); SEARCH_DIR(&quot;=/usr/local/lib&quot;); SEARCH_DIR(&quot;=/lib&quot;); SEARCH_DIR(&quot;=/usr/lib&quot;);
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li><p>PROVIDE</p></li>
+</ol>
+<p>In some cases, it is desirable for a linker script to define a symbol only if it is referenced and is not defined by any object included in the link. For example, traditional linkers defined the symbol ‘etext’. However, ANSI C requires that the user be able to use ‘etext’ as a function name without encountering an error. The PROVIDE keyword may be used to define a symbol, such as ‘etext’, only if it is referenced but not defined. The syntax is PROVIDE(symbol = expression).</p>
+<p>Here is an example of using PROVIDE to define ‘etext’:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SECTIONS</span>
+<span class="p">{</span>
+  <span class="o">.</span><span class="n">text</span> <span class="p">:</span>
+    <span class="p">{</span>
+      <span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+      <span class="n">_etext</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+      <span class="n">PROVIDE</span><span class="p">(</span><span class="n">etext</span> <span class="o">=</span> <span class="o">.</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In this example, if the program defines ‘_etext’ (with a leading underscore), the linker will give a multiple definition diagnostic. If, on the other hand, the program defines ‘etext’ (with no leading underscore), the linker will silently use the definition in the program. If the program references ‘etext’ but does not define it, the linker will use the definition in the linker script.</p>
+<p>Note - the PROVIDE directive considers a common symbol to be defined, even though such a symbol could be combined with the symbol that the PROVIDE would create. This is particularly important when considering constructor and destructor list symbols such as ‘<strong>CTOR_LIST</strong>’ as these are often defined as common symbols.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+    <a href="builtin.html" class="btn btn-neutral float-left" title="2.4. 内嵌的函数与指令包装" accesskey="p"
+      rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+    <a href="library.html" class="btn btn-neutral float-right" title="2.6. 一些常用的库函数" accesskey="n"
+      rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+  </div>
+
+  <hr />
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022-2026, 龙芯中科技术有限公司。
+      <span class="lastupdated">最后更新于 2026年2月10日 11:15:08.
+      </span>
+
+      <!-- 
+      <span class="footer-aside">
+        <a href="../../龙芯实验室文档.pdf" class="fa fa-file-pdf-o">&nbsp下载 PDF</a>
+      </span>
+       -->
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

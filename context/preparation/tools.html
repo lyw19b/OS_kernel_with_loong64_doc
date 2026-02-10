@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1.2. 工具链说明 &mdash; 龙芯实验室文档 V1.0 文档</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=b01b2dd9" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.jpg"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=3f0bcac8"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+        <script src="../../_static/translations.js?v=beaddf03"></script>
+        <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="2. 工具链" href="../toolchains/index.html" />
+    <link rel="prev" title="1.1. 前言" href="preface.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          <a href="../../index.html" class="icon icon-home">
+            龙芯实验室文档
+          </a>
+              <div class="version">
+                V1.0
+              </div>
+<div role="search">
+  <form id="evas-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">1. 准备工作</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="preface.html">1.1. 前言</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="preface.html#id2">1.1.1. 更新说明</a></li>
+<li class="toctree-l3"><a class="reference internal" href="preface.html#id3">1.1.2. 仓库地址</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.2. 工具链说明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gcc">1.2.1. GCC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llvm">1.2.2. LLVM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rust">1.2.3. Rust</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">1.3. 模拟器</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qemu">1.3.1. QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#la-emu">1.3.2. LA_EMU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">1.4. 操作系统编译</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#loongnix">1.4.1. LoongNix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#uos">1.4.2. UOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deepin">1.4.3. Deepin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#aosc">1.4.4. AOSC(安同)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linux-kernel">1.4.5. Linux kernel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../toolchains/index.html">2. 工具链</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/gcc.html">2.1. GCC</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id1">2.1.1. GCC的相关概念</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id2">2.1.1.1. GCC的基本定义与起源</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id4">2.1.1.2. GCC支持的语言与平台</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id5">2.1.1.3. GCC的核心功能与特点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id6">2.1.1.4. GCC的最新进展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id7">2.1.1.5. GCC的应用场景</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id8">2.1.2. 交叉编译器</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id9">2.1.3. 常见的类别组合</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id12">2.1.4. 如何编译交叉编译器</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#loongarch64-linux-gnu-sf">2.1.4.1. 如何编译loongarch64-linux-gnu[sf]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#loongarch64-linux-musl-sf">2.1.4.2. 如何编译loongarch64-linux-musl[sf]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#crtn-crti-crtbegin-crtend">2.1.4.3. crtn, crti, crtbegin, crtend有什么区别</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/gcc.html#id22">2.1.5. 常用的参数与选项</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#id23">2.1.5.1. GCC常见的参数</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#picpie">2.1.5.2. PIC与PIE的区别是什么</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#loongarch">2.1.5.3. 与LoongArch相关的选项说明</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/gcc.html#c-c">2.1.5.4. C/C++ 预处理器内嵌的宏定义</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/binutils.html">2.2. Binutils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#gnu-binutils">2.2.1. GNU Binutils的相关说明</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id1">2.2.1.1. <strong>核心定位与背景</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id2">2.2.1.2. <strong>重要组成部分与功能</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id5">2.2.1.3. <strong>应用场景</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#ld">2.2.2. ld链接器</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id6">2.2.2.1. LD的参数说明</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#readelf">2.2.3. 如何正确的使用readelf</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id7">2.2.3.1. 基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id11">2.2.3.2. 二、高级用法</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id14">2.2.3.3. 三、实战示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id18">2.2.3.4. 四、与其他工具对比</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#objdump">2.2.4. objdump</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id19">2.2.4.1. 一、基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id25">2.2.4.2. 二、高级用法</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id31">2.2.4.3. 三、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id36">2.2.4.4. 四、与其他工具对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id37">2.2.4.5. 五、注意事项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id38">2.2.4.6. 六、实战示例</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/binutils.html#objcopy">2.2.5. objcopy</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id42">2.2.5.1. 一、基础用法与核心选项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id46">2.2.5.2. 二、高级功能</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id51">2.2.5.3. 三、参数详解</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id52">2.2.5.4. 四、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id56">2.2.5.5. 五、常见问题与解决</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id60">2.2.5.6. 六、与其他工具对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/binutils.html#id61">2.2.5.7. 七、总结</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/rust.html">2.3. Rust</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#id1">2.3.1. Rust的概念</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id2">2.3.1.1. Rust的起源与发展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id3">2.3.1.2. Rust的核心特性</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id4">2.3.1.3. Rust的应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id5">2.3.1.4. Rust的最新进展</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/rust.html#id6">2.3.1.5. Rust的优缺点</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#loongarchtarget">2.3.2. LoongArch支持的target有哪些</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#loongarch">2.3.3. 与LoongArch相关的具体参数那些</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/rust.html#laexe">2.3.4. 简单的例子说明如何编译成LA架构的EXE文件</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/builtin.html">2.4. 内嵌的函数与指令包装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/builtin.html#gcc">2.4.1. GCC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/builtin.html#llvm">2.4.2. LLVM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/builtin.html#rust">2.4.3. Rust</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/builtin.html#loongarch">2.4.3.1. LoongArch包的相关内容</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/assembly.html">2.5. 汇编代码与链接脚本</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/assembly.html#loongarch">2.5.1. 与LoongArch相关的汇编指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id2">2.5.1.1. 伪汇编指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id3">2.5.1.2. 地址加载指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id4">2.5.1.3. 内嵌汇编</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id5">2.5.1.4. 参考阅读</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/assembly.html#id6">2.5.2. 链接脚本</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id7">2.5.2.1. 一、基础语法结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id8">2.5.2.2. 二、核心命令与操作</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id13">2.5.2.3. 三、高级功能</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id17">2.5.2.4. 四、典型应用场景</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id21">2.5.2.5. 五、实战示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id24">2.5.2.6. 六、调试与验证</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id25">2.5.2.7. 七、总结</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/assembly.html#id26">2.5.2.8. 以LoongArch为例说明链接脚本</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../toolchains/library.html">2.6. 一些常用的库函数</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#glibc">2.6.1. GLIBC</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id2">2.6.1.1. 一、核心功能与作用</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id3">2.6.1.2. 二、架构与实现细节</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id4">2.6.1.3. 三、版本演进与升级风险</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id5">2.6.1.4. 四、与其他运行库的对比</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id6">2.6.1.5. 五、开发与调试工具</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#musl">2.6.2. MUSL</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#musl-c">2.6.2.1. Musl C 库详解</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../toolchains/library.html#id15">2.6.2.2. 总结</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#memcpy">2.6.3. memcpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#memmove">2.6.4. memmove</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../toolchains/library.html#memset">2.6.5. memset</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../privilege_isa/index.html">3. 特权态指令</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html">3.1. CSR寄存器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html#id1">3.2. CSR指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrrd">3.2.1. CSRRD指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrwr">3.2.2. CSRWR指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#csrxchg">3.2.3. CSRXCHG指令</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/csr.html#iocsr">3.3. IOCSR指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#iocsrrd">3.3.1. IOCSRRD指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/csr.html#iocsrwr">3.3.2. IOCSRWR指令</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/cacop_insn.html">3.4. CPUCFG 指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/cacop_insn.html#cacop">3.5. CACOP 指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/tlb_insn.html">3.6. TLB 与页表指令</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id1">3.6.1. TLB 相关指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbsrch">3.6.1.1. TLBSRCH</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbrd">3.6.1.2. TLBRD</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbwr">3.6.1.3. TLBWR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbfill">3.6.1.4. TLBFILL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbclr">3.6.1.5. TLBCLR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#tlbflush">3.6.1.6. TLBFLUSH</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#invtlb">3.6.1.7. INVTLB</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id2">3.6.2. 页表查找指令</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#lddir">3.6.2.1. LDDIR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../privilege_isa/tlb_insn.html#ldpte">3.6.2.2. LDPTE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../privilege_isa/tlb_insn.html#id3">3.6.3. 应用示例</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html">3.7. ERTN指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html#idle">3.8. IDLE指令</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../privilege_isa/misc_insn.html#syscall">3.9. SysCALL指令</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mmu/index.html">4. 内存管理</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_struct.html">4.1. LoongArch的地址管理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id2">4.1.1. 直接地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id3">4.1.2. 映射地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id4">4.1.3. 存储访问的类型</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_struct.html#loongarchtlb">4.2. LoongArch的TLB结构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id5">4.2.1. 逻辑组织结构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#tlb-cpu">4.2.2. TLB的表项（以CPU的视觉）</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_struct.html#tlb">4.3. TLB的管理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id6">4.3.1. TLB的一些概念区分</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#id7">4.3.2. TLB相关的指令</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#tlbcsr">4.3.3. TLB相关的CSR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#tlb-excption-handle">4.3.4. TLB相关的例外</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_struct.html#cputlb">4.3.5. CPU内部TLB查找流程示例</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/dmw.html">4.4. 直接映射翻译模式</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/dmw.html#csr-dmw-0-3">4.4.1. CSR.DMW[0-3]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/dmw.html#id2">4.4.2. 操作系统中如何使用</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/dmw.html#dmw">4.4.2.1. DMW的优点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/dmw.html#id3">4.4.2.2. DMW的缺点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/dmw.html#id4">4.4.2.3. 代码示例如何在内核中使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_ptw.html">4.5. 多级页表结构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id2">4.5.1. 设计背景与必要性</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id3">4.5.1.1. 多级页表的结构与层级</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id4">4.5.1.2. 地址转换流程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id5">4.5.1.3. 多级页表的优势</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id6">4.5.1.4. 优化机制</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id7">4.5.1.5. 对比不同架构的页表设计</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#loongarch">4.5.2. LoongArch的多级页表结构</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#kernel">4.5.2.1. Kernel如何初始化设置多级页表结构</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#kb">4.5.2.2. 二级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id8">4.5.2.3. 二级页表，16KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id9">4.5.2.4. 三级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id10">4.5.2.5. 三级页表，16KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id11">4.5.2.6. 四级页表，4KB页大小</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id12">4.5.2.7. 四级页表，16KB页大小</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id13">4.5.3. 内存中的页表表项（Kernel视角）</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id14">4.5.3.1. 基本页表（叶子节点）</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id15">4.5.3.2. 大页页表（叶子节点）</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#no-leaf-pg-entry">4.5.3.3. 中间指向下一级目录的地址的页表(非叶子节点页表)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id17">4.5.4. 页表的遍历</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#k">4.5.4.1. 以一个例子4K页为例说明：</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#m">4.5.4.2. 以一个例子2M页为例说明：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/tlb_ptw.html#cputlb">4.6. 从内存中的页表表项到CPU中的TLB</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#tlbrefill-softeware-ptw">4.6.1. TLBRefill (Softeware PTW)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#csr">4.6.1.1. 相关的CSR寄存器</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id18">4.6.1.2. 重填示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id19">4.6.1.3. 两级页表的示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#three-level-page-table-refill">4.6.1.4. 三级页表的示例代码</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id21">4.6.1.5. 四级页表的示例代码</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#hardware-ptw">4.6.2. Hardware PTW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/tlb_ptw.html#id22">4.6.3. 页表的刷新</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id23">4.6.3.1. 页表为什么需要刷新</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id24">4.6.3.2. 页表刷新的指令</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mmu/tlb_ptw.html#id25">4.6.3.3. 页表刷新的例子</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mmu/page_table_in_kernel.html">4.7. Kernel与MMU</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id1">4.7.1. 地址翻译相关的初始化</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id2">4.7.2. 如何从直接地址翻译模式到映射地址翻译模式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id3">4.7.3. 如何建立虚拟地址到物理地址的映射关系</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id4">4.7.4. 页表的遍历页表</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#tlb">4.7.5. 情况1. 如果TLB中没有映射</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#v-0">4.7.6. 情况2. 如果页表项的V=0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#d-0">4.7.7. 情况3. 如果写操作页表项D=0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#id5">4.7.8. 情况4. 如果权限不合法</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mmu/page_table_in_kernel.html#ptw">4.7.9. 如果使能硬件PTW</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../trap/index.html">5. 中断与异常系统</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../trap/interrupt.html">5.1. 中断</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id2">5.1.1. 线中断</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#ipi">5.1.1.1. 核间中断IPI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id3">5.1.1.2. 定时器中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id4">5.1.1.3. 性能计数器中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id5">5.1.1.4. 外部硬中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id6">5.1.1.5. 内部软中断</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id7">5.1.1.6. 中断号</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id8">5.1.2. 消息中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id9">5.1.3. 中断的优先级</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id10">5.1.3.1. 线中断的优先级</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/interrupt.html#id11">5.1.3.2. 消息中断的优先级</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id12">5.1.4. 中断的打开与关闭</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id13">5.1.5. 中断的入口地址</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/interrupt.html#id14">5.1.6. 中断的处理流程</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/exception.html">5.2. 例外</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id2">5.2.1. 例外的优先级</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id3">5.2.2. 例外的入口地址</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/exception.html#id4">5.2.3. 例外的处理过程</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#id5">5.2.3.1. 普通例外的处理过程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#tlb">5.2.3.2. TLB 重填例外硬件处理过程</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/exception.html#id6">5.2.3.3. 机器错误例外硬件处理过程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/trap_in_kernel.html">5.3. Kernel与异常</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#expection-entry-selection">5.3.1. 异常的入口地址选择</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id2">5.3.1.1. “统一式”的入口地址</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id3">5.3.1.2. “分离式”的入口地址</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id4">5.3.2. 异常的初始化</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id5">5.3.2.1. 统一式的初始化</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../trap/trap_in_kernel.html#id7">5.3.2.2. 分离式的初始化</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#cpu">5.3.3. 异常发生时，CPU做了什么</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../trap/trap_in_kernel.html#id9">5.4. 特殊异常的处理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id10">5.4.1. 定时器中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id11">5.4.2. 系统调用</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../trap/trap_in_kernel.html#id12">5.4.3. 非对齐访问</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../smp/index.html">6. SMP多核系统</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../smp/smp.html">6.1. SMP与LoongArch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#ipi">6.1.1. IPI中断</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#id1">6.1.2. 如何通信</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../smp/smp.html#id2">6.1.3. 如何初始化</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../smp/smp.html#linuxsmp">6.2. Linux中SMP的处理（与架构相关）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../abi/index.html">7. 程序二进制接口</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html">7.1. 新旧世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id2">7.2. 旧世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id3">7.3. 新世界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/new_and_old_world.html#id4">7.4. 新旧世界的区分</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../abi/abi.html">7.5. ABI 2.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/index.html">8. 调试方法与技巧</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../debug/debug_env.html">8.1. LoongArch最小debug环境搭建</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#linux-ramdisk">8.1.1. 制作Linux RamDisk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#qemu">8.1.2. 如何在 QEMU 中调试</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_env.html#id1">8.1.3. 设置断点</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../debug/debug_gdb.html">8.2. GDB的使用</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id1">8.2.1. 交叉编译环境中的GDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id2">8.2.2. 常见的GDB命令示例</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debug/debug_gdb.html#id3">8.2.3. 调试指令常见失效状况</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/index.html">9. 平台相关</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../platform/qemu.html">9.1. QEMU</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/qemu.html#virt">9.1.1. Virt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/qemu.html#id1">9.1.2. 设备</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/3a5000.html">9.2. 3A5000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id1">9.2.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id2">9.2.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a5000.html#id3">9.2.3. 地址空间</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../platform/3a5000.html#id4">9.2.3.1. 结点间物理地址空间</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../platform/3a5000.html#id5">9.2.3.2. 结点内物理地址空间</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/3a6000.html">9.3. 3A6000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a6000.html#id1">9.3.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/3a6000.html#id2">9.3.2. 芯片架构</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k3000.html">9.4. 2k3000芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k3000.html#id1">9.4.1. 芯片参数</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k1000la.html">9.5. 2k1000LA芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id1">9.5.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id2">9.5.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id3">9.5.3. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k1000la.html#id4">9.5.4. 地址空间</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k0500.html">9.6. 2k0500芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id1">9.6.1. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id2">9.6.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id3">9.6.3. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id4">9.6.4. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id5">9.6.5. 地址空间</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0500.html#id6">9.6.6. 中断配置</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../platform/2k0300.html">9.7. 2k0300芯片</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id1">9.7.1. 芯片参数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id2">9.7.2. 芯片架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id3">9.7.3. 芯片功能</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id4">9.7.4. 地址空间</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../platform/2k0300.html#id5">9.7.5. 中断配置及路由</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../simd/index.html">10. 高级应用：SMID与向量指令</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../simd/todo.html">10.1. TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../virt/index.html">11. 高级应用：LVZ与虚拟化扩展</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../virt/todo.html">11.1. TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">12. FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../faq/faq-25.html">12.1. FAQ-25</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">龙芯实验室文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html"><span class="section-number">1. </span>准备工作</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">1.2. </span>工具链说明</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1><span class="section-number">1.2. </span>工具链说明<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>本章简要介绍，在为龙芯架构开发系统内核时，使用的编译工具链。</p>
+<p>其中，工具链具体原理与详细说明，请以文档第二章为主。</p>
+<section id="gcc">
+<h2><span class="section-number">1.2.1. </span>GCC<a class="headerlink" href="#gcc" title="Link to this heading"></a></h2>
+<p>1、龙芯生态的新世界与旧世界。</p>
+<p>龙芯目前有两套生态, 社区常常使用新世界和旧世界进行区分。旧世界兼容<code class="docutils literal notranslate"><span class="pre">MIPS</span></code>生态，新世界增加了更多的LoongArch架构特性，两个世界并不兼容。一般而言，开发者需要使用一整套同一个世界的工具链。</p>
+<p>以下是新旧世界下，一些常见软件、开发工具的版本对比：</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 42.9%" />
+<col style="width: 28.6%" />
+<col style="width: 28.6%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Linux</p></td>
+<td><p>4.19</p></td>
+<td><blockquote>
+<div><p>= 5.19</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><p>binutils</p></td>
+<td><p>2.31</p></td>
+<td><blockquote>
+<div><p>= 2.38</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd"><td><p>gcc</p></td>
+<td><p>8.3</p></td>
+<td><blockquote>
+<div><p>= 12.1</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><p>glibc</p></td>
+<td><p>2.28</p></td>
+<td><blockquote>
+<div><p>= 12.1</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd"><td><p>LLVM</p></td>
+<td><p>8</p></td>
+<td><blockquote>
+<div><p>= 16</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><p>Node.js</p></td>
+<td><p>14.16.1</p></td>
+<td><blockquote>
+<div><p>= 18</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Go</p></td>
+<td><p>1.15,1.18</p></td>
+<td><blockquote>
+<div><p>= 1.19</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><p>Rust</p></td>
+<td><p>1.41,1.58</p></td>
+<td><blockquote>
+<div><p>= 1.71</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p>2、编译器选项</p>
+<p>编译器支持两类命令行选项。</p>
+<ul class="simple">
+<li><p>基础选项:选择编译目标的基本配置，包括 -march -mabi -mtune;</p></li>
+<li><p>扩展选项:对基础选项或基础选项默认值的配置进行增量调整。</p></li>
+</ul>
+<p>基础选项内容与可选值如下：</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">基础选项</span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 37.5%" />
+<col style="width: 37.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>选项</strong></p></th>
+<th class="head"><p><strong>可用值</strong></p></th>
+<th class="head"><p><strong>描述</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-march=</p></td>
+<td><p>native,loongarch64,la464</p></td>
+<td><p>设定可用的指令集和寄存器范围</p></td>
+</tr>
+<tr class="row-odd"><td><p>-mabi=</p></td>
+<td><p>lp64d,lp64f,lf64s,ilp32d,ilp32f,ilp32s</p></td>
+<td><p>选择基础ABI类型</p></td>
+</tr>
+<tr class="row-even"><td><p>-mtune=</p></td>
+<td><p>native,loongarch64,la464</p></td>
+<td><p>设定魏家沟相关的性能调优参数</p></td>
+</tr>
+</tbody>
+</table>
+<p>扩展选项内容与可选值如下：</p>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text">基础选项</span><a class="headerlink" href="#id5" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 37.5%" />
+<col style="width: 37.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>选项</strong></p></th>
+<th class="head"><p><strong>可用值</strong></p></th>
+<th class="head"><p><strong>描述</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-msoft-float</p></td>
+<td></td>
+<td><p>禁止使用浮点指令，ABI使用软浮点类型(后缀为s)</p></td>
+</tr>
+<tr class="row-odd"><td><p>-msingle-float</p></td>
+<td></td>
+<td><p>允许使用32位浮点指令，ABI使用32位浮点类型(后缀为f)</p></td>
+</tr>
+<tr class="row-even"><td><p>-mdouble-float</p></td>
+<td></td>
+<td><p>允许使用32位和64位浮点指令，ABI使用64位浮点类型(后缀为d)</p></td>
+</tr>
+<tr class="row-odd"><td><p>-mfpu=</p></td>
+<td><p>64,32,0,none</p></td>
+<td><p>选择可用的浮点指令和浮点寄存器范围。</p></td>
+</tr>
+</tbody>
+</table>
+<p>3、musl和glibc</p>
+<p>针对不同的ABI，其支持的 C 库，与对应架构标识符，如下所示：</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>ABI类型/扩展特性</strong></p></th>
+<th class="head"><p><strong>C库</strong></p></th>
+<th class="head"><p><strong>架构标识符</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>lp64d/base</p></td>
+<td><p>glibc</p></td>
+<td><p>loongarch64-linux-gnu</p></td>
+</tr>
+<tr class="row-odd"><td><p>lp64f/base</p></td>
+<td><p>glibc</p></td>
+<td><p>loongarch64-linux-gnuf32</p></td>
+</tr>
+<tr class="row-even"><td><p>lp64s/base</p></td>
+<td><p>glibc</p></td>
+<td><p>loongarch64-linux-gnusf</p></td>
+</tr>
+<tr class="row-odd"><td><p>lp64d/base</p></td>
+<td><p>musl,libc</p></td>
+<td><p>loongarch64-linux-musl</p></td>
+</tr>
+<tr class="row-even"><td><p>lp64f/base</p></td>
+<td><p>musl,libc</p></td>
+<td><p>loongarch64-linux-muslf32</p></td>
+</tr>
+<tr class="row-odd"><td><p>lp64s/base</p></td>
+<td><p>musl,libc</p></td>
+<td><p>loongarch64-linux-muslsf</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="llvm">
+<h2><span class="section-number">1.2.2. </span>LLVM<a class="headerlink" href="#llvm" title="Link to this heading"></a></h2>
+<p>LLVM 是如今设计和开发编译器的最重要的框架之一，它不仅提供了知名的 C/C++ 编译器前端 clang，也为 Rust 等许多其他编程语言提供了编译框架支持，包括 Chromium 在内的大量大型软件都采用 LLVM 作为编译构建工具。</p>
+<p>LLVM 自 16.0.0 版本开始，以正式后端（official target）的级别实现了对 LoongArch 指令集架构的完善支持。</p>
+<p>LoongArch 架构在整个 LLVM 项目中得到了更加全面的支持，可支持 OrcJIT、GHC 调用约定等高级特性，clang、compiler-rt、lldb、openmp 和 libunwind 等子项目。</p>
+</section>
+<section id="rust">
+<h2><span class="section-number">1.2.3. </span>Rust<a class="headerlink" href="#rust" title="Link to this heading"></a></h2>
+<p>Rust 是近年来新兴的系统级编程语言，专注于安全性、并发性和性能。Rust 拥有丰富的类型系统和所有权模型，可通过在编译时检查内存访问和并发问题，保证内存安全和线程安全。Rust 在构建并行和分布式应用程序时具有优良的并发性能，其高性能特性使 Rust 适用于编写高效的系统软件，如操作系统内核、嵌入式设备驱动程序和网络服务器。</p>
+<p>Rust 自 1.71.0 版本开始，将对 LoongArch 架构的支持提升到 Tier2 级别，这一进展标志着 Rust 开源社区与其它主流指令集架构一样，将原生构建并发布针对 LoongArch 架构的二进制版本，实现对 LoongArch 指令集的原生支持。</p>
+<p>目前 Rust 支持的 LoongArch Linux 目标平台，包括：loongarch64-unknown-linux-gnu 与 loongarch64-unknown-linux-musl ， 支持原生构建和交叉构建，可通过 rustup 管理使用。</p>
+</section>
+</section>
+<section id="id2">
+<h1><span class="section-number">1.3. </span>模拟器<a class="headerlink" href="#id2" title="Link to this heading"></a></h1>
+<section id="qemu">
+<h2><span class="section-number">1.3.1. </span>QEMU<a class="headerlink" href="#qemu" title="Link to this heading"></a></h2>
+<p>QEMU 是一个通用且开源的机器模拟器和虚拟化程序，可以运行为特定机器（例如 Loongson 3A5000 ）编写的操作系统和程序，在不同的机器（例如 x86 PC）上运行。</p>
+<p>同事，通过使用动态翻译，QEMU 可以使用 Xen 或 KVM 等其他虚拟机监控程序来利用 CPU 扩展（HVM）进行虚拟化。</p>
+<p>这样，运行操作系统和程序时，QEMU 通过在主机 CPU 上直接执行客户机代码来实现接近原生的性能，达到良好性能。</p>
+<p>QEMU 提供全系统仿真和用户模式仿真两种模式。</p>
+<ul class="simple">
+<li><p>全系统仿真：QEMU 模拟一个完整的系统，包括一个或多个处理器和各种外围设备。它更准确但速度较慢。</p></li>
+<li><p>用户模式仿真：QEMU 能够通过利用主机系统资源，运行不同架构编译的 Linux 可执行文件。</p></li>
+</ul>
+<p>在 x86 平台设备，或 LoongArch 平台上，安装支持 LoongArch 架构模拟的 QEMU，教程如下:</p>
+<ol class="arabic simple">
+<li><p>可使用以下命令，安装社区或发行版维护的预编译版本:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">#  在 Ubuntu/Deepin 系统系统上通过 apt 进行安装</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>qemu-system-loongarch64<span class="w"> </span>qemu-utils
+</pre></div>
+</div>
+<p>使用这种方式安装预编译版本，可开箱即用，但 QEMU 版本可能较为落后。</p>
+<ol class="arabic simple" start="2">
+<li><p>可使用源码编译方式，进行安装:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">#  安装依赖</span>
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>libglib2.0-0<span class="w"> </span>libglib2.0-dev
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libpixman-1-0<span class="w"> </span>libpixman-1-dev
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>flex
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>bison<span class="w"> </span>ninja-build
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>gcc<span class="w"> </span>g++
+<span class="c1">#  克隆官方仓库</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/qemu/qemu.git
+<span class="c1">#  开始安装</span>
+<span class="nb">cd</span><span class="w"> </span>qemu/
+mkdir<span class="w"> </span>build
+<span class="nb">cd</span><span class="w"> </span>build
+../configure<span class="w"> </span>--target-list<span class="o">=</span>loongarch64-softmmu<span class="w"> </span>--enable-kvm<span class="w"> </span>--disable-werror<span class="w"> </span>--enable-vnc<span class="w"> </span>--enable-debug<span class="w"> </span>--enable-gdb
+<span class="c1">#  如果有需求，请添加 sudo 权限</span>
+make
+make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>即可成功安装 QEMU 。</p>
+<p>QEMU 启动运行时，支持的参数选项包括:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-system-loongarch64<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-m<span class="w"> </span>8G<span class="w"> </span><span class="se">\ </span><span class="w">     </span><span class="c1">#  指定分配内存大小</span>
+<span class="w">  </span>-cpu<span class="w"> </span>la464-loongarch-cpu<span class="w"> </span><span class="se">\ </span><span class="w">    </span><span class="c1">#  指定模拟 CPU 型号</span>
+<span class="w">  </span>-machine<span class="w"> </span>virt<span class="w"> </span><span class="se">\ </span><span class="w">      </span><span class="c1">#  指定模拟硬件凭条</span>
+<span class="w">  </span>-smp<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\ </span><span class="w">       </span><span class="c1">#  指定 CPU 核心数</span>
+<span class="w">  </span>-bios<span class="w"> </span>./QEMU_EFI.fd<span class="w"> </span><span class="se">\ </span><span class="w">      </span><span class="c1">#  指定 BIOS 用于启动时加载和执行</span>
+<span class="w">  </span>-device<span class="w"> </span>virtio-gpu-pci<span class="w"> </span><span class="se">\ </span><span class="w">      </span><span class="c1">#  指定 GPU 设备</span>
+<span class="w">  </span>-hda<span class="w"> </span>./Loongnix-20.5.loongarch64.qcow2<span class="w">     </span><span class="c1">#  指定虚拟机的硬盘镜像</span>
+</pre></div>
+</div>
+</section>
+<section id="la-emu">
+<h2><span class="section-number">1.3.2. </span>LA_EMU<a class="headerlink" href="#la-emu" title="Link to this heading"></a></h2>
+<p>LA_EMU 为 LoongArch64 模拟器，支持整型、浮点、向量指令集。模拟器能够启动 Linux kernel，并运行大型测试。</p>
+<p>可使用以下命令进行安装:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#  克隆官方仓库</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Open-ChipHub/LA_EMU.git
+<span class="c1">#  编译</span>
+make
+</pre></div>
+</div>
+<p>编译完成后，在 <code class="docutils literal notranslate"><span class="pre">build/</span></code>目录下，生成两个可执行程序：<code class="docutils literal notranslate"><span class="pre">la_emu_kernel</span></code>与<code class="docutils literal notranslate"><span class="pre">la_emu_user</span></code>，分别支持系统模式仿真和用户模式仿真。</p>
+<p>LA_EMU 启动运行时，支持的参数选项包括:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>la_emu_kernel<span class="w"> </span>-m<span class="w"> </span>n<span class="o">[</span>G<span class="o">]</span><span class="w"> </span>-k<span class="w"> </span>kernel
+-m<span class="w"> </span>Memory<span class="w"> </span>size<span class="o">(</span>kernel<span class="w"> </span>mode<span class="o">)</span>
+-k<span class="w"> </span>Kernel<span class="w"> </span>vmlinux<span class="w"> </span>or<span class="w"> </span>checkpoint<span class="w"> </span>directory<span class="o">(</span>kernel<span class="w"> </span>mode<span class="o">)</span>
+-d<span class="w"> </span>Log<span class="w"> </span>info,<span class="w"> </span>support:<span class="w"> </span>exec,cpu,fpu,int
+-D<span class="w"> </span>Log<span class="w"> </span>file
+-c<span class="w"> </span>Check<span class="w"> </span>item,<span class="w"> </span>support:<span class="w"> </span>tlb_mhit
+-z<span class="w"> </span>Determined<span class="w"> </span>events
+-g<span class="w"> </span>Enable<span class="w"> </span>gdbserver
+-w<span class="w"> </span>Force<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>hardware<span class="w"> </span>page<span class="w"> </span>table<span class="w"> </span>walker
+</pre></div>
+</div>
+<p>系统模式下，LA_EMU 常用运行命令如下:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build/la_emu_kernel<span class="w"> </span>-w<span class="w"> </span>-z<span class="w"> </span>-n<span class="w"> </span>-m<span class="w"> </span><span class="m">8</span><span class="w"> </span>-k<span class="w"> </span>~/linux/vmlinux
+</pre></div>
+</div>
+<p>该命令可在 LA_EMU 系统模式下，启动 Linux kernel。</p>
+</section>
+</section>
+<section id="id3">
+<h1><span class="section-number">1.4. </span>操作系统编译<a class="headerlink" href="#id3" title="Link to this heading"></a></h1>
+<p>本章以多个开源操作系统为示例，展示LoongArch架构的操作系统编译详细步骤，并在 x86 平台 QEMU 上启动。</p>
+<p>首先准备启动系统需要的 bios 固件，可通过以下指令下载编译好的版本:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://raw.githubusercontent.com/Open-ChipHub/LoongArch-SDK/refs/heads/main/bios/QEMU_EFI.fd
+</pre></div>
+</div>
+<p>或者，可使用以下命令，手动编译。</p>
+<ol class="arabic simple">
+<li><p>安装交叉编译器</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://github.com/loongson/build-tools/releases/download/2023.08.08/x86_64-cross-tools-loongarch64-gcc-libc.tar.xz
+tar<span class="w"> </span>xvf<span class="w"> </span>./x86_64-cross-tools-loongarch64-gcc-libc.tar.xz
+//<span class="w"> </span><span class="nb">set</span><span class="w"> </span>env
+<span class="nb">export</span><span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>loongarch64-unknown-linux-gnu-
+//<span class="w"> </span>replace<span class="w"> </span>your<span class="w"> </span>real<span class="w"> </span>path<span class="w"> </span>of<span class="w"> </span>cross<span class="w"> </span>compiler<span class="w"> </span>with<span class="w"> </span><span class="o">{</span>/path/of/cross/compile<span class="o">}</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">={</span>/path/of/cross/compile<span class="o">}</span>/bin:<span class="nv">$PATH</span>
+</pre></div>
+</div>
+<p>使用以下命令检查软件安装情况:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>loongarch64-unknown-linux-gnu-gcc<span class="w"> </span>--version
+//<span class="w"> </span>print<span class="w"> </span>version<span class="w"> </span>on<span class="w"> </span>terminal.
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>下载仓库并初始化</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/tianocore/edk2.git
+<span class="c1">#  初始化</span>
+<span class="nb">cd</span><span class="w"> </span>edk2
+git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>--init
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>开始构建</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-C<span class="w"> </span>BaseTools
+build<span class="w"> </span>-a<span class="w"> </span>LOONGARCH64<span class="w"> </span>-t<span class="w"> </span>GCC5<span class="w"> </span>-p<span class="w"> </span>OvmfPkg/LoongArchVirt/LoongArchVirtQemu.dsc
+</pre></div>
+</div>
+<p>编译完成后，固件映像位于 Build/LoongArchPkg/DEBUG_GCC5/FV/ 目录下。</p>
+<section id="loongnix">
+<h2><span class="section-number">1.4.1. </span>LoongNix<a class="headerlink" href="#loongnix" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>使用以下命令，下载 Loongnix 社区预编译系统:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://pkg.loongnix.cn/loongnix/isos/Loongnix-20.3/Loongnix-20.3.mate.gui.loongarch64.en.qcow2
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>使用以下命令，启动 Loongnix 系统:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-system-loongarch64<span class="w"> </span>-m<span class="w"> </span>8G<span class="w"> </span>-cpu<span class="w"> </span>la464<span class="w"> </span>-machine<span class="w"> </span>virt<span class="w"> </span>-smp<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-bios<span class="w"> </span>../QEMU_EFI.fd<span class="w"> </span>-serial<span class="w"> </span>stdio<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-device<span class="w"> </span>virtio-gpu-pci<span class="w"> </span>-net<span class="w"> </span>nic<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-device<span class="w"> </span>nec-usb-xhci,id<span class="o">=</span>xhci,addr<span class="o">=</span>0x1b<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-device<span class="w"> </span>usb-tablet,id<span class="o">=</span>tablet,bus<span class="o">=</span>xhci.0,port<span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-device<span class="w"> </span>usb-kbd,id<span class="o">=</span>keyboard,bus<span class="o">=</span>xhci.0,port<span class="o">=</span><span class="m">2</span><span class="w">  </span><span class="se">\</span>
+<span class="w">   </span>-hda<span class="w"> </span>./Loongnix-20.3.mate.gui.loongarch64.cn.qcow2
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>可在 QEMU 界面看到如下选项。</p></li>
+</ol>
+<a class="bg-primary reference internal image-reference" href="../../_images/loongnix_start.png"><img alt="Loongnix 启动界面" class="bg-primary align-center" src="../../_images/loongnix_start.png" style="width: 631.0px; height: 649.0px;" /></a>
+<ol class="arabic simple" start="4">
+<li><p>点击回车键，可进入系统登录界面。</p></li>
+</ol>
+<a class="bg-primary reference internal image-reference" href="../../_images/loongnix_login.png"><img alt="Loongnix 登录界面" class="bg-primary align-center" src="../../_images/loongnix_login.png" style="width: 631.0px; height: 649.0px;" /></a>
+<ol class="arabic simple" start="5">
+<li><p>输入密码 Loongson20 ，即可进入主界面。</p></li>
+</ol>
+<a class="bg-primary reference internal image-reference" href="../../_images/loongnix_home.png"><img alt="Loongnix 登录界面" class="bg-primary align-center" src="../../_images/loongnix_home.png" style="width: 631.0px; height: 649.0px;" /></a>
+</section>
+<section id="uos">
+<h2><span class="section-number">1.4.2. </span>UOS<a class="headerlink" href="#uos" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>使用以下命令，下载 UOS 系统镜像:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://cdimage-download.chinauos.com/desktop-professional/1074/uos-desktop-20-professional-1070-loongarch64-202511.iso
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>创建虚拟机磁盘。</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-img<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>qcow2<span class="w"> </span>./uso-20.qcow2<span class="w"> </span>100G
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>使用以下命令，启动系统:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-system-loongarch64<span class="w"> </span>-m<span class="w"> </span>4G<span class="w"> </span>-smp<span class="w"> </span><span class="m">4</span><span class="w"> </span>-cpu<span class="w"> </span>la464<span class="w"> </span>-machine<span class="w"> </span>virt<span class="w"> </span>-bios<span class="w"> </span>./QEMU_EFI.fd<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-serial<span class="w"> </span>stdio<span class="w"> </span>-device<span class="w"> </span>virtio-gpu-pci<span class="w"> </span>-net<span class="w"> </span>nic<span class="w"> </span>-net<span class="w"> </span>user<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-device<span class="w"> </span>virtio-blk-pci,drive<span class="o">=</span>drive-virtio-disk0<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-drive<span class="w"> </span><span class="nv">id</span><span class="o">=</span>drive-virtio-disk0,if<span class="o">=</span>none,format<span class="o">=</span>raw,file<span class="o">=</span>uos-20.qcow2<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-device<span class="w"> </span>virtio-scsi-pci,id<span class="o">=</span>scsi0<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-drive<span class="w"> </span><span class="nv">id</span><span class="o">=</span>drive-scsi0-cdrom0,if<span class="o">=</span>none,format<span class="o">=</span>raw,readonly<span class="o">=</span>on,file<span class="o">=</span>uos-desktop-20-professional-1070-loongarch64-202511<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-device<span class="w"> </span>scsi-cd,bus<span class="o">=</span>scsi0.0,drive<span class="o">=</span>drive-scsi0-cdrom0
+</pre></div>
+</div>
+</section>
+<section id="deepin">
+<h2><span class="section-number">1.4.3. </span>Deepin<a class="headerlink" href="#deepin" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>下载 Deepin 安装镜像，可使用以下命令:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://mirrors.hust.edu.cn/deepin-cd/25.0.10/loong64/deepin-desktop-community-25.0.10-loong64.iso
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>创建虚拟机磁盘。</p></li>
+</ol>
+<p>首先创建一个 100GB 大小的磁盘，可使用以下命令:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>/emulator/qemu/bin/qemu-img<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>qcow2<span class="w"> </span>./deepin-v23.qcow2<span class="w"> </span>100G
+</pre></div>
+</div>
+<p>运行一下命令，启动系统:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>~/emulator/qemu/bin/qemu-system-loongarch64<span class="w"> </span>-m<span class="w"> </span>8G<span class="w"> </span>-cpu<span class="w"> </span>la464-loongarch-cpu<span class="w"> </span>-machine<span class="w"> </span>virt<span class="w"> </span>-smp<span class="w"> </span><span class="m">4</span><span class="w"> </span>-bios<span class="w"> </span>../QEMU_EFI.fd<span class="w"> </span><span class="se">\</span>
+<span class="w">            </span>-serial<span class="w"> </span>stdio<span class="w"> </span>-device<span class="w"> </span>virtio-gpu-pci<span class="w"> </span>-net<span class="w"> </span>nic<span class="w"> </span><span class="se">\</span>
+<span class="w">            </span>-device<span class="w"> </span>virtio-blk-pci,drive<span class="o">=</span>drive-virtio-disk0<span class="w"> </span><span class="se">\</span>
+<span class="w">            </span>-drive<span class="w"> </span><span class="nv">id</span><span class="o">=</span>drive-virtio-disk0,if<span class="o">=</span>none,format<span class="o">=</span>raw,file<span class="o">=</span>deepin-v23.qcow2<span class="w"> </span><span class="se">\</span>
+<span class="w">            </span>-device<span class="w"> </span>virtio-scsi-pci,id<span class="o">=</span>scsi0<span class="w"> </span><span class="se">\</span>
+<span class="w">            </span>-drive<span class="w"> </span><span class="nv">id</span><span class="o">=</span>drive-scsi0-cdrom0,if<span class="o">=</span>none,format<span class="o">=</span>raw,readonly<span class="o">=</span>on,file<span class="o">=</span>deepin-desktop-community-25.0.10-loong64.iso<span class="w"> </span><span class="se">\</span>
+<span class="w">            </span>-device<span class="w"> </span>scsi-cd,bus<span class="o">=</span>scsi0.0,drive<span class="o">=</span>drive-scsi0-cdrom0
+</pre></div>
+</div>
+</section>
+<section id="aosc">
+<h2><span class="section-number">1.4.4. </span>AOSC(安同)<a class="headerlink" href="#aosc" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>在终端中运行该指令下载安同os镜像:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>wget<span class="w"> </span>https://releases.aosc.io/os-loongarch64/installer/aosc-os_installer_20251206_loongarch64.iso
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>创建映像文件</p></li>
+</ol>
+<p>在虚拟机终端中运行如下命令，建立一个 20GiB 大小的硬盘映像文件 aosc.img 供qemu挂载使用</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sudo<span class="w"> </span>qemu-img<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>raw<span class="w"> </span>aosc.img<span class="w"> </span>20G
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>为映像文件建立分区</p></li>
+</ol>
+<p>随后为 aosc.img 建立分区</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sudo<span class="w"> </span>fdisk<span class="w"> </span>aosc.img
+
+Welcome<span class="w"> </span>to<span class="w"> </span>fdisk<span class="w"> </span><span class="o">(</span>util-linux<span class="w"> </span><span class="m">2</span>.37.2<span class="o">)</span>.<span class="w">   </span>
+Changes<span class="w"> </span>will<span class="w"> </span>remain<span class="w"> </span><span class="k">in</span><span class="w"> </span>memory<span class="w"> </span>only,<span class="w"> </span><span class="k">until</span><span class="w"> </span>you<span class="w"> </span>decide<span class="w"> </span>to<span class="w"> </span>write<span class="w"> </span>them.<span class="w">   </span>
+Be<span class="w"> </span>careful<span class="w"> </span>before<span class="w"> </span>using<span class="w"> </span>the<span class="w"> </span>write<span class="w"> </span>command.<span class="w">   </span>
+<span class="w">   </span>
+Device<span class="w"> </span>does<span class="w"> </span>not<span class="w"> </span>contain<span class="w"> </span>a<span class="w"> </span>recognized<span class="w"> </span>partition<span class="w"> </span>table.<span class="w">   </span>
+Created<span class="w"> </span>a<span class="w"> </span>new<span class="w"> </span>DOS<span class="w"> </span>disklabel<span class="w"> </span>with<span class="w"> </span>disk<span class="w"> </span>identifier<span class="w"> </span>0x0f513192.
+
+Command<span class="w"> </span><span class="o">(</span>m<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nb">help</span><span class="o">)</span>:<span class="w"> </span>n<span class="w">   </span>
+Partition<span class="w"> </span><span class="nb">type</span><span class="w">   </span>
+<span class="w">   </span>p<span class="w">   </span>primary<span class="w"> </span><span class="o">(</span><span class="m">0</span><span class="w"> </span>primary,<span class="w"> </span><span class="m">0</span><span class="w"> </span>extended,<span class="w"> </span><span class="m">4</span><span class="w"> </span>free<span class="o">)</span><span class="w">   </span>
+<span class="w">   </span>e<span class="w">   </span>extended<span class="w"> </span><span class="o">(</span>container<span class="w"> </span><span class="k">for</span><span class="w"> </span>logical<span class="w"> </span>partitions<span class="o">)</span><span class="w">   </span>
+Select<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>p<span class="o">)</span>:<span class="w"> </span>p<span class="w">   </span>
+Partition<span class="w"> </span>number<span class="w"> </span><span class="o">(</span><span class="m">1</span>-4,<span class="w"> </span>default<span class="w"> </span><span class="m">1</span><span class="o">)</span>:<span class="w"> </span><span class="m">1</span><span class="w">   </span>
+First<span class="w"> </span>sector<span class="w"> </span><span class="o">(</span><span class="m">2048</span>-41943039,<span class="w"> </span>default<span class="w"> </span><span class="m">2048</span><span class="o">)</span>:<span class="w">    </span>
+Last<span class="w"> </span>sector,<span class="w"> </span>+/-sectors<span class="w"> </span>or<span class="w"> </span>+/-size<span class="o">{</span>K,M,G,T,P<span class="o">}</span><span class="w"> </span><span class="o">(</span><span class="m">2048</span>-41943039,<span class="w"> </span>default<span class="w"> </span><span class="m">41943039</span><span class="o">)</span>:<span class="w"> </span>
+<span class="w">   </span>
+Created<span class="w"> </span>a<span class="w"> </span>new<span class="w"> </span>partition<span class="w"> </span><span class="m">1</span><span class="w"> </span>of<span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="s1">&#39;Linux&#39;</span><span class="w"> </span>and<span class="w"> </span>of<span class="w"> </span>size<span class="w"> </span><span class="m">20</span><span class="w"> </span>GiB.
+<span class="w">   </span>
+Command<span class="w"> </span><span class="o">(</span>m<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nb">help</span><span class="o">)</span>:<span class="w"> </span>w<span class="w">   </span>
+The<span class="w"> </span>partition<span class="w"> </span>table<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>altered.<span class="w">   </span>
+Syncing<span class="w"> </span>disks.
+</pre></div>
+</div>
+<p>打印目前的分区表</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>fdisk<span class="w"> </span>-l<span class="w"> </span>aosc.img
+
+Disk<span class="w"> </span>aosc.img:<span class="w"> </span><span class="m">20</span><span class="w"> </span>GiB,<span class="w"> </span><span class="m">21474836480</span><span class="w"> </span>bytes,<span class="w"> </span><span class="m">41943040</span><span class="w"> </span>sectors
+Units:<span class="w"> </span>sectors<span class="w"> </span>of<span class="w"> </span><span class="m">1</span><span class="w"> </span>*<span class="w"> </span><span class="nv">512</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">512</span><span class="w"> </span>bytes
+Sector<span class="w"> </span>size<span class="w"> </span><span class="o">(</span>logical/physical<span class="o">)</span>:<span class="w"> </span><span class="m">512</span><span class="w"> </span>bytes<span class="w"> </span>/<span class="w"> </span><span class="m">512</span><span class="w"> </span>bytes
+I/O<span class="w"> </span>size<span class="w"> </span><span class="o">(</span>minimum/optimal<span class="o">)</span>:<span class="w"> </span><span class="m">512</span><span class="w"> </span>bytes<span class="w"> </span>/<span class="w"> </span><span class="m">512</span><span class="w"> </span>bytes
+Disklabel<span class="w"> </span>type:<span class="w"> </span>dos
+Disk<span class="w"> </span>identifier:<span class="w"> </span>0xe25655f6
+
+Device<span class="w">     </span>Boot<span class="w"> </span>Start<span class="w">      </span>End<span class="w">  </span>Sectors<span class="w"> </span>Size<span class="w"> </span>Id<span class="w"> </span>Type
+aosc.img1<span class="w">        </span><span class="m">2048</span><span class="w"> </span><span class="m">41943039</span><span class="w"> </span><span class="m">41940992</span><span class="w">  </span>20G<span class="w"> </span><span class="m">83</span><span class="w"> </span>Linux
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>创建Makefile文件</p></li>
+</ol>
+<p>创建一个Makefile文件<br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">vim</span> <span class="pre">Makefile</span></code><br />
+在其中编写</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">QEMU</span><span class="w">  </span><span class="o">=</span><span class="w"> </span>/your/qemu/path/qemu-system-loongarch64
+<span class="nv">MEM</span><span class="w">   </span><span class="o">=</span><span class="w"> </span>4G
+<span class="nv">CORES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4</span>
+<span class="nv">CPU</span><span class="w">   </span><span class="o">=</span><span class="w"> </span>la464
+<span class="nv">MACH</span><span class="w">  </span><span class="o">=</span><span class="w"> </span>virt
+<span class="nv">BIOS</span><span class="w">  </span><span class="o">=</span><span class="w"> </span>/your/EFI.fd/path/QEMU_EFI.fd
+
+<span class="nv">DISK</span><span class="w">  </span><span class="o">=</span><span class="w"> </span>aosc.img
+<span class="c"># ISO名字可能会随着版本变化而改变，更改为最新下载版本的名字即可</span>
+<span class="nv">ISO</span><span class="w">   </span><span class="o">=</span><span class="w"> </span>aosc-os_installer_20251206_loongarch64.iso
+
+<span class="nf">.PHONY</span><span class="o">:</span><span class="w"> </span><span class="n">run</span> <span class="n">run</span>-<span class="n">hd</span> <span class="n">create</span> <span class="n">clean</span>
+
+<span class="nf">run</span><span class="o">:</span>
+<span class="w">        </span><span class="k">$(</span>QEMU<span class="k">)</span><span class="w"> </span>-m<span class="w"> </span><span class="k">$(</span>MEM<span class="k">)</span><span class="w"> </span>-smp<span class="w"> </span><span class="k">$(</span>CORES<span class="k">)</span><span class="w"> </span>-cpu<span class="w"> </span><span class="k">$(</span>CPU<span class="k">)</span><span class="w"> </span>-machine<span class="w"> </span><span class="k">$(</span>MACH<span class="k">)</span><span class="w"> </span>-bios<span class="w"> </span><span class="k">$(</span>BIOS<span class="k">)</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-serial<span class="w"> </span>stdio<span class="w"> </span>-device<span class="w"> </span>virtio-gpu-pci<span class="w"> </span>-net<span class="w"> </span>nic<span class="w"> </span>-net<span class="w"> </span>user<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-device<span class="w"> </span>virtio-blk-pci,drive<span class="o">=</span>drive-virtio-disk0<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-drive<span class="w"> </span><span class="nv">id</span><span class="o">=</span>drive-virtio-disk0,if<span class="o">=</span>none,format<span class="o">=</span>raw,file<span class="o">=</span><span class="k">$(</span>DISK<span class="k">)</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-device<span class="w"> </span>virtio-scsi-pci,id<span class="o">=</span>scsi0<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-drive<span class="w"> </span><span class="nv">id</span><span class="o">=</span>drive-scsi0-cdrom0,if<span class="o">=</span>none,format<span class="o">=</span>raw,readonly<span class="o">=</span>on,file<span class="o">=</span><span class="k">$(</span>ISO<span class="k">)</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-device<span class="w"> </span>scsi-cd,bus<span class="o">=</span>scsi0.0,drive<span class="o">=</span>drive-scsi0-cdrom0
+
+<span class="nf">run-hd</span><span class="o">:</span>
+<span class="w">        </span><span class="k">$(</span>QEMU<span class="k">)</span><span class="w"> </span>-m<span class="w"> </span><span class="k">$(</span>MEM<span class="k">)</span><span class="w"> </span>-smp<span class="w"> </span><span class="k">$(</span>CORES<span class="k">)</span><span class="w"> </span>-cpu<span class="w"> </span><span class="k">$(</span>CPU<span class="k">)</span><span class="w"> </span>-machine<span class="w"> </span><span class="k">$(</span>MACH<span class="k">)</span><span class="w"> </span>-bios<span class="w"> </span><span class="k">$(</span>BIOS<span class="k">)</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-serial<span class="w"> </span>stdio<span class="w"> </span>-device<span class="w"> </span>virtio-gpu-pci<span class="w"> </span>-net<span class="w"> </span>nic<span class="w"> </span>-net<span class="w"> </span>user<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-drive<span class="w"> </span><span class="nv">file</span><span class="o">=</span><span class="k">$(</span>DISK<span class="k">)</span>,format<span class="o">=</span>raw,if<span class="o">=</span>virtio
+
+<span class="nf">create</span><span class="o">:</span>
+<span class="w">        </span>qemu-img<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>raw<span class="w"> </span><span class="k">$(</span>DISK<span class="k">)</span><span class="w"> </span>20G
+
+<span class="nf">clean</span><span class="o">:</span>
+<span class="w">        </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="k">$(</span>DISK<span class="k">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>使用qemu运行安同os<br />
+此时文件夹下有三个文件，分别是：</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aosc</span><span class="o">.</span><span class="n">img</span>      
+<span class="n">aosc</span><span class="o">-</span><span class="n">os_installer_20251206_loongarch64</span><span class="o">.</span><span class="n">iso</span>   
+<span class="n">Makefile</span>
+</pre></div>
+</div>
+<p>使用<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">run</span></code>命令运行<br />
+屏幕上会弹出安同os的界面<br />
+如果无法在安同os界面操作，那就返回到终端中进行操作选择</p>
+<a class="bg-primary reference internal image-reference" href="../../_images/aosc_language.png"><img alt="aosc 选择配置界面" class="bg-primary align-center" src="../../_images/aosc_language.png" style="width: 697.0px; height: 344.5px;" /></a>
+<p>第一个界面选择 中文（简体）</p>
+<a class="bg-primary reference internal image-reference" href="../../_images/aosc_grub.png"><img alt="aosc 选择启动项界面" class="bg-primary align-center" src="../../_images/aosc_grub.png" style="width: 695.0px; height: 347.5px;" /></a>
+<p>第二个界面选择 试用AOSC OS桌面版<br />
+稍等片刻即可进入安同os桌面</p>
+<a class="bg-primary reference internal image-reference" href="../../_images/aosc_desktop.png"><img alt="aosc 桌面版图片" class="bg-primary align-center" src="../../_images/aosc_desktop.png" style="width: 693.5px; height: 439.0px;" /></a>
+</section>
+<section id="linux-kernel">
+<h2><span class="section-number">1.4.5. </span>Linux kernel<a class="headerlink" href="#linux-kernel" title="Link to this heading"></a></h2>
+<p>linux内核版本推荐6.10。</p>
+<p>首先，基于busybox制作最小根文件系统。</p>
+<p>可使用以下命令获取对应文件。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://github.com/Open-ChipHub/LoongArch-SDK/raw/refs/heads/main/rootfs/rootfs.cpio.gz
+mv<span class="w"> </span>./rootfs.cpio.gz<span class="w"> </span>/path/to/your/linux/directory/
+</pre></div>
+</div>
+<p>也可使用以下命令，重新制作。</p>
+<p>首先获取busybox。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># 下载tar包</span>
+wget<span class="w"> </span>https://busybox.net/downloads/busybox-1.33.0.tar.bz2
+tar<span class="w"> </span>-xjf<span class="w"> </span>./busybox-1.33.0.tar.bz2
+<span class="nb">cd</span><span class="w"> </span>busybox-1.33.0
+<span class="c1"># 或从git仓库下载</span>
+git<span class="w"> </span>clone<span class="w"> </span>git://git.busybox.net/busybox
+<span class="nb">cd</span><span class="w"> </span>busybox
+</pre></div>
+</div>
+<p>使用以下命令进行编译。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># 安装依赖</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libncurses5-dev<span class="w"> </span>ncurses-devel
+make<span class="w"> </span><span class="nv">arch</span><span class="o">=</span>loongarch<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>loongarch64-linux-gnu-<span class="w"> </span>defconfig
+make<span class="w"> </span><span class="nv">arch</span><span class="o">=</span>loongarch<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>loongarch64-linux-gnu-<span class="w"> </span>menuconfig
+<span class="c1"># 根据需求进行配置</span>
+make<span class="w"> </span>-j<span class="k">$(</span>nproc<span class="k">)</span>
+<span class="c1"># 生成到新建目录rootfs</span>
+make<span class="w"> </span>install<span class="w"> </span><span class="nv">CONFIG_PREFIX</span><span class="o">={</span>/path/to/rootfs<span class="o">}</span>
+</pre></div>
+</div>
+<p>在rootfs目录下，进行以下命令。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="o">{</span>/path/to/rootfs<span class="o">}</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>proc<span class="w"> </span>sys<span class="w"> </span>dev<span class="w"> </span>etc/init.d
+vim<span class="w"> </span>etc/init.d/rcS
+</pre></div>
+</div>
+<p>修改etc/init.d/rcS为以下内容</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mount<span class="w"> </span>-t<span class="w"> </span>proc<span class="w"> </span>none<span class="w"> </span>/proc
+mount<span class="w"> </span>-t<span class="w"> </span>sysfs<span class="w"> </span>nont<span class="w"> </span>/sys
+<span class="nb">exec</span><span class="w"> </span>/bin/sh
+</pre></div>
+</div>
+<p>进行以下命令。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>chmod<span class="w"> </span>+x<span class="w"> </span>etc/init.d/rcS
+ln<span class="w"> </span>-sf<span class="w"> </span>bin/busybox<span class="w"> </span>init
+<span class="c1"># 打包为initramfs</span>
+find<span class="w"> </span>.<span class="w"> </span><span class="p">|</span><span class="w"> </span>cpio<span class="w"> </span>-o<span class="w"> </span>-H<span class="w"> </span>newc<span class="w"> </span><span class="p">|</span><span class="w"> </span>gzip<span class="w"> </span>&gt;<span class="w"> </span>../rootfs.cpio.gz
+</pre></div>
+</div>
+<p>接下来编译linux kernel</p>
+<p>可使用以下命令进行获取。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># 下载tar.gz包</span>
+wget<span class="w"> </span>https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.10.tar.gz
+tar<span class="w"> </span>zxvf<span class="w"> </span>linux-6.10.tar.gz<span class="w"> </span>-C<span class="w"> </span><span class="o">{</span>/path/of/linux/<span class="o">}</span>
+<span class="nb">cd</span><span class="w"> </span>linux-6.10
+<span class="c1"># 或从git仓库下载</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+<span class="nb">cd</span><span class="w"> </span>linux
+git<span class="w"> </span>checkout<span class="w"> </span>v6.10
+</pre></div>
+</div>
+<p>使用以下命令，配置内核对应的设备数文件，与内核配置文件。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># 可手动从github仓库下载该文件，或使用以下命令</span>
+wget<span class="w"> </span>https://raw.githubusercontent.com/Open-ChipHub/LoongArch-SDK/refs/heads/main/dts/labcore-sim.dts
+mv<span class="w"> </span>./labcore-sim.dts<span class="w"> </span><span class="o">{</span>path/to/linux<span class="o">}</span>/arch/loongarch/boot/dts/
+wget<span class="w"> </span>https://raw.githubusercontent.com/Open-ChipHub/LoongArch-SDK/refs/heads/main/linux/labcore_defconfig
+mv<span class="w"> </span>./labcore_defconfig<span class="w"> </span><span class="o">{</span>path/to/linux<span class="o">}</span>/.config
+</pre></div>
+</div>
+<p>使用以下命令，对linux kernel进行编译。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="o">{</span>path/to/rootfs/<span class="o">}</span>/rootfs.cpio.gz<span class="w"> </span>./
+<span class="c1"># 请确保交叉编译器环境变量设置正确</span>
+make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>loongarch<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>loongarch64-linux-gnu-<span class="w"> </span>menuconfig
+</pre></div>
+</div>
+<p>在<code class="docutils literal notranslate"><span class="pre">[General</span> <span class="pre">setup]</span></code>选项中，选择<code class="docutils literal notranslate"><span class="pre">[Initial</span> <span class="pre">RAM</span> <span class="pre">filesystem</span> <span class="pre">and</span> <span class="pre">RAM</span> <span class="pre">disk</span> <span class="pre">(initramfs/initrd)</span> <span class="pre">support]</span></code>。在<code class="docutils literal notranslate"><span class="pre">[Initramfs</span> <span class="pre">source</span> <span class="pre">file(s)]</span></code>中输入<code class="docutils literal notranslate"><span class="pre">[rootfs.cpio.gz]</span></code>。</p>
+<p>返回上一页，在<code class="docutils literal notranslate"><span class="pre">[Kernel</span> <span class="pre">type</span> <span class="pre">and</span> <span class="pre">options]</span></code>选项中，选中<code class="docutils literal notranslate"><span class="pre">[Enable</span> <span class="pre">built-in</span> <span class="pre">dtb</span> <span class="pre">in</span> <span class="pre">kernel]</span></code>，在<code class="docutils literal notranslate"><span class="pre">[Source</span> <span class="pre">file</span> <span class="pre">for</span> <span class="pre">built-in</span> <span class="pre">dtb]</span></code>中输入<code class="docutils literal notranslate"><span class="pre">[labcore-sim]</span></code>。</p>
+<p>保存并退出。</p>
+<p>使用以下命令，进行编译。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># 请确保交叉编译器环境变量设置正确</span>
+make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>loongarch<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>loongarch64-linux-gnu-<span class="w"> </span>-j<span class="k">$(</span>nproc<span class="k">)</span>
+</pre></div>
+</div>
+<p>部分编译过程以及结果如下所示。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+    <a href="preface.html" class="btn btn-neutral float-left" title="1.1. 前言" accesskey="p"
+      rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+    <a href="../toolchains/index.html" class="btn btn-neutral float-right" title="2. 工具链" accesskey="n"
+      rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+  </div>
+
+  <hr />
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022-2026, 龙芯中科技术有限公司。
+      <span class="lastupdated">最后更新于 2026年2月10日 11:15:08.
+      </span>
+
+      <!-- 
+      <span class="footer-aside">
+        <a href="../../龙芯实验室文档.pdf" class="fa fa-file-pdf-o">&nbsp下载 PDF</a>
+      </span>
+       -->
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>
