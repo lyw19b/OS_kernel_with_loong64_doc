@@ -7,7 +7,7 @@ build:
 
 python:
   install:
-    - requirements: requirements.txt
+    - requirements: sphinx_loongsonlab_theme/requirements.txt
     - method: pip
       path: .
 
