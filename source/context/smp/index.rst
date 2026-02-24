@@ -8,4 +8,8 @@ SMP多核系统
   :maxdepth: 1
 
   smp.md
+  smp_ipi.md
+  smp_iocsr.md
+  smp_init.md
+  smp_linux_loongarch.md
   
