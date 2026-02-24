@@ -269,7 +269,7 @@ VS配置的大小，具体看Kernel设计的情况。比如，Linux中，将VS=7
 .endm
 ```
 
-```asm
+```
 .section .text
 .balign 4096
 .global exception_entry_base
@@ -654,7 +654,7 @@ LoongArch相关的定时器的状态控制寄存器如下所示：
 
 **TCFG**: 定时器配置
 
-该寄存器是软件配置定时器的接口。定时器的有效位数由实现决定，因此该寄存器中 InitVal 域的位
+该寄存器是软件配置定时器的接口。定时器的有效位数由实现决定，因此该寄存器中InitVal域的位
 宽也将随之变化。    
 
 |位|名字|读写|描述|
