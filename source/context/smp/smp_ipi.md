@@ -144,3 +144,184 @@ CSR.ESTAT寄存器中的IS[12]，支持核间中断IPI，用于通知当前处�
 
 
 
+## 多核中断处理流程
+
+1. 首先源处理器核，准备数据，发送到目标的MailBox寄存器。
+
+```c
+/* Send mailbox buffer via Mail_Send */
+static void csr_mail_send(uint64_t data, int cpu, int mailbox)
+{
+	uint64_t val;
+
+	/* Send high 32 bits */
+	val = IOCSR_MBUF_SEND_BLOCKING;
+	val |= (IOCSR_MBUF_SEND_BOX_HI(mailbox) << IOCSR_MBUF_SEND_BOX_SHIFT);
+	val |= (cpu << IOCSR_MBUF_SEND_CPU_SHIFT);
+	val |= (data & IOCSR_MBUF_SEND_H32_MASK);
+	iocsr_write64(val, LOONGARCH_IOCSR_MBUF_SEND);
+
+	/* Send low 32 bits */
+	val = IOCSR_MBUF_SEND_BLOCKING;
+	val |= (IOCSR_MBUF_SEND_BOX_LO(mailbox) << IOCSR_MBUF_SEND_BOX_SHIFT);
+	val |= (cpu << IOCSR_MBUF_SEND_CPU_SHIFT);
+	val |= (data << IOCSR_MBUF_SEND_BUF_SHIFT);
+	iocsr_write64(val, LOONGARCH_IOCSR_MBUF_SEND);
+};
+```
+
+如上所示，首先向Mail_Send写入相应的值，通过IOCSR指令，写入到地址空间中。
+
+
+根据Mail_Send的定义:
+- MailSend[63:32]: 存放的是发送的32位数据。
+- MailSend[31]: 等待完成的标志，置1时会等待写入生效。上述例子中，IOCSR_MBUF_SEND_BLOCKING的值为``1<<31``。
+- MailSend[25:16]: 是写入目的CPU的MailBox寄存器，比如为0，是写入CPU-0；值为1，就是写入CPU-1。上述
+  例子中，直接将``cpu<<16``写入。
+- MailSend[4:2]:是写入目标CPU的哪一个MailBox，具体的分类方法如下：
+
+```c
+#define  IOCSR_MBUF_SEND_BOX_LO(box)	(box << 1)
+#define  IOCSR_MBUF_SEND_BOX_HI(box)	((box << 1) + 1)
+```
+
+对应于下面：
+|MailSend[4:2]的值|对应写入的目标MailBox内容（32位）|
+|- | -|
+|0 | MailBox0 低 32 位|
+|1 | MailBox0 高 32 位|
+|2 | MailBox1 低 32 位|
+|3 | MailBox1 高 32 位|
+|4 | MailBox2 低 32 位|
+|5 | MailBox2 高 32 位|
+|6 | MailBox3 低 32 位|
+|7 | MailBox4 高 32 位|
+
+------------------
+
+
+:::{tip}
+上述``iocsr_write64(val, LOONGARCH_IOCSR_MBUF_SEND)``的执行结果，会根据Mail_Send值具体的定义，     
+写入目标寄存器的MailBox寄存器中，也就是上面描述的perCore_MailBox0，perCore_MailBox1， perCore_MailBox2      
+perCore_MailBox3。
+:::
+
+:::{warning}
+上述对Mail_Send的操作，只是将内容的值写入目标CPU的MailBox中，但是并不会打断目标CPU的当前执行的指令！
+:::
+
+2. 源处理器核向目标处理器核通过IPI_Send发送IPI中断。
+
+```c
+static void ipi_write_action(int cpu, u32 action)
+{
+	uint32_t val;
+
+	val = IOCSR_IPI_SEND_BLOCKING | action;
+	val |= (cpu << IOCSR_IPI_SEND_CPU_SHIFT);
+	iocsr_write32(val, LOONGARCH_IOCSR_IPI_SEND);
+}
+```
+
+根据IPI_Send的定义:
+- IPISend[31]: 等待完成的标志，置1时会等待写入生效。上述例子中，IOCSR_IPI_SEND_BLOCKING的值为``1<<31``。
+- IPISend[25:16]: 是写入目的CPU的IPI_Status寄存器，比如为0，是写入CPU-0；值为1，就是写入CPU-1。上述
+  例子中，直接将``cpu<<16``写入。
+- MailSend[4:0]:中断向量号，对应于目标CPU中IPI_Status中的向量（注意是32位）。      
+  比如，向MailSend[4:0]写入0，对应于目标CPU中IPI_Status[0]=1;      
+  向MailSend[4:0]写入3，对应于目标CPU中IPI_Status[3]=1;
+
+
+下面是Linux中，LoongArch的SMP定义的几个向量类型，相当于定义了IPI_Status寄存器中，每位对应的含义。
+
+```c
+#define ACTION_BOOT_CPU	0
+#define ACTION_RESCHEDULE	1
+#define ACTION_CALL_FUNCTION	2
+#define ACTION_IRQ_WORK		3
+#define ACTION_CLEAR_VECTOR	4
+#define SMP_BOOT_CPU		BIT(ACTION_BOOT_CPU)
+#define SMP_RESCHEDULE		BIT(ACTION_RESCHEDULE)
+#define SMP_CALL_FUNCTION	BIT(ACTION_CALL_FUNCTION)
+#define SMP_IRQ_WORK		BIT(ACTION_IRQ_WORK)
+#define SMP_CLEAR_VECTOR	BIT(ACTION_CLEAR_VECTOR)
+```
+
+:::{tip}
+上述``iocsr_write32(val, LOONGARCH_IOCSR_IPI_SEND)``的执行结果，会根据IPI_Send值具体的定义，     
+写入目标寄存器的IPI_Status寄存器中。至于会不会产生中断，还是要根据配置情况。
+:::
+
+
+3. 目标处理器核根据配置选项，看是否产生IPI中断。
+
+具体是否产生中断的判断是： 
+
+```verilog
+IPI <= |(IPI_Status[31:0] & IPI_Enable[31:0])
+```
+如果对应IPI_Status的使能位IPI_Enable也置1了，就会产生相应的IPI中断，反之，就算IPI_Status置位了，但是IPI_Enable
+没有使能，也是不会产生IPI的异常。
+
+
+4. 产生中断异常后，进入异常处理程序，目标处理器核根据自身当前的IPI_Status来决定执行什么样的操作。
+
+```c
+static irqreturn_t loongson_ipi_interrupt(int irq, void *dev)
+{
+	unsigned int action;
+	unsigned int cpu = smp_processor_id();
+
+	action = ipi_read_clear(cpu_logical_map(cpu));
+
+	if (action & SMP_RESCHEDULE) {
+		scheduler_ipi();
+		per_cpu(irq_stat, cpu).ipi_irqs[IPI_RESCHEDULE]++;
+	}
+
+	if (action & SMP_CALL_FUNCTION) {
+		generic_smp_call_function_interrupt();
+		per_cpu(irq_stat, cpu).ipi_irqs[IPI_CALL_FUNCTION]++;
+	}
+
+	if (action & SMP_IRQ_WORK) {
+		irq_work_run();
+		per_cpu(irq_stat, cpu).ipi_irqs[IPI_IRQ_WORK]++;
+	}
+
+	if (action & SMP_CLEAR_VECTOR) {
+		complete_irq_moving();
+		per_cpu(irq_stat, cpu).ipi_irqs[IPI_CLEAR_VECTOR]++;
+	}
+
+	return IRQ_HANDLED;
+}
+
+```
+
+5. 执行完相应的IPI历程外，还需要清除对应的在IPI_Status中的置位。
+```c
+static u32 ipi_read_clear(int cpu)
+{
+	u32 action;
+
+	/* Load the ipi register to figure out what we're supposed to do */
+	action = iocsr_read32(LOONGARCH_IOCSR_IPI_STATUS);
+	/* Clear the ipi register to clear the interrupt */
+	iocsr_write32(action, LOONGARCH_IOCSR_IPI_CLEAR);
+	wbflush();
+
+	return action;
+}
+```
+
+主要是想IPI_Clear对应的位写1，就会将IPI_Status对应的位的1清除。
+
+
+6. 如果当前处理器核想主动的发起IPI中断，也是可行的，主要是通过向IPI_Set寄存器的对应位写入1。
+
+```c
+iocsr_write32(action, LOONGARCH_IOCSR_IPI_SET);
+```
+
+后续的处理方式和前面的设置是一样的。
