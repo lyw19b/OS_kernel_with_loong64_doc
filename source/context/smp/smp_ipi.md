@@ -263,6 +263,7 @@ IPI <= |(IPI_Status[31:0] & IPI_Enable[31:0])
 如果对应IPI_Status的使能位IPI_Enable也置1了，就会产生相应的IPI中断，反之，就算IPI_Status置位了，但是IPI_Enable
 没有使能，也是不会产生IPI的异常。
 
+(loongson_ipi_interrupt_routine)=
 
 4. 产生中断异常后，进入异常处理程序，目标处理器核根据自身当前的IPI_Status来决定执行什么样的操作。
 
