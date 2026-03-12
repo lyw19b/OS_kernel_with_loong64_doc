@@ -107,8 +107,11 @@ SIMD (单指令多数据流)与向量指令，是 CPU 为高效处理数据并�
 
 1、Linux 内核以及发行版仓库地址。
 
--	[linux kernel](https://github.com/torvalds/linux.git) : Linux 开源操作系统
--	[Loongnix](https://www.loongnix.cn/zh/loongnix/) : Loongnix操作系统是龙芯开源社区推出的Linux操作系统，作为龙芯软件生态建设的成果验证和展示环境，集成了内核、工具链、龙芯浏览器、Java虚拟机、音视频库、图形环境、云计算、打印驱动等操作系统基础设施方面的最新研发成果，可直接应用于日常办公、生产、生活等应用环境，同时可供合作厂商、科研机构及爱好者在龙芯平台上研发其品牌软件或专用系统.
+-	[linux kernel](https://github.com/torvalds/linux.git) : Linux 开源操作系统      
+-	[Loongnix](https://www.loongnix.cn/zh/loongnix/) : Loongnix操作系统是龙芯开源社区推出的Linux操作系统，      
+    作为龙芯软件生态建设的成果验证和展示环境，集成了内核、工具链、龙芯浏览器、Java虚拟机、音视频库、图形环境、      
+    云计算、打印驱动等操作系统基础设施方面的最新研发成果，可直接应用于日常办公、生产、生活等应用环境，同时可供合作厂商、      
+    科研机构及爱好者在龙芯平台上研发其品牌软件或专用系统.
 -	[UOS](https://www.chinauos.com/resource/download-education) : 统信UOS系统是一款基于Linux内核的国产操作系统，上手难度低，界面美观，操作简单。
 -	[Deepin](https://www.deepin.org/index/en) : 基于 Linux 的开源国产操作系统。
 -	[AOSC OS](https://aosc.io/aosc-os) : 安同 OS（英译：AOSC OS）是一款以“简明可靠”为设计及维护目标的 Linux 发行版。
