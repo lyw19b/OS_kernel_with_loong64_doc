@@ -338,9 +338,51 @@ Relocation section '.rela.plt' at offset 0x540 contains 3 entries:
 |70 | R_LARCH_ABS64_HI12 | [63:52] bits of 64-bit absolute address, <br> ``%abs64_hi12(symbol)`` |(\*(uint32_t \*) PC)[21:10] = (S+A) [63:52]
 |71 | R_LARCH_PCALA_HI20 | [31:12] bits of 32/64-bit PC-relative offset, <br> ``%pc_hi20(symbol)`` |(\*(uint32_t \*) PC)[24:5] = <br>(((S+A+0x800) & ~0xfff) - (PC & ~0xfff)) [31:12]|
 |72 | R_LARCH_PCALA_LO12 | [11:0] bits of 32/64-bit address, <br> ``%pc_lo12(symbol)`` | (\*(uint32_t \*) PC)[21:10] = (S+A)[11:0]
+|73 | R_LARCH_PCALA64_LO20    | [51:32] bits of 64-bit PC-relative offset, <br> ``%pc64_lo20(symbol)`` |(\*(uint32_t \*) PC) [24:5] = <br>(((S+A+0x8000'0000 + (((S+A) & 0x800) ? <br>(0x1000-0x1'0000'0000) : 0)) <br>& ~0xfff) - (PC-8 & ~0xfff))[51:32]|
+|74 | R_LARCH_PCALA64_HI12 | [63:52] bits of 64-bit PC-relative offset, <br>``%pc64_hi12(symbol)`` |(\*(uint32_t \*) PC) [21:10] = <br>(((S+A+0x8000'0000 + (((S+A) & 0x800) ? <br>(0x1000-0x1'0000'0000) : 0)) & ~0xfff) <br>- (PC-12 & ~0xfff))[63:52]|
+|75 | R_LARCH_GOT_PC_HI20 | [31:12] bits of 32/64-bit PC- relative offset to GOT entry, <br>``%got_pc_hi20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = <br>(((GOT+G) & ~0xfff) - (PC & ~0xfff)) [31:12]|
+|76 | R_LARCH_GOT_PC_LO12 | [11:0] bits of 32/64-bit GOT entry address,<br>``%got_pc_lo12(symbol)`` | (\*(uint32_t \*) PC) [21:10] = (GOT+G) [11:0]|
+|77 | R_LARCH_GOT64_PC_LO20 | [51:32] bits of 64-bit PC-relative offset to GOT entry,<br>``%got64_pc_hi20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = <br> (((GOT+G+0x8000'0000 + (((GOT+G) & 0x800)<br> ? (0x1000-0x1'0000'0000) : 0)) & ~0xfff) <br>- (PC-8 & ~0xfff))[51:32]|
+|78 | R_LARCH_GOT64_PC_HI12 | [63:52] bits of 64-bit PC-relative offset to GOT entry,<br>``%got64_pc_hi12(symbol)`` | (\*(uint32_t \*) PC) [21:10] = <br> (((GOT+G+0x8000'0000 + (((GOT+G) & 0x800) <br>? (0x1000-0x1'0000'0000) : 0)) & ~0xfff) <br>- (PC-12 & ~0xfff)) [63:52]|
+|79 | R_LARCH_GOT_HI20 | [31:12] bits of 32/64-bit GOT entry absolute address, <br>``%got_hi20(symbol)`` |(\*(uint32_t \*) PC) [24:5] = (GOT+G) [31:12] |
+|80 | R_LARCH_GOT_LO12 | [11:0] bits of 32/64-bit GOT entry absolute address,<br>``%got_lo12(symbol)`` | (\*(uint32_t \*) PC) [21:10] = (GOT+G) [11:0]|
+|81 | R_LARCH_GOT64_LO20 | [51:32] bits of 64-bit GOT entry absolute address,<br>``%got64_lo20(symbol)`` |(\*(uint32_t \*) PC) [24:5] = (GOT+G) [51:32]|
+|82 | R_LARCH_GOT64_HI12 | [63:52] bits of 64-bit GOT entry absolute address,<br>``%got64_hi12(symbol)`` |(\*(uint32_t \*) PC) [21:10] = (GOT+G) [63:52]|
+|83 | R_LARCH_TLS_LE_HI20 | [31:12] bits of TLS LE 32/64-bit offset from TP register,<br>``%le_hi20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = T [31:12]|
+|84 | R_LARCH_TLS_LE_LO12 | [11:0] bits of TLS LE 32/64-bit offset from TP register,<br>``%le_lo12(symbol)``|(\*(uint32_t \*) PC) [21:10] = T [11:0]|
+|85 | R_LARCH_TLS_LE64_LO20 | [51:32] bits of TLS LE 64-bit offset from TP register,<br>``%le64_lo20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = T [51:32]|
+|86 | R_LARCH_TLS_LE64_HI12 | [63:52] bits of TLS LE 64-bit offset from TP register,<br>``%le64_hi12(symbol)`` | (\*(uint32_t \*) PC) [21:10] = T [63:52]|
+|87 | R_LARCH_TLS_IE_PC_HI20 | [31:12] bits of 32/64-bit PC-relative offset to TLS IE <br>GOT entry, ``%ie_pc_hi20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = (((GOT+IE) & ~0xfff) <br>- (PC & ~0xfff)) [31:12]|
+|88 | R_LARCH_TLS_IE_PC_LO12 | [11:0] bits of 32/64-bit TLS IE GOT entry address,<br>``%ie_pc_lo12(symbol)``| (\*(uint32_t \*) PC) [21:10] = (GOT+IE) [11:0]|
+|89 | R_LARCH_TLS_IE64_PC_LO20 | [51:32] bits of 64-bit PC-relative offset to TLS IE GOT<br> entry, ``%ie64_pc_lo20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = <br>(((GOT+IE+0x8000'0000 +(((GOT+IE) & 0x800) <br>? (0x1000-0x1'0000'0000) : 0))<br>& ~0xfff) - (PC-8 & ~0xfff))[51:32]|
+|90 | R_LARCH_TLS_IE64_PC_HI12 | [63:52] bits of 64-bit PC-relative offset to TLS IE GOT<br>entry, ``%ie64_pc_hi12(symbol)``| (\*(uint32_t \*) PC) [21:10] = <br>(((GOT+IE+0x8000'0000+ (((GOT+IE) & 0x800) <br>? (0x1000-0x1'0000'0000) : 0)) & ~0xfff) <br>- (PC-12 &~0xfff)) [63:52]|
+|91 | R_LARCH_TLS_IE_HI20 | [31:12] bits of 32/64-bit TLS IE GOT entry absolute address,<br> ``%ie_hi20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = (GOT+IE) [31:12]|
+|92 | R_LARCH_TLS_IE_LO12 | [11:0] bits of 32/64-bit TLS IE GOT entry absolute address,<br> ``%ie_lo12(symbol)`` | (\*(uint32_t \*) PC) [21:10] = (GOT+IE) [11:0]|
+|93 | R_LARCH_TLS_IE64_LO20 | [51:32] bits of 64-bit TLS IE GOT entry absolute address,<br>``%ie64_lo20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = (GOT+IE) [51:32] |
+|94 | R_LARCH_TLS_IE64_HI12 | [63:52] bits of 64-bit TLS IE GOT entry absolute address,<br>``%ie64_hi12(symbol)`` | (\*(uint32_t \*) PC) [21:10] = (GOT+IE) [63:52]|
+|95 | R_LARCH_TLS_LD_PC_HI20 | [31:12] bits of 32/64-bit PC-relative offset to TLS LD GOT<br> entry, ``%ld_pc_hi20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = <br>(((GOT+GD) & ~0xfff) - (PC & ~0xfff)) [31:12]|
+|96 | R_LARCH_TLS_LD_HI20 | [31:12] bits of 32/64-bit TLS LD GOT entry absolute address, <br> ``%ld_hi20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = (GOT+GD) [31:12]|
+|97 | R_LARCH_TLS_GD_PC_HI20 | [31:12] bits of 32/64-bit PC-relative offset to TLS GD GOT<br>entry, ``%gd_pc_hi20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = <br>(((GOT+GD) & ~0xfff) - (PC & ~0xfff)) [31:12]|
+|98 | R_LARCH_TLS_GD_HI20 | [31:12] bits of 32/64-bit TLS GD GOT entry absolute address,<br> ``%gd_hi20(symbol)`` | (\*(uint32_t \*) PC) [24:5] = (GOT+GD) [31:12]|
+|99 | R_LARCH_32_PCREL | 32-bit PC relative | (\*(uint32_t \*) PC) = (S+A-PC) [31:0]|
+|100| R_LARCH_RELAX | Instruction can be relaxed, <br>paired with a normal <br>relocation at the same address ||
 
 
-
+上述描述中，符号的意义如下表所示：
+|变量|描述|
+|-|-|
+|RtAddr | Runtime address of the symbol in the relocation entry |
+|PC | The address of the instruction to be relocated|
+|B  | Base address of an object loaded into the memory|
+|S  | The address of the symbol in the relocation entry|
+|A  | Addend field in the relocation entry associated with the symbol|
+|GOT| The address of GOT (Global Offset Table)|
+|G  | GOT-relative offset of the GOT entry of a symbol. For tls LD/GD symbols, <br> G is always equal to GD.|
+|T  | TP-relative offset of a TLS LE/IE symbols|
+|IE | GOT-relative offset of the GOT entry of a TLS IE symbol|
+|GD | GOT-relative offset of the GOT entry of a TLS LD/GD/DESC symbol. If a symbol is <br> referenced by IE, GD/LD and DESC simultaneously, this symbol has five GOT entries.  <br> The first two are for GD/LD; the next two are for DESC; the last one is for IE.|
+|PLT| The address of PLT entry of a function symbol|
+|R(S) | The target (it may be a symbol, a GOT entry for a symbol) of an <br>R_LARCH_*_PCADD_HI20 relocation filling the immediate slot for a pcaddu12i <br>instruction at S|
 
 
 
