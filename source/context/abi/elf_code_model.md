@@ -121,10 +121,10 @@ bash> loongarch64-linux-gnu-objdump -ald hello
 我们反汇编上面的C代码，结果如下：
 
 ```
-  3c:	1a000004 	pcalau12i   	$a0, 0
-  40:	02c00084 	addi.d      	$a0, $a0, 0
-  44:	1e000001 	pcaddu18i   	$ra, 0
-  48:	4c000021 	jirl        	$ra, $ra, 0   # 跳转到printf函数
+   120000740:	1a000004 	pcalau12i   	$a0, 0
+   120000744:	02dda084 	addi.d      	$a0, $a0, 1896
+   120000748:	1e000001 	pcaddu18i   	$ra, 0
+   12000074c:	4ffdb821 	jirl        	$ra, $ra, -584    # 跳转到printf函数
 ```
 
 

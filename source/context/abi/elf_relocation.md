@@ -192,6 +192,9 @@ DSO（Dynamic Shared Object）是Linux/Unix系统中动态链接的共享库文�
 
 我们下面一一介绍这些类型。
 
+
+(reloc_type_dynamic)=
+
 - **R_LARCH_32 类型**
 
 使用``readelf -r main``可以得到下面的信息：
